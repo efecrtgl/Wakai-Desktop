@@ -7,6 +7,11 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 ### Eklendi
 - Görünüm modları: Wakai (özgün), Siyah ve Beyaz.
 - Yazı tipi seçimi (Windows 11 ile gelen yazı tipleri) ve tutarlı yazı ölçeği.
+- Alışveriş Kedisi: miktar ayrıştırmalı alışveriş listesi.
+
+### Değişti
+- Takvim Kedisi yeniden tasarlandı (okunaklı başlık, Bugün kısayolu, klavye gezinmesi, renk çubuklu etkinlikler, kompakt düzen).
+- Widget'lar kendi boyutlarına göre sadeleşir.
 
 ## [1.0.0] — 2026-11-24
 

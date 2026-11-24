@@ -28,3 +28,5 @@ pub const FOCUS_CHANGED: &str = "focus:changed";
 pub const SYSTEM_STATS: &str = "system:stats";
 /// Yük: `MediaState`.
 pub const MEDIA_CHANGED: &str = "media:changed";
+/// Yük: değişen alışveriş listesinin kimliği.
+pub const SHOPPING_CHANGED: &str = "shopping:changed";

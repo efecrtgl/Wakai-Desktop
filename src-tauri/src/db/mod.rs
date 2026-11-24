@@ -5,6 +5,7 @@ pub mod events;
 pub mod migrations;
 pub mod notes;
 pub mod settings;
+pub mod shopping;
 pub mod tasks;
 pub mod widgets;
 

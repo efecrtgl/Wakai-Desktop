@@ -153,6 +153,23 @@ pub static DEFINITIONS: &[WidgetDefinition] = &[
         default_config: || json!({ "note_id": null, "font_size": 14 }),
     },
     WidgetDefinition {
+        kind: "shopping",
+        name: "Alışveriş Kedisi",
+        description: "Alışveriş listesi: madde ve miktar ekleme, sepete atma, düzenleme.",
+        category: Category::Productivity,
+        default_size: size(280, 320),
+        min_size: size(200, 200),
+        multi_instance: true,
+        interactions: &[
+            "madde ekle/düzenle/sil",
+            "sepete at",
+            "sürükle",
+            "boyutlandır",
+        ],
+        cat: "happy",
+        default_config: || json!({ "list_id": null, "show_checked": true }),
+    },
+    WidgetDefinition {
         kind: "clock",
         name: "Saat Kedisi",
         description: "Dijital ya da analog saat, tarih ve ek saat dilimleri.",

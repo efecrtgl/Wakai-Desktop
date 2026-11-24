@@ -115,3 +115,15 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
+
+/* Küçük boyut düzeni */
+@container (max-height: 220px) {
+  .wx__days {
+    display: none;
+  }
+}
+@container (max-width: 270px) {
+  .wx__facts {
+    display: none;
+  }
+}

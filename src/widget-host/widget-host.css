@@ -32,10 +32,12 @@ body.widget-body {
   }
 }
 
+/* Widget'lar kendi boyutlarına göre düzen değiştirebilsin diye kapsayıcı sorgu kökü. */
 .widget-content {
   position: relative;
   flex: 1;
   min-height: 0;
+  container-type: size;
   padding: var(--space-3) var(--space-4) var(--space-4);
 }
 
@@ -116,4 +118,9 @@ body.widget-body {
 .widget-unsupported {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+}
+
+/* Klavye ile çalışılan widget belirgin olsun (yazarken nerede olduğunu görmek için). */
+.widget-frame:focus-within {
+  border-color: var(--color-border-strong);
 }

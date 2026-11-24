@@ -18,3 +18,11 @@ Her aşamanın sonunda ne yapıldığı, nasıl doğrulandığı ve commit bilgi
 - Yazı tipi seçimi: Varsayılan (Segoe UI Variable), Modern (Bahnschrift), Daktilo (Cascadia). Hepsi Windows 11'de yüklü; uygulama boyutu değişmedi.
 - Yeni ortak bileşenler: `Dialog`, `Loading`, `Tooltip`.
 - Doğrulama: üç modda Kontrol Merkezi ve widget ekran görüntüleri incelendi; ayar testi (geçersiz görünüm değeri reddedilir) eklendi.
+
+## Aşama 2 — Widget yenilemesi
+
+- **Takvim Kedisi yeniden tasarlandı:** ay/yıl başlığı, yalnızca başka bir güne/aya geçildiğinde görünen "Bugün" kısayolu, yuvarlak köşeli gün hücreleri (bugün: yumuşak vurgu, seçili: dolu), ok tuşlarıyla gün gezinme, renk çubuklu etkinlik satırları ve etkinlik sayısı rozeti, boş gün için "eklemek için dokun". Veriler ve işlevler aynı.
+- **Alışveriş Kedisi (yeni):** göç 003 (`shopping_lists`, `shopping_items`), 10 komut, `shopping:changed` olayı. "2 kg elma" gibi girdiden miktar ayrıştırma, sepete atma, çift tıkla düzenleme, silme, sepeti temizleme, boş durum, son madde sepete girince kutlama. Widget bir listeye bağlıdır; widget silinince liste kalır.
+- **Kapsayıcı sorguları:** widget içeriği kendi boyutuna göre sadeleşir (Takvim, Görev, Hava Durumu, Sistem, Müzik, Alışveriş).
+- `WidgetIconButton` verilen `className`'i temel sınıfın yerine koyuyordu; birleştirilecek şekilde düzeltildi.
+- Doğrulama: 2 yeni Rust testi (liste yaşam döngüsü, doğrulama ve kademeli silme), 2 yeni ön yüz testi (miktar ayrıştırma); widget'lar gerçek uygulamada ekran görüntüsüyle incelendi (Takvim tam ve kompakt boyut, Alışveriş). Test widget'ı ve örnek liste sonra kaldırıldı.

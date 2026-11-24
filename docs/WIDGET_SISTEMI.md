@@ -73,6 +73,7 @@ Pencere oluşturan veya taşıyan komutlar `async` tanımlıdır ve işi `state:
 | `calendar` | Takvim Kedisi | Evet | Pazartesiyle başlayan Türkçe ay görünümü, bugün vurgusu, hafta sonu rengi, etkinlik noktaları, hızlı ekleme/düzenleme, yaklaşanlar. |
 | `tasks` | Görev Kedisi | Evet | Hızlı ekleme, öncelik/son tarih/kategori/hatırlatıcı, gecikme vurgusu, ilerleme çubuğu, tamamlama kutlaması, kategori filtresi. |
 | `note` | Not Kedisi | Evet | Her örnek bir nota bağlı; 600 ms gecikmeli otomatik kayıt; sabitleme; renk; basit biçimlendirme. |
+| `shopping` | Alışveriş Kedisi | Evet | Bir alışveriş listesine bağlı (`config.list_id`); "2 kg elma" gibi girdiden miktar ayrıştırma, sepete atma, düzenleme, sepeti temizleme. |
 | `clock` | Saat Kedisi | Evet | Dijital/analog, saniye ayarı, 12/24 saat, tarih, ek saat dilimleri. Güncelleme saniye/dakika sınırına hizalı. |
 | `focus` | Odak Kedisi | Hayır | Rust'taki zamanlayıcının bitiş anına göre kalan süre; yalnızca çalışırken saniyede bir çizim. |
 | `weather` | Hava Durumu Kedisi | Evet | Konum arama (Türkçe sonuçlar), anlık durum, 5 günlük tahmin, önbellek ve çevrim dışı gösterim. Sağlayıcı arayüzü: `WeatherProvider`. |

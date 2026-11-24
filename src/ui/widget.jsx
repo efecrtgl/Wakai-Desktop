@@ -32,9 +32,9 @@ export function ColorDot({ color, size = 8 }) {
 }
 
 /** Widget içi küçük simge düğmesi. */
-export function WidgetIconButton({ label, children, ...rest }) {
+export function WidgetIconButton({ label, children, className = '', ...rest }) {
   return (
-    <button type="button" className="wg-icon-btn" aria-label={label} title={label} {...rest}>
+    <button type="button" className={`wg-icon-btn ${className}`} aria-label={label} title={label} {...rest}>
       {children}
     </button>
   );

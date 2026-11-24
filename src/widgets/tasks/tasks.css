@@ -125,3 +125,15 @@
 .tone-pink {
   background: var(--color-primary-strong);
 }
+
+/* Küçük boyut düzeni */
+@container (max-width: 260px) {
+  .task__cat {
+    display: none;
+  }
+}
+@container (max-height: 230px) {
+  .tasks .wg-progress {
+    display: none;
+  }
+}

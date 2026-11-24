@@ -85,3 +85,10 @@
 .music__btn--main:hover:not(:disabled) {
   background: var(--color-primary-strong);
 }
+
+/* Küçük boyut düzeni */
+@container (max-width: 250px) {
+  .music__art {
+    display: none;
+  }
+}
