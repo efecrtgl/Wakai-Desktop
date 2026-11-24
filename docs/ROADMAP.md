@@ -1,0 +1,22 @@
+# Yol Haritası
+
+| Aşama | Kapsam | Durum |
+|---|---|---|
+| 0 | Depo incelemesi, ortam doğrulama, mimari ve plan | ✅ Tamamlandı |
+| 1 | Proje temeli: Tauri 2 + React (JS), SQLite ve göçler, tasarım sistemi başlangıcı, uygulama kabuğu | ⏳ |
+| 2 | Yerel Windows masaüstü motoru (Progman/WorkerW, z-sırası, Explorer kurtarma, monitörler) | ⏳ |
+| 3 | Widget çalışma zamanı (kayıt defteri, örnekler, yaşam döngüsü, sürükleme, boyutlandırma, kalıcılık) | ⏳ |
+| 4 | Pastel piksel kedi tasarım sistemi | ⏳ |
+| 5 | Temel widget'lar: Takvim, Görev, Not, Saat, Odak Kedisi | ⏳ |
+| 6 | Gelişmiş widget'lar: Hava Durumu, Müzik, Sistem Kedisi | ⏳ |
+| 7 | Kontrol Merkezi | ⏳ |
+| 8 | Sistem tepsisi, başlangıç, tek örnek, kurtarma, çoklu monitör | ⏳ |
+| 9 | Performans ölçümü ve iyileştirme | ⏳ |
+| 10 | Testler ve güvenilirlik | ⏳ |
+| 11 | Üretim hazırlığı ve yükleyici | ⏳ |
+
+## İlk Sürüm Sonrası (planlanan, uygulanmadı)
+
+- Ek temalar (tasarım sistemi buna uygun yapılandırılmıştır).
+- Güvenli bir eklenti modeli araştırması (ilk sürümde üçüncü taraf kodu çalıştırılmaz).
+- Widget'lar için ek dil desteği.
