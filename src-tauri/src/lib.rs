@@ -16,11 +16,13 @@ mod monitor;
 pub mod pets;
 mod procstats;
 mod profiles;
+mod recovery;
 mod scheduler;
 pub mod settings;
 mod state;
 mod subscriptions;
 mod tray;
+mod updater;
 mod validate;
 mod weather;
 mod widgets;
@@ -38,6 +40,7 @@ pub fn run() {
             Some(vec!["--autostart"]),
         ))
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
@@ -83,6 +86,8 @@ pub fn run() {
             let engine = pets::engine::PetEngine::default();
             engine.start(app.handle().clone(), pets::engine_settings(&initial));
             app.manage(engine);
+            app.manage(updater::UpdateState::default());
+            updater::spawn_startup_check(app.handle());
             app.manage(profiles::AutoGaming::default());
             profiles::sync_auto_gaming(app.handle(), initial.auto_gaming_profile);
             if let Some(q) = quarantined {
@@ -197,6 +202,10 @@ pub fn run() {
             commands::pets::delete_home_item,
             commands::pets::get_home_style,
             commands::pets::set_home_style,
+            commands::updates::check_for_updates,
+            commands::updates::update_status,
+            commands::updates::install_update,
+            commands::updates::verify_update,
             commands::services::subscribe,
             commands::services::unsubscribe,
             commands::services::system_stats,

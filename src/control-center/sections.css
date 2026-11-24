@@ -672,3 +672,33 @@
 .prof-card__foot {
   padding: 0 var(--space-4) var(--space-3);
 }
+
+/* Güncelleme penceresi */
+.upd-notes {
+  max-height: 180px;
+  overflow: auto;
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken);
+  white-space: pre-wrap;
+  font-size: var(--text-sm);
+}
+.upd-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+}
+.upd-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+.upd-bar__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+  transition: width 200ms ease;
+}

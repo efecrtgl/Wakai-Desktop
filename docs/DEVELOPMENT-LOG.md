@@ -66,3 +66,14 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - İsteğe bağlı **otomatik Oyun profili**: tam ekran uygulama algılanınca geçer, çıkınca önceki profile döner. Varsayılan kapalı; açıkken 3 sn'de bir hafif kontrol yapan iş parçacığı çalışır, kapatılınca biter.
 - Doğrulama: 3 yeni Rust testi. Gerçek uygulamada Odaklanma ve Dinlenme uygulandı: görünürlük kuralları doğru, tüm widget konumları üç durumda da aynı. Test sonrası kullanıcının önceki widget görünürlüğü ve ayarları geri yüklendi.
 - Elle doğrulanacaklar: tepsi profil menüsü tıklaması; otomatik geçişin gerçek bir tam ekran oyunla denenmesi.
+
+## Aşama 9 — İmzalı otomatik güncellemeler
+
+- Resmi `tauri-plugin-updater` (2.14.1); NSIS yükleyicisi için `createUpdaterArtifacts`, `installMode: passive`. Uç nokta: GitHub Releases `latest/download/latest.json`.
+- İmzalama anahtarı depo dışında üretildi (`~/.tauri/wakai-desktop-updater.key`); depoda yalnızca genel anahtar var. Depoda anahtar dosyası olmadığı doğrulandı.
+- `src-tauri/src/updater.rs`: açılıştan 20 sn sonra, en fazla 20 saatte bir, kendi iş parçacığında denetim (ayar `auto_update_check`, varsayılan açık); `update:available` olayı + bildirim; indirme ilerlemesi `update:progress` (≈256 KB'de bir); imza doğrulandıktan **sonra** kurulum öncesi hazırlık (konumlar + kediler kaydedilir, veritabanı yedeği, çalışan exe `previous/<sürüm>/` altına saklanır). Başarısız indirme hiçbir iz bırakmaz; bekleyen güncelleme yeniden denenebilir.
+- Kontrol Merkezi: "Yeni bir sürüm hazır!" penceresi (Güncellemeyi İndir / Daha Sonra, notlar, ilerleme çubuğu), Ayarlar → Güncellemeler kartı (otomatik denetim, elle denetim, son denetim).
+- `.github/workflows/release.yml` (etiketle imzalı sürüm, `latest.json`; gizli yoksa durur) ve `ci.yml` (lint, test, build, fmt, clippy `-D warnings`, cargo test).
+- Doğrulama: yerel HTTP sunucusu + hata ayıklama derlemesi; geçerli imza kabul edildi, değiştirilmiş dosya reddedildi, eski sürüm "güncelleme yok", erişilemeyen sunucu anlaşılır hata verdi. Birincil kuruluma güncelleme kurulmadı. Ayrıntılar: `docs/GUNCELLEMELER.md`.
+- **Sahip eylemi:** `TAURI_SIGNING_PRIVATE_KEY` GitHub gizlisini eklemek. 1.0.0 kullanıcıları 1.1.0'ı bir kez elle kurmalı.
+- Gözlem: test sırasında Kontrol Merkezi tüm widget'ları gizli gösterdi (veriye dokunulmadı; kullanıcı bilgilendirilecek).

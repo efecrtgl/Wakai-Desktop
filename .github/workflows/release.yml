@@ -1,0 +1,67 @@
+# Wakai Desktop sürüm derlemesi: v* etiketi itildiğinde imzalı NSIS yükleyicisi,
+# .sig imza dosyası ve güncelleyici bildirimi (latest.json) bir GitHub Release'e yüklenir.
+#
+# Gerekli depo gizlileri (Settings → Secrets and variables → Actions):
+#   TAURI_SIGNING_PRIVATE_KEY           — güncelleme imzalama özel anahtarının içeriği
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  — anahtarın parolası (parolasızsa boş bırakılabilir)
+# Özel anahtar asla depoya eklenmez ve günlüklere yazılmaz.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: |
+          npm run lint
+          npm test
+          cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Check signing key
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::TAURI_SIGNING_PRIVATE_KEY secret is missing. See docs/GUNCELLEMELER.md."
+            exit 1
+          fi
+
+      - name: Build and publish release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Wakai Desktop ${{ github.ref_name }}'
+          releaseBody: 'Değişiklikler için CHANGELOG.md dosyasına bakın.'
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          args: --bundles nsis

@@ -5,6 +5,55 @@ import { bytes } from '../../lib/format.js';
 import { tr } from '../../lib/i18n.js';
 import { PageHeader } from './PageHeader.jsx';
 
+function Updates({ settings, update }) {
+  const [status, setStatus] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState(null);
+  const [error, setError] = useState(null);
+
+  const reload = useCallback(() => call('update_status').then(setStatus, (e) => setError(e.message)), []);
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const check = async () => {
+    setBusy(true);
+    setError(null);
+    setNote(null);
+    try {
+      const found = await call('check_for_updates');
+      setNote(found ? `Wakai Desktop ${found.version} yüklenebilir.` : 'Wakai Desktop güncel.');
+      await reload();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const last = status?.last_check ? new Date(status.last_check).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }) : 'Henüz denetlenmedi';
+
+  return (
+    <Card title="Güncellemeler" action={<Button size="sm" onClick={check} disabled={busy}>{busy ? 'Denetleniyor…' : 'Güncellemeleri denetle'}</Button>}>
+      <Toggle
+        label="Güncellemeleri otomatik denetle"
+        description="Açılıştan kısa süre sonra, en fazla günde bir kez arka planda denetlenir. Güncelleme sizin onayınız olmadan asla kurulmaz."
+        checked={settings.auto_update_check}
+        onChange={(v) => update({ auto_update_check: v })}
+      />
+      <dl className="cc-dl">
+        <dt>Şu anki sürüm</dt>
+        <dd>{status?.current ?? '—'}</dd>
+        <dt>Son denetim</dt>
+        <dd>{last}</dd>
+      </dl>
+      {note ? <p className="cc-note">{note}</p> : null}
+      <ErrorNote error={error} />
+      <p className="cc-muted">Güncellemeler GitHub Releases üzerinden indirilir ve kurulmadan önce dijital imzaları doğrulanır.</p>
+    </Card>
+  );
+}
+
 function Backups() {
   const [list, setList] = useState(null);
   const [error, setError] = useState(null);
@@ -82,6 +131,7 @@ export function SettingsSection({ settingsApi }) {
         <Toggle label={tr.settings.closeToTray} description={tr.settings.closeToTrayDesc} checked={settings.close_to_tray} onChange={(v) => update({ close_to_tray: v })} />
         <Toggle label={tr.settings.launchOnStartup} description={tr.settings.launchOnStartupDesc} checked={settings.launch_on_startup} onChange={(v) => update({ launch_on_startup: v })} />
       </Card>
+      <Updates settings={settings} update={update} />
       <Backups />
       <Card title="Hakkında">
         <dl className="cc-dl">
@@ -94,7 +144,7 @@ export function SettingsSection({ settingsApi }) {
           <dt>Hava durumu verisi</dt>
           <dd>Open-Meteo (open-meteo.com, CC BY 4.0)</dd>
         </dl>
-        <p className="cc-muted">Wakai Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. Yalnızca Hava Durumu Kedisi internete bağlanır.</p>
+        <p className="cc-muted">Wakai Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. İnternete yalnızca Hava Durumu Kedisi ve güncelleme denetimi bağlanır.</p>
       </Card>
     </div>
   );

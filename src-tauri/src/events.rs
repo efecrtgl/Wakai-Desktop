@@ -34,3 +34,7 @@ pub const SHOPPING_CHANGED: &str = "shopping:changed";
 pub const PETS_CHANGED: &str = "pets:changed";
 /// Profiller ya da etkin profil değişti.
 pub const PROFILES_CHANGED: &str = "profiles:changed";
+/// Yeni sürüm bulundu. Yük: `UpdateInfo`.
+pub const UPDATE_AVAILABLE: &str = "update:available";
+/// Güncelleme indirme ilerlemesi. Yük: `{ downloaded, total }` ya da `{ installing: true }`.
+pub const UPDATE_PROGRESS: &str = "update:progress";

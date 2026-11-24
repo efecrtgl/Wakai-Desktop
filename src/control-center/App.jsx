@@ -4,6 +4,7 @@ import { SECTIONS } from './sections/index.js';
 import { useSettings } from '../lib/settings.js';
 import { useMotionAttribute } from '../lib/motion.js';
 import { useTauriEvent } from '../lib/ipc.js';
+import { UpdateDialog } from './UpdateDialog.jsx';
 
 export default function App() {
   const [active, setActive] = useState(SECTIONS[0].id);
@@ -26,6 +27,7 @@ export default function App() {
       <main className="cc__main">
         <View settingsApi={settingsApi} onNavigate={setActive} focusWidget={focusWidget} />
       </main>
+      <UpdateDialog />
     </div>
   );
 }

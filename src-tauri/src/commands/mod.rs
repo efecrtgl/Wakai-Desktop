@@ -8,4 +8,5 @@ pub mod profiles;
 pub mod services;
 pub mod settings;
 pub mod shopping;
+pub mod updates;
 pub mod widgets;

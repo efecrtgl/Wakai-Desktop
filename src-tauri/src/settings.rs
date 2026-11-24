@@ -54,6 +54,8 @@ pub struct AppSettings {
     pub active_profile: Option<i64>,
     /// Tam ekran uygulama algılanınca "Oyun" profiline otomatik geç.
     pub auto_gaming_profile: bool,
+    /// Açılışta (en fazla günde bir) güncellemeleri arka planda denetle.
+    pub auto_update_check: bool,
     pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
@@ -90,6 +92,7 @@ impl Default for AppSettings {
             pets_hide_fullscreen: true,
             active_profile: None,
             auto_gaming_profile: false,
+            auto_update_check: true,
             font_family: FontFamily::System,
             close_to_tray: true,
             launch_on_startup: false,

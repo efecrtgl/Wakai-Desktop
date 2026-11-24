@@ -16,6 +16,7 @@ tauri = { version = "2.12.7", features = ["tray-icon"] }
 tauri-plugin-autostart = "2.7.0"
 tauri-plugin-notification = "2.8.1"
 tauri-plugin-single-instance = "2.5.5"
+tauri-plugin-updater = "2.14.1"
 thiserror = "2.0.21"
 
 [build-dependencies]
