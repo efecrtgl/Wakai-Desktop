@@ -5,7 +5,7 @@ import { WidgetsSection } from './Widgets.jsx';
 import { SettingsSection } from './Settings.jsx';
 
 export const SECTIONS = [
-  { id: 'overview', label: tr.nav.overview, icon: '🏠', component: Overview },
-  { id: 'widgets', label: tr.nav.widgets, icon: '🧩', component: WidgetsSection },
-  { id: 'settings', label: tr.nav.settings, icon: '⚙️', component: SettingsSection },
+  { id: 'overview', label: tr.nav.overview, icon: 'home', component: Overview },
+  { id: 'widgets', label: tr.nav.widgets, icon: 'widgets', component: WidgetsSection },
+  { id: 'settings', label: tr.nav.settings, icon: 'gear', component: SettingsSection },
 ];

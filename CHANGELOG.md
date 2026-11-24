@@ -20,4 +20,6 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Widget çerçevesi: sürükleme, boyutlandırma ve sağ tık menüsü.
 - Kontrol Merkezi'nde "Widget'larım" bölümü.
 - Saat Kedisi (ilk sürüm: dijital saat ve tarih).
+- Özgün piksel kedi ailesi: oturan, mutlu, meraklı, rahat, çalışan, uyuyan kedi ve yüz; göz kırpma, kuyruk sallama, Zz ve kutlama animasyonları.
+- Piksel simge seti ve widget görsel yapı taşları.
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

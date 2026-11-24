@@ -48,3 +48,28 @@ Wakai-Desktop/
 2. Girdiyi doğrulayın; hatalar `AppError::invalid("Türkçe mesaj")` ile döndürülür.
 3. `lib.rs` içindeki `generate_handler!` listesine ekleyin.
 4. Ön yüzde `call('komut_adi', { ... })` ile çağırın.
+
+## Tasarım sistemi
+
+| Dosya | İçerik |
+|---|---|
+| `src/ui/tokens.css` | Tüm renk, tipografi, boşluk, köşe, gölge ve hareket belirteçleri. Yeni tema = aynı değişkenlerin `:root[data-theme]` altında yeniden tanımlanması. |
+| `src/ui/components.jsx` | Düğme, kart, anahtar, kaydırıcı, seçim, alan, rozet, boş durum, hata notu. |
+| `src/ui/widget.jsx` | Widget yapı taşları: başlık (kediyle), ilerleme çubuğu, renk noktası, simge düğmesi. |
+| `src/ui/PixelIcon.jsx` | 12×12 tek renkli piksel simgeler (`currentColor`). |
+| `src/ui/cats/` | Özgün piksel kedi sprite'ları ve `PixelCat` bileşeni. |
+
+### Piksel kediler
+
+Pozlar: `face`, `sitting`, `happy`, `curious`, `relaxed`, `working`, `sleeping`. Her sprite 16×16 katmanlardan oluşur (`base`, `blink`, `tailA`/`tailB`, `zz`, `sparkle`, `question`). Renkler `--cat-*` belirteçlerinden gelir. Önizleme:
+
+```powershell
+node scripts/preview-sprites.mjs sprites.png base,tailA,zz
+```
+
+### Animasyon kuralları
+
+- Yalnızca `opacity` ve `transform` canlandırılır; `steps()` ile düşük kare hızı kullanılır.
+- Göz kırpma ~6 saniyede bir ve her kedide farklı gecikmeyle; kuyruk yalnızca üzerine gelince sallanır.
+- Kutlama (`useCelebration`) tek seferliktir.
+- `<html data-motion="full|reduced|off">` uygulama ayarlarından gelir; `reduced`/`off` ve işletim sisteminin “hareketi azalt” tercihi tüm animasyonları durdurur.
