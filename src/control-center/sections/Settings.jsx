@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, ErrorNote, Toggle } from '../../ui/components.jsx';
+import { Button, Card, Dialog, ErrorNote, Toggle } from '../../ui/components.jsx';
 import { call } from '../../lib/ipc.js';
 import { bytes } from '../../lib/format.js';
 import { tr } from '../../lib/i18n.js';
 import { PageHeader } from './PageHeader.jsx';
+import { RELEASE_NOTES } from '../../lib/releaseNotes.js';
 
 function Updates({ settings, update }) {
   const [status, setStatus] = useState(null);
@@ -50,6 +51,83 @@ function Updates({ settings, update }) {
       {note ? <p className="cc-note">{note}</p> : null}
       <ErrorNote error={error} />
       <p className="cc-muted">Güncellemeler GitHub Releases üzerinden indirilir ve kurulmadan önce dijital imzaları doğrulanır.</p>
+    </Card>
+  );
+}
+
+const fmtDate = (ms) => new Date(ms).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+function VersionHistory() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    call('version_history').then(setData, (e) => setError(e.message));
+  }, []);
+
+  const rollback = async () => {
+    setBusy(true);
+    try {
+      await call('rollback_to_version', { version: confirm });
+    } catch (e) {
+      setError(e.message);
+      setBusy(false);
+      setConfirm(null);
+    }
+  };
+
+  const notes = data ? RELEASE_NOTES[data.current] : null;
+
+  return (
+    <Card title="Sürüm geçmişi">
+      <ErrorNote error={error} />
+      {notes ? (
+        <div className="ver-notes">
+          <strong>{data.current} yenilikleri — {notes.title}</strong>
+          <ul>
+            {notes.items.map((t) => <li key={t}>{t}</li>)}
+          </ul>
+        </div>
+      ) : null}
+      {data?.history?.length ? (
+        <dl className="cc-dl">
+          {data.history.map((h) => (
+            <div key={h.version} className="ver-row">
+              <dt>{h.version}{h.version === data.current ? ' (şu anki)' : ''}</dt>
+              <dd>{fmtDate(h.first_seen)} tarihinden beri · {h.launches} açılış</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {data?.previous?.length ? (
+        <>
+          <p className="cc-muted">Güncellemeden önce saklanan sürümler. Yeni sürümde sorun yaşarsanız önceki sürüme dönebilirsiniz; verileriniz korunur (önce yedek alınır).</p>
+          <div className="cc-actions">
+            {data.previous.map((p) => (
+              <Button key={p.version} size="sm" onClick={() => setConfirm(p.version)} disabled={busy}>{p.version} sürümüne dön</Button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p className="cc-muted">Henüz saklanmış önceki sürüm yok. Bir güncelleme kurulduğunda, kurulumdan önceki sürüm geri dönüş için saklanır.</p>
+      )}
+      <Dialog
+        open={Boolean(confirm)}
+        title={`${confirm} sürümüne dönülsün mü?`}
+        onClose={() => !busy && setConfirm(null)}
+        dismissible={!busy}
+        actions={
+          <>
+            <Button variant="ghost" onClick={() => setConfirm(null)} disabled={busy}>Vazgeç</Button>
+            <Button variant="primary" onClick={rollback} disabled={busy}>{busy ? 'Dönülüyor…' : 'Önceki sürüme dön'}</Button>
+          </>
+        }
+      >
+        <p>Wakai Desktop yeniden başlatılacak ve {confirm} sürümüyle açılacak. Veritabanınız önce yedeklenir; widget'larınız, kedileriniz ve ayarlarınız korunur.</p>
+        <p className="cc-muted">Otomatik güncelleme denetimi açıksa yeni sürüm yeniden önerilir; istemiyorsanız "Daha Sonra" deyin ya da denetimi kapatın.</p>
+      </Dialog>
     </Card>
   );
 }
@@ -132,6 +210,7 @@ export function SettingsSection({ settingsApi }) {
         <Toggle label={tr.settings.launchOnStartup} description={tr.settings.launchOnStartupDesc} checked={settings.launch_on_startup} onChange={(v) => update({ launch_on_startup: v })} />
       </Card>
       <Updates settings={settings} update={update} />
+      <VersionHistory />
       <Backups />
       <Card title="Hakkında">
         <dl className="cc-dl">

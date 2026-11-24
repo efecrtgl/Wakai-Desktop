@@ -96,3 +96,23 @@ Birincil kuruluma dokunmadan, hata ayıklama derlemesi + yerel HTTP sunucusuyla:
 | Sunucuya ulaşılamıyor | "Güncelleme denetlenemedi. İnternet bağlantınızı kontrol edin." |
 
 Gerçek bir kurulumun (1.1.0 → sonraki sürüm) uçtan uca denenmesi, imzalı ilk GitHub sürümü yayınlandıktan sonra ayrı bir test kurulumunda yapılmalıdır.
+
+## Sürüm geçmişi ve önceki sürüme dönüş
+
+- **Sürüm geçmişi:** her açılışta sürüm `app_versions` tablosuna yazılır (göç 006, yalnızca ekleme). Ayarlar → Sürüm geçmişi kartında bu bilgisayarda çalışmış sürümler, ilk görülme tarihi, açılış sayısı ve şu anki sürümün uygulamaya gömülü yenilikleri (`src/lib/releaseNotes.js`) gösterilir.
+- **Saklanan sürümler:** güncelleme kurulmadan hemen önce çalışan program `%APPDATA%\com.wakai.desktop\previous\<sürüm>\wakai-desktop.exe` olarak saklanır (en fazla 2).
+- **Elle geri dönüş:** Ayarlar → Sürüm geçmişi → "<sürüm> sürümüne dön". Onaydan sonra veritabanı yedeklenir (`…-geri-donus-oncesi.db`), çalışan exe `.exe.old` olarak yeniden adlandırılır (Windows çalışan exe'nin üzerine yazmaya izin vermez ama yeniden adlandırmaya izin verir), saklanan sürüm yerine kopyalanır ve uygulama yeniden başlar. Kopyalama başarısız olursa eski exe geri konur. `.old` bir sonraki açılışta silinir.
+- **Otomatik geri dönüş:** bir sürüm 15 sn sorunsuz çalışınca "sağlıklı" işaretlenir. Henüz hiç sağlıklı açılmamış bir sürüm art arda 3 kez başarısız olursa (ör. güncelleme sonrası açılışta çökme) saklanan önceki sürüme otomatik dönülür ve "Wakai Desktop önceki sürüme döndü" bildirimi gösterilir. Sağlıklı açılmış bir sürüm asla otomatik geri alınmaz; döngüye girmemek için geri alınan sürüm işaretlenir.
+- **Veriler geri alınmaz:** tüm göçler yalnızca tablo/sütun ekler; eski sürümler yeni şemayı açabilir (bilinmeyen tabloları yok sayar). Gerekirse geri dönüş öncesi yedek Ayarlar → Yedekler'den geri yüklenebilir.
+- **Sınırlar:** geri dönüş yalnızca programı değiştirir; Windows "Uygulamalar" listesindeki sürüm numarası yükleyicinin yazdığı değer olarak kalır. Bir sonraki güncelleme bunu düzeltir. Otomatik denetim açıksa geri dönülen yeni sürüm yeniden önerilir ("Daha Sonra" ya da denetimi kapatma).
+
+### Geri dönüş testi (yalıtılmış ortam)
+
+`WAKAI_DATA_DIR` ortam değişkeni uygulamanın veri klasörünü değiştirir (yalnızca test içindir). Hata ayıklama derlemesinin bir kopyası geçici bir klasörde, ayrı bir veri klasörüyle çalıştırıldı; birincil kurulum ve veriler kullanılmadı:
+
+| Senaryo | Sonuç |
+| --- | --- |
+| Sağlık dosyası "2 başarısız açılış", saklı sürüm var → açılış | 3. başarısız açılış algılandı, exe saklı sürümle değişti (SHA-256 doğrulandı), uygulama aynı yoldan yeniden başladı, `.old` temizlendi, bildirim bir kez gösterildi, döngü yok |
+| 15 sn sonra | Sürüm "sağlıklı" işaretlendi |
+| Ayarlar'dan elle geri dönüş (0.8.0) | Yedek alındı, exe değişti (SHA-256), yeniden başladı |
+| Geçersiz/yok sürüm (`../../x`, `7.7.7`) | "Bu sürümün yedeği bulunamadı."; yedek ya da dosya değişikliği yok |

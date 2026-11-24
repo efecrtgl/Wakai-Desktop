@@ -77,3 +77,12 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - Doğrulama: yerel HTTP sunucusu + hata ayıklama derlemesi; geçerli imza kabul edildi, değiştirilmiş dosya reddedildi, eski sürüm "güncelleme yok", erişilemeyen sunucu anlaşılır hata verdi. Birincil kuruluma güncelleme kurulmadı. Ayrıntılar: `docs/GUNCELLEMELER.md`.
 - **Sahip eylemi:** `TAURI_SIGNING_PRIVATE_KEY` GitHub gizlisini eklemek. 1.0.0 kullanıcıları 1.1.0'ı bir kez elle kurmalı.
 - Gözlem: test sırasında Kontrol Merkezi tüm widget'ları gizli gösterdi (veriye dokunulmadı; kullanıcı bilgilendirilecek).
+
+## Aşama 10 — Sürüm geçmişi ve güvenli geri dönüş
+
+- Göç 006 `app_versions` (yalnızca ekleme). Her açılış kaydedilir; sürüm değişince bekleyen güncelleme kaydı temizlenir.
+- `recovery.rs`: önceki sürümün saklanması (en fazla 2), sürüm başına açılış sağlığı (15 sn sağlıklı → bir daha sayılmaz), hiç sağlıklı açılmamış sürüm 3 kez başarısız olursa otomatik geri dönüş, `.exe.old` yöntemiyle güvenli exe değişimi (başarısız kopyada geri alma), tek seferlik geri dönüş bildirimi.
+- Komutlar `version_history`, `rollback_to_version` (önce doğrulama, sonra yedek, sonra değişim ve yeniden başlatma). Ayarlar → Sürüm geçmişi kartı + gömülü Türkçe sürüm notları.
+- Yalıtılmış test ortamı için `WAKAI_DATA_DIR`.
+- Doğrulama: 3 yeni Rust testi (91 birim test). Yalıtılmış ortamda otomatik ve elle geri dönüş gerçek exe ile denendi (SHA-256 ile doğrulandı). Test sırasında bulunan hata: geçersiz sürümle çağrıda önce yedek alınıyordu — doğrulama öne alındı ve yeniden denendi.
+- Not: gerçek bir NSIS güncellemesinden sonraki geri dönüş, imzalı ilk sürüm yayınlandıktan sonra ayrıca denenmelidir; değiştirilen mekanizma (exe değişimi + yeniden başlatma) burada denendi.

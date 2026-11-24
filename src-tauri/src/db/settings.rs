@@ -23,3 +23,8 @@ pub fn set(conn: &Connection, key: &str, value: &serde_json::Value) -> AppResult
     )?;
     Ok(())
 }
+
+pub fn delete(conn: &Connection, key: &str) -> AppResult<()> {
+    conn.execute("DELETE FROM settings WHERE key = ?1", [key])?;
+    Ok(())
+}

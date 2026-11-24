@@ -1,11 +1,12 @@
-#![allow(dead_code)] // Açılış sağlığı ve geri dönüş 10. aşamada bağlanır.
 //! Güncelleme güvenliği: önceki sürümün saklanması, sürüm geçmişi, açılış sağlığı ve geri dönüş.
 //!
 //! - Güncelleme kurulmadan önce çalışan program `previous/<sürüm>/wakai-desktop.exe` olarak saklanır
 //!   (en fazla 2 önceki sürüm).
 //! - Her açılışta sürüm `app_versions` tablosuna kaydedilir (göç 006).
-//! - Açılış sağlığı: açılışta bir sayaç artırılır, uygulama 15 sn sağlıklı çalışınca sıfırlanır.
-//!   Art arda 3 başarısız açılışta saklanan önceki sürüme otomatik dönülür.
+//! - Açılış sağlığı (sürüm başına): bir sürüm henüz hiç sağlıklı açılmadıysa her açılışta sayaç
+//!   artar; uygulama 15 sn sorunsuz çalışınca o sürüm "sağlıklı" işaretlenir ve bir daha sayılmaz.
+//!   Hiç sağlıklı açılmamış bir sürüm art arda 3 kez başarısız olursa saklanan önceki sürüme
+//!   otomatik dönülür. Sağlıklı açılmış bir sürüm asla otomatik geri alınmaz.
 //! - Geri dönüş çalışan exe'nin üzerine yazmaz: Windows çalışan bir exe'nin yeniden adlandırılmasına
 //!   izin verir; mevcut exe `.old` yapılır, önceki sürüm yerine kopyalanır ve uygulama yeniden başlar.
 //!
@@ -119,21 +120,103 @@ pub fn cleanup_old(exe: &Path) {
     let _ = std::fs::remove_file(exe.with_extension("exe.old"));
 }
 
-/// Açılış başında çağrılır; art arda başarısız açılış sayısını döndürür (bu açılış dahil).
-pub fn begin_launch(data_dir: &Path) -> u32 {
-    let path = data_dir.join(HEALTH_FILE);
-    let n = std::fs::read_to_string(&path)
-        .ok()
-        .and_then(|s| s.trim().parse::<u32>().ok())
-        .unwrap_or(0)
-        + 1;
-    let _ = std::fs::write(&path, n.to_string());
+fn read_health(data_dir: &Path) -> Option<(String, String)> {
+    let text = std::fs::read_to_string(data_dir.join(HEALTH_FILE)).ok()?;
+    let mut it = text.split_whitespace();
+    Some((it.next()?.to_string(), it.next()?.to_string()))
+}
+
+fn write_health(data_dir: &Path, version: &str, value: &str) {
+    let _ = std::fs::write(data_dir.join(HEALTH_FILE), format!("{version} {value}"));
+}
+
+/// Açılış başında çağrılır. Bu sürüm daha önce sağlıklı açıldıysa 0, değilse art arda
+/// başarısız açılış sayısını (bu açılış dahil) döndürür.
+pub fn begin_launch(data_dir: &Path, version: &str) -> u32 {
+    let n = match read_health(data_dir) {
+        Some((v, state)) if v == version => match state.as_str() {
+            "ok" => return 0,
+            n => n.parse::<u32>().unwrap_or(0) + 1,
+        },
+        _ => 1,
+    };
+    write_health(data_dir, version, &n.to_string());
     n
 }
 
-/// Uygulama sağlıklı çalışınca çağrılır (sayaç sıfırlanır).
-pub fn launch_healthy(data_dir: &Path) {
-    let _ = std::fs::remove_file(data_dir.join(HEALTH_FILE));
+/// Uygulama sağlıklı çalışınca çağrılır: bu sürüm bir daha sayılmaz.
+pub fn launch_healthy(data_dir: &Path, version: &str) {
+    write_health(data_dir, version, "ok");
+}
+
+/// Hiç sağlıklı açılmamış sürüm art arda başarısız olduysa dönülecek önceki sürüm.
+pub fn auto_rollback_target(data_dir: &Path, version: &str, failed: u32) -> Option<String> {
+    if failed < FAILED_LAUNCHES_FOR_ROLLBACK {
+        return None;
+    }
+    list_previous(data_dir)
+        .ok()?
+        .into_iter()
+        .map(|p| p.version)
+        .find(|v| v != version)
+}
+
+/// Otomatik geri dönüş yapıldı: sağlık kaydı, geri alınan sürüm için döngüye girmesin diye işaretlenir.
+pub fn mark_rolled_back(data_dir: &Path, from_version: &str) {
+    write_health(data_dir, from_version, "rolled-back");
+    let _ = std::fs::write(data_dir.join("rollback-notice"), from_version);
+}
+
+/// Bir önceki açılışta otomatik geri dönüş yapıldıysa geri alınan sürümü döndürür (bir kez).
+pub fn take_rollback_notice(data_dir: &Path) -> Option<String> {
+    let path = data_dir.join("rollback-notice");
+    let v = std::fs::read_to_string(&path).ok()?;
+    let _ = std::fs::remove_file(path);
+    Some(v.trim().to_string())
+}
+
+// --- Sürüm geçmişi (app_versions) ---
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct VersionRecord {
+    pub version: String,
+    pub first_seen: i64,
+    pub last_seen: i64,
+    pub launches: i64,
+}
+
+/// Bu açılışı kaydeder; bir önceki açılıştaki sürüm farklıysa onu döndürür (yükseltme/geri dönüş).
+pub fn record_launch(
+    conn: &rusqlite::Connection,
+    version: &str,
+    now: i64,
+) -> AppResult<Option<String>> {
+    let previous: Option<String> = conn
+        .query_row(
+            "SELECT version FROM app_versions ORDER BY last_seen DESC LIMIT 1",
+            [],
+            |r| r.get(0),
+        )
+        .ok();
+    conn.execute(
+        "INSERT INTO app_versions (version, first_seen, last_seen, launches) VALUES (?1, ?2, ?2, 1)
+         ON CONFLICT(version) DO UPDATE SET last_seen = ?2, launches = launches + 1",
+        rusqlite::params![version, now],
+    )?;
+    Ok(previous.filter(|p| p != version))
+}
+
+pub fn history(conn: &rusqlite::Connection) -> AppResult<Vec<VersionRecord>> {
+    let mut stmt = conn.prepare("SELECT version, first_seen, last_seen, launches FROM app_versions ORDER BY first_seen DESC")?;
+    let rows = stmt.query_map([], |r| {
+        Ok(VersionRecord {
+            version: r.get(0)?,
+            first_seen: r.get(1)?,
+            last_seen: r.get(2)?,
+            launches: r.get(3)?,
+        })
+    })?;
+    Ok(rows.collect::<Result<_, _>>()?)
 }
 
 #[cfg(test)]
@@ -197,11 +280,64 @@ mod tests {
     }
 
     #[test]
-    fn launch_health_counter() {
+    fn launch_health_is_per_version() {
         let data = tmp("health");
-        assert_eq!(begin_launch(&data), 1);
-        assert_eq!(begin_launch(&data), 2);
-        launch_healthy(&data);
-        assert_eq!(begin_launch(&data), 1);
+        assert_eq!(begin_launch(&data, "1.1.0"), 1);
+        assert_eq!(begin_launch(&data, "1.1.0"), 2);
+        launch_healthy(&data, "1.1.0");
+        assert_eq!(
+            begin_launch(&data, "1.1.0"),
+            0,
+            "sağlıklı sürüm bir daha sayılmaz"
+        );
+        assert_eq!(begin_launch(&data, "1.2.0"), 1, "yeni sürüm baştan sayılır");
+    }
+
+    #[test]
+    fn auto_rollback_only_after_repeated_failures_with_backup() {
+        let data = tmp("auto");
+        let exe = data.join("wakai-desktop.exe");
+        assert_eq!(
+            auto_rollback_target(&data, "1.2.0", 5),
+            None,
+            "yedek yokken geri dönülmez"
+        );
+        std::fs::write(&exe, "x").unwrap();
+        preserve(&data, &exe, "1.1.0").unwrap();
+        assert_eq!(auto_rollback_target(&data, "1.2.0", 2), None);
+        assert_eq!(
+            auto_rollback_target(&data, "1.2.0", 3).as_deref(),
+            Some("1.1.0")
+        );
+        assert_eq!(
+            auto_rollback_target(&data, "1.1.0", 3),
+            None,
+            "aynı sürüme dönülmez"
+        );
+        mark_rolled_back(&data, "1.2.0");
+        assert_eq!(
+            begin_launch(&data, "1.1.0"),
+            1,
+            "geri dönülen sürüm sayaçla döngüye girmez"
+        );
+        assert_eq!(take_rollback_notice(&data).as_deref(), Some("1.2.0"));
+        assert_eq!(take_rollback_notice(&data), None);
+    }
+
+    #[test]
+    fn version_history_records_launches_and_changes() {
+        let conn = rusqlite::Connection::open_in_memory().unwrap();
+        conn.execute_batch(include_str!("db/migrations/006_app_versions.sql"))
+            .unwrap();
+        assert_eq!(record_launch(&conn, "1.0.0", 1).unwrap(), None);
+        assert_eq!(record_launch(&conn, "1.0.0", 2).unwrap(), None);
+        assert_eq!(
+            record_launch(&conn, "1.1.0", 3).unwrap().as_deref(),
+            Some("1.0.0")
+        );
+        let h = history(&conn).unwrap();
+        assert_eq!(h.len(), 2);
+        assert_eq!(h[0].version, "1.1.0");
+        assert_eq!(h[1].launches, 2);
     }
 }

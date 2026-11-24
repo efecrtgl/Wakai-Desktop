@@ -42,16 +42,23 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
-            let dir = app.path().app_data_dir()?;
+            // WAKAI_DATA_DIR: yalnızca yalıtılmış test ortamı içindir (birincil verilere dokunmadan).
+            let dir = match std::env::var_os("WAKAI_DATA_DIR") {
+                Some(d) => std::path::PathBuf::from(d),
+                None => app.path().app_data_dir()?,
+            };
             std::fs::create_dir_all(&dir)?;
             logging::init(&dir);
             install_panic_hook();
+            let version = app.package_info().version.to_string();
+            launch_safety(app.handle(), &dir, &version);
             let db_path = dir.join("wakai.db");
             if let Err(e) = backup::apply_pending_restore(&dir, &db_path) {
                 log::error!("yedek geri yüklenemedi: {e}");
             }
             let (db, quarantined) = db::Db::open_or_recover(&db_path)?;
             let initial = settings::load(&db).unwrap_or_default();
+            record_version(&db, &version);
             app.manage(focus::FocusTimer::new(&db));
             let pet_store = pets::store::PetStore::default();
             if let Err(e) = pet_store.load(&db) {
@@ -92,6 +99,18 @@ pub fn run() {
             profiles::sync_auto_gaming(app.handle(), initial.auto_gaming_profile);
             if let Some(q) = quarantined {
                 notify_recovered(app.handle(), &q);
+            }
+            if let Some(from) = recovery::take_rollback_notice(&dir) {
+                notify_rolled_back(app.handle(), &from, &version);
+            }
+            // 15 sn sorunsuz çalışan sürüm "sağlıklı" sayılır; bir daha otomatik geri alınmaz.
+            {
+                let dir = dir.clone();
+                let version = version.clone();
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_secs(15));
+                    recovery::launch_healthy(&dir, &version);
+                });
             }
 
             // Windows ile başlatıldıysa yalnızca widget'lar gelir; Kontrol Merkezi açılmaz.
@@ -206,6 +225,8 @@ pub fn run() {
             commands::updates::update_status,
             commands::updates::install_update,
             commands::updates::verify_update,
+            commands::updates::version_history,
+            commands::updates::rollback_to_version,
             commands::services::subscribe,
             commands::services::unsubscribe,
             commands::services::system_stats,
@@ -245,6 +266,52 @@ fn shutdown(app: &tauri::AppHandle) {
             .with(|c| Ok(c.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);")?));
     }
     log::info!("Wakai Desktop kapandı");
+}
+
+/// Açılış güvenliği: kalan `.old` dosyasını temizler; hiç sağlıklı açılmamış bu sürüm art arda
+/// başarısız olduysa saklanan önceki sürüme döner ve yeniden başlar.
+fn launch_safety(app: &tauri::AppHandle, dir: &std::path::Path, version: &str) {
+    let Ok(exe) = std::env::current_exe() else {
+        return;
+    };
+    recovery::cleanup_old(&exe);
+    let failed = recovery::begin_launch(dir, version);
+    let Some(target) = recovery::auto_rollback_target(dir, version, failed) else {
+        return;
+    };
+    log::error!("{version} art arda {failed} kez sağlıklı açılamadı; {target} sürümüne dönülüyor");
+    match recovery::rollback(dir, &exe, &target) {
+        Ok(()) => {
+            recovery::mark_rolled_back(dir, version);
+            app.restart();
+        }
+        Err(e) => log::error!("otomatik geri dönüş başarısız: {e}"),
+    }
+}
+
+/// Sürüm geçmişine bu açılışı yazar; sürüm değiştiyse bekleyen güncelleme kaydını temizler.
+fn record_version(db: &db::Db, version: &str) {
+    let now = chrono::Local::now().timestamp_millis();
+    match db.with(|c| recovery::record_launch(c, version, now)) {
+        Ok(Some(previous)) => {
+            log::info!("sürüm değişti: {previous} → {version}");
+            let _ = db.with(|c| db::settings::delete(c, "update_in_progress"));
+        }
+        Ok(None) => {}
+        Err(e) => log::warn!("sürüm geçmişi yazılamadı: {e}"),
+    }
+}
+
+fn notify_rolled_back(app: &tauri::AppHandle, from: &str, to: &str) {
+    use tauri_plugin_notification::NotificationExt;
+    let _ = app
+        .notification()
+        .builder()
+        .title("Wakai Desktop önceki sürüme döndü")
+        .body(format!(
+            "{from} sürümü düzgün açılamadığı için {to} sürümüne dönüldü. Verileriniz korunuyor."
+        ))
+        .show();
 }
 
 /// Bozuk veritabanı karantinaya alındıysa kullanıcıyı bilgilendirir.
