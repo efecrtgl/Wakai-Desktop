@@ -2,7 +2,9 @@
 
 Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınarak hazırlanmıştır.
 
-## [Yayınlanmadı]
+## [1.0.0] — 2026-11-24
+
+İlk sürüm.
 
 ### Düzeltildi
 - Bozuk ayar kaydı ayarların yüklenmesini engelliyordu.
@@ -12,6 +14,7 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - İşlevi olmayan "Örtülünce askıya al" ayarı (gerekçe: docs/PERFORMANS.md §7).
 
 ### Eklendi
+- Türkçe NSIS yükleyici (kullanıcı başına kurulum, yönetici izni gerekmez, yaklaşık 2,5 MB), uygulama bilgileri, MIT lisansı.
 - Tauri 2 + React (JavaScript) proje temeli.
 - SQLite veritabanı, sürümlü göçler ve göç öncesi otomatik yedek.
 - Türlü uygulama ayarları (doğrulama ve sınırlandırma ile).

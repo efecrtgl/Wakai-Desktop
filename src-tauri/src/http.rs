@@ -63,7 +63,7 @@ pub fn get(url: &str) -> AppResult<String> {
     unsafe {
         let session = check(
             WinHttpOpen(
-                &HSTRING::from("WakaiDesktop/0.1"),
+                &HSTRING::from(concat!("WakaiDesktop/", env!("CARGO_PKG_VERSION"))),
                 WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
                 PCWSTR::null(),
                 PCWSTR::null(),
