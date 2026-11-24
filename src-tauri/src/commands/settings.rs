@@ -33,6 +33,13 @@ pub fn apply_settings_patch(app: &AppHandle, patch: serde_json::Value) -> AppRes
     {
         crate::main_window::apply_theme(app, &w);
     }
+    let pets_before = crate::pets::engine_settings(&before);
+    let pets_next = crate::pets::engine_settings(&next);
+    if pets_before != pets_next
+        && let Some(engine) = app.try_state::<crate::pets::engine::PetEngine>()
+    {
+        engine.send(crate::pets::engine::Cmd::Settings(pets_next));
+    }
     if before.widgets_visible != next.widgets_visible {
         crate::tray::sync(app, next.widgets_visible);
     }

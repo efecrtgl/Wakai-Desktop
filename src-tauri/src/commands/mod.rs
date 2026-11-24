@@ -3,6 +3,7 @@
 pub mod app;
 pub mod content;
 pub mod focus;
+pub mod pets;
 pub mod services;
 pub mod settings;
 pub mod shopping;

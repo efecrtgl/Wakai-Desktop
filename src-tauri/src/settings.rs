@@ -40,6 +40,16 @@ pub enum FontFamily {
 #[serde(default)]
 pub struct AppSettings {
     pub appearance: Appearance,
+    /// Masaüstü kedileri açık mı?
+    pub pets_enabled: bool,
+    /// Kedilerin genel etkinlik düzeyi (profiller değiştirir).
+    pub pet_activity: crate::pets::behavior::ActivityLevel,
+    /// Kedi boyutu: sprite pikseli başına ekran pikseli (2–5).
+    pub pet_size: u32,
+    /// Masaüstünde aynı anda dolaşabilecek en fazla kedi (1–12).
+    pub pets_max_active: u32,
+    /// Tam ekran bir uygulama (oyun, video) öndeyken kedileri gizle.
+    pub pets_hide_fullscreen: bool,
     pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
@@ -69,6 +79,11 @@ impl Default for AppSettings {
     fn default() -> Self {
         Self {
             appearance: Appearance::Wakai,
+            pets_enabled: true,
+            pet_activity: crate::pets::behavior::ActivityLevel::Normal,
+            pet_size: 3,
+            pets_max_active: 5,
+            pets_hide_fullscreen: true,
             font_family: FontFamily::System,
             close_to_tray: true,
             launch_on_startup: false,
@@ -95,6 +110,8 @@ impl AppSettings {
         self.widget_opacity = clamp_f(self.widget_opacity, 0.4, 1.0, 1.0);
         self.widget_scale = clamp_f(self.widget_scale, 0.75, 1.5, 1.0);
         self.corner_radius = self.corner_radius.min(28);
+        self.pet_size = self.pet_size.clamp(2, 5);
+        self.pets_max_active = self.pets_max_active.clamp(1, 12);
         self.monitor_interval_secs = self.monitor_interval_secs.clamp(1, 60);
         self.weather_refresh_minutes = self.weather_refresh_minutes.clamp(15, 180);
         self

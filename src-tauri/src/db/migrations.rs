@@ -9,6 +9,7 @@ pub const MIGRATIONS: &[&str] = &[
     include_str!("migrations/001_initial.sql"),
     include_str!("migrations/002_content.sql"),
     include_str!("migrations/003_shopping.sql"),
+    include_str!("migrations/004_pets.sql"),
 ];
 
 pub fn current_version(conn: &Connection) -> AppResult<usize> {

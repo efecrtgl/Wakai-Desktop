@@ -30,3 +30,5 @@ pub const SYSTEM_STATS: &str = "system:stats";
 pub const MEDIA_CHANGED: &str = "media:changed";
 /// Yük: değişen alışveriş listesinin kimliği.
 pub const SHOPPING_CHANGED: &str = "shopping:changed";
+/// Kediler ya da ihtiyaçları değişti (etkileşimlerde; yüksek frekanslı değildir).
+pub const PETS_CHANGED: &str = "pets:changed";

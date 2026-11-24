@@ -13,6 +13,7 @@ mod logging;
 mod main_window;
 mod media;
 mod monitor;
+pub mod pets;
 mod procstats;
 mod scheduler;
 pub mod settings;
@@ -48,6 +49,11 @@ pub fn run() {
             let (db, quarantined) = db::Db::open_or_recover(&db_path)?;
             let initial = settings::load(&db).unwrap_or_default();
             app.manage(focus::FocusTimer::new(&db));
+            let pet_store = pets::store::PetStore::default();
+            if let Err(e) = pet_store.load(&db) {
+                log::error!("kediler yüklenemedi: {e}");
+            }
+            app.manage(pet_store);
             app.manage(AppState {
                 db,
                 data_dir: dir.clone(),
@@ -71,6 +77,11 @@ pub fn run() {
             }
 
             tray::create(app.handle())?;
+
+            // Kedi motoru widget motorundan bağımsız kendi iş parçacığında çalışır.
+            let engine = pets::engine::PetEngine::default();
+            engine.start(app.handle().clone(), pets::engine_settings(&initial));
+            app.manage(engine);
             if let Some(q) = quarantined {
                 notify_recovered(app.handle(), &q);
             }
@@ -158,6 +169,19 @@ pub fn run() {
             commands::focus::focus_pause,
             commands::focus::focus_reset,
             commands::focus::focus_skip,
+            commands::pets::list_pets,
+            commands::pets::pet_catalog,
+            commands::pets::pet_progress,
+            commands::pets::adopt_pet,
+            commands::pets::rename_pet,
+            commands::pets::release_pet,
+            commands::pets::set_pet_location,
+            commands::pets::set_pet_paused,
+            commands::pets::set_pet_accessory,
+            commands::pets::feed_pet,
+            commands::pets::stroke_pet,
+            commands::pets::play_with_pet,
+            commands::pets::summon_pet,
             commands::services::subscribe,
             commands::services::unsubscribe,
             commands::services::system_stats,
@@ -182,6 +206,15 @@ pub fn run() {
 /// Düzenli kapanış: bekleyen konumları yaz, WAL'ı veritabanına aktar.
 fn shutdown(app: &tauri::AppHandle) {
     widgets::manager::flush_rects(app);
+    if let Some(engine) = app.try_state::<pets::engine::PetEngine>() {
+        engine.send(pets::engine::Cmd::Shutdown);
+    }
+    if let (Some(store), Some(state)) = (
+        app.try_state::<pets::store::PetStore>(),
+        app.try_state::<AppState>(),
+    ) {
+        let _ = store.flush(&state.db);
+    }
     if let Some(state) = app.try_state::<AppState>() {
         let _ = state
             .db
