@@ -63,7 +63,15 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 | Oturum kapanışı (`WM_ENDSESSION`) | SQLite WAL kontrol noktası yazılır. | Test edilmedi. |
 | Masaüstü penceresi kaybolursa | Her işlemden önce `IsWindow` ile kontrol edilir, gerekirse hiyerarşi yeniden aranır. Masaüstü bulunamazsa widget normal pencere olarak gösterilir (`Detached`). | Kod yolu mevcut. |
 
-## 5. Kullanılan API'ler
+## 5. Widget'ların Kullandığı Windows Hizmetleri
+
+| Widget | API | Davranış |
+|---|---|---|
+| Müzik Kedisi | WinRT `Windows.Media.Control` (GSMTC): `GlobalSystemMediaTransportControlsSessionManager` | Olay güdümlü: `CurrentSessionChanged`, `MediaPropertiesChanged`, `PlaybackInfoChanged`. Yalnızca bir Müzik Kedisi açıkken etkin. Oynat/duraklat, önceki/sonraki gerçek oturuma gönderilir; uygulama içinde oynatıcı yoktur. Geliştirme makinesinde Spotify oturumu (başlık, sanatçı, kapak) doğrulandı. Komutlar kullanıcının müziğini kesmemek için otomatik test edilmedi. |
+| Sistem Kedisi | `GetSystemTimes`, `GlobalMemoryStatusEx`, `GetDiskFreeSpaceExW`, PDH `\GPU Engine(*engtype_3D)\Utilization Percentage` | Yalnızca abone varken, ayarlanan aralıkla (varsayılan 3 sn; düşük kaynak modunda 2 katı). GPU sayacı okunamazsa "Ölçülemiyor" gösterilir. Değerler geliştirme makinesinde gerçek okumalarla doğrulandı. |
+| Hava Durumu Kedisi | WinHTTP (`WinHttpOpen` … `WinHttpReadData`) | Windows sertifika deposu ve SChannel ile HTTPS. WinRT `HttpClient` geliştirme makinesinde Let's Encrypt sertifikalı Open-Meteo sunucularında `0x80072F8F` hatası verdiği (sertifika hatası listelemeden) için WinHTTP tercih edildi. |
+
+## 6. Kullanılan API'ler
 
 - Hiyerarşi: `FindWindowW`, `FindWindowExW`, `EnumWindows`, `SendMessageTimeoutW(0x052C)` (zaman aşımlı).
 - Yerleşim: `SetParent`, `SetWindowLongPtrW` (yalnızca kendi pencerelerimizde), `SetWindowPos`, `ScreenToClient`, `GetWindow(GW_HWNDPREV)`.
@@ -71,16 +79,18 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 - Monitörler: `EnumDisplayMonitors`, `MonitorFromRect`, `GetMonitorInfoW`, `GetDpiForMonitor`.
 - WebView2: `ICoreWebView2Controller3::SetRasterizationScale`.
 
-## 6. Yapılmayanlar
+## 7. Yapılmayanlar
 
 - `HWND_TOPMOST` kullanılmaz.
 - Explorer sonlandırılmaz veya yeniden başlatılmaz.
 - Explorer pencerelerinin stilleri değiştirilmez, onlara girdi enjekte edilmez.
 - Fare kancası (`WH_MOUSE_LL`) kullanılmaz; sistemin girdi gecikmesine etki edilmez.
 
-## 7. Bilinen Sınırlamalar
+## 8. Bilinen Sınırlamalar
 
 - **Simgelerle çakışma:** İmleç simgelerle çakışan bir widget'ın üzerine geldiğinde widget kaldırılır ve o sırada çakışan simgelerin üstünde görünür. Widget'ları simgelerin bulunmadığı alanlara yerleştirmek önerilir.
 - **Süreçler arası ebeveynlik:** `SetParent` ile Explorer penceresine bağlanmak iki iş parçacığının girdi kuyruklarını ilişkilendirir. Bu yüzden widget pencerelerinin UI iş parçacığında engelleyici iş yapılmaz.
 - `0x052C` mesajı belgelenmemiş bir Explorer davranışıdır; gelecekteki Windows sürümlerinde değişebilir. Bu durumda kod `Progman`'a bağlanmaya, o da olmazsa normal pencereye geri düşer.
 - Ölçüm aracı notu: Sistem DPI'ına duyarlı (`SetProcessDPIAware`) araçlar, %125 monitördeki widget koordinatlarını sanallaştırılmış (0.8 katı) gösterir. Doğrulama araçları Per-Monitor-V2 bağlamında çalıştırılmalıdır.
+- GPU kullanımı yalnızca 3D motorlarının toplamıdır (Görev Yöneticisi'nin "3D" grafiğine yakın); video kodlama/kopyalama motorları dahil değildir.
+- Müzik Kedisi yalnızca Windows medya oturumu yayınlayan uygulamaları görür.

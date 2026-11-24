@@ -6,12 +6,17 @@ pub mod desktop;
 pub mod error;
 mod events;
 mod focus;
+mod http;
 mod layer;
 mod logging;
+mod media;
+mod monitor;
 mod scheduler;
 pub mod settings;
 mod state;
+mod subscriptions;
 mod validate;
+mod weather;
 mod widgets;
 
 use state::AppState;
@@ -35,6 +40,12 @@ pub fn run() {
             app.manage(focus::FocusTimer::new(&db));
             app.manage(AppState { db });
             app.manage(layer::LayerState::new());
+            app.manage(subscriptions::Subscriptions::default());
+            app.manage(monitor::SystemMonitor::default());
+            app.manage(media::MediaService::default());
+            app.manage(commands::services::WeatherState(Box::new(
+                weather::OpenMeteo,
+            )));
             layer::start(app.handle());
 
             let scheduler = scheduler::Scheduler::default();
@@ -53,6 +64,9 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
+            if let tauri::WindowEvent::Destroyed = event {
+                subscriptions::on_window_destroyed(window.app_handle(), window.label());
+            }
             if widgets::window::id_from_label(window.label()).is_some()
                 && let Some(w) = window.app_handle().get_webview_window(window.label())
             {
@@ -97,6 +111,13 @@ pub fn run() {
             commands::focus::focus_pause,
             commands::focus::focus_reset,
             commands::focus::focus_skip,
+            commands::services::subscribe,
+            commands::services::unsubscribe,
+            commands::services::system_stats,
+            commands::services::media_state,
+            commands::services::media_control,
+            commands::services::weather_get,
+            commands::services::weather_search,
         ])
         .build(tauri::generate_context!())
         .expect("Wakai Desktop başlatılamadı")

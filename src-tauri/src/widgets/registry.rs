@@ -12,6 +12,9 @@ use serde_json::{Map, Value, json};
 pub enum Category {
     Productivity,
     Time,
+    Info,
+    Media,
+    System,
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -189,6 +192,42 @@ pub static DEFINITIONS: &[WidgetDefinition] = &[
                 "notify": true
             })
         },
+    },
+    WidgetDefinition {
+        kind: "weather",
+        name: "Hava Durumu Kedisi",
+        description: "Seçtiğiniz konum için anlık hava durumu ve 5 günlük tahmin (Open-Meteo).",
+        category: Category::Info,
+        default_size: size(300, 260),
+        min_size: size(220, 180),
+        multi_instance: true,
+        interactions: &["konum seç", "yenile", "sürükle", "boyutlandır"],
+        cat: "relaxed",
+        default_config: || json!({ "location": null, "show_forecast": true }),
+    },
+    WidgetDefinition {
+        kind: "music",
+        name: "Müzik Kedisi",
+        description: "Windows medya oturumundaki parçayı gösterir ve kontrol eder (Spotify, tarayıcılar, Medya Oynatıcı…).",
+        category: Category::Media,
+        default_size: size(320, 150),
+        min_size: size(240, 120),
+        multi_instance: false,
+        interactions: &["oynat/duraklat", "önceki/sonraki", "sürükle"],
+        cat: "happy",
+        default_config: || json!({ "show_artwork": true }),
+    },
+    WidgetDefinition {
+        kind: "system",
+        name: "Sistem Kedisi",
+        description: "İşlemci, bellek, GPU ve disk kullanımı; ayarlanabilir yenileme aralığı.",
+        category: Category::System,
+        default_size: size(280, 230),
+        min_size: size(220, 180),
+        multi_instance: false,
+        interactions: &["sürükle", "boyutlandır"],
+        cat: "working",
+        default_config: || json!({ "show_gpu": true, "show_disk": true }),
     },
 ];
 

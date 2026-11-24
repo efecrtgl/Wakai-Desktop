@@ -3,5 +3,6 @@
 pub mod app;
 pub mod content;
 pub mod focus;
+pub mod services;
 pub mod settings;
 pub mod widgets;

@@ -24,3 +24,7 @@ pub const TASKS_CHANGED: &str = "tasks:changed";
 pub const NOTES_CHANGED: &str = "notes:changed";
 /// Yük: `FocusState`.
 pub const FOCUS_CHANGED: &str = "focus:changed";
+/// Yük: `SystemStats`.
+pub const SYSTEM_STATS: &str = "system:stats";
+/// Yük: `MediaState`.
+pub const MEDIA_CHANGED: &str = "media:changed";

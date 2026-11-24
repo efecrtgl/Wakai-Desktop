@@ -26,6 +26,10 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Odak Kedisi: duvar saatine dayalı Pomodoro zamanlayıcısı, kısa/uzun molalar, oturum geçmişi, bildirimler.
 - Olay güdümlü hatırlatıcı zamanlayıcısı ve Windows bildirimleri.
 - Veritabanı göçü 002 (içerik tabloları).
+- Hava Durumu Kedisi: Open-Meteo (API anahtarsız), konum arama, 5 günlük tahmin, önbellek ve çevrim dışı gösterim.
+- Müzik Kedisi: Windows medya oturumu (GSMTC) ile parça bilgisi, kapak ve oynatma kontrolleri.
+- Sistem Kedisi: CPU, bellek, GPU (PDH), disk ve açık kalma süresi; yalnızca açıkken ve ayarlanan aralıkla ölçüm.
+- Abonelik modeli: arka plan hizmetleri yalnızca gösteren bir pencere varken çalışır.
 - Özgün piksel kedi ailesi: oturan, mutlu, meraklı, rahat, çalışan, uyuyan kedi ve yüz; göz kırpma, kuyruk sallama, Zz ve kutlama animasyonları.
 - Piksel simge seti ve widget görsel yapı taşları.
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

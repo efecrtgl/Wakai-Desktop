@@ -43,3 +43,35 @@ export function useFocusState() {
   useTauriEvent('focus:changed', setState);
   return [state, setState];
 }
+
+/** Pencere görünürken bir arka plan hizmetine abone olur (system | media). */
+export function useSubscription(topic) {
+  useEffect(() => {
+    call('subscribe', { name: topic }).catch(console.error);
+    return () => {
+      call('unsubscribe', { name: topic }).catch(() => {});
+    };
+  }, [topic]);
+}
+
+/** Canlı sistem istatistikleri; yalnızca bu kanca kullanılırken örnekleme yapılır. */
+export function useSystemStats() {
+  useSubscription('system');
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    call('system_stats').then((s) => s && setStats(s), console.error);
+  }, []);
+  useTauriEvent('system:stats', setStats);
+  return stats;
+}
+
+/** Windows medya oturumu durumu. */
+export function useMediaState() {
+  useSubscription('media');
+  const [state, setState] = useState(null);
+  useEffect(() => {
+    call('media_state').then(setState, console.error);
+  }, []);
+  useTauriEvent('media:changed', setState);
+  return state;
+}

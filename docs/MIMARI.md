@@ -46,9 +46,13 @@ Wakai Desktop iki ana parçadan oluşur:
 | `desktop` | Windows masaüstü hiyerarşisi (Progman/WorkerW/DefView), pencere yerleştirme, z-sırası, fare girdisi yönlendirme, Explorer yeniden başlatma ve ekran değişikliği izleme. |
 | `monitor` | Sistem kaynak ölçümü (CPU, bellek, GPU) — yalnızca abone varken ve ayarlanan aralıkla. |
 | `media` | Windows Global System Media Transport Controls (GSMTC) entegrasyonu. |
-| `weather` | Sağlayıcı arayüzü ve Open-Meteo uygulaması (API anahtarı gerektirmez). |
+| `weather` | Sağlayıcı arayüzü (`WeatherProvider`), Open-Meteo uygulaması (API anahtarı gerektirmez) ve SQLite önbelleği. |
 | `scheduler` | Etkinlik/görev hatırlatıcıları ve odak zamanlayıcısı bildirimleri. |
 | `settings` | Uygulama ayarlarının okunması/yazılması ve varsayılanlar. |
+| `focus` | Odak (Pomodoro) zamanlayıcısının durumu; duvar saatine dayalı. |
+| `subscriptions` | Pahalı hizmetleri yalnızca abone pencere varken çalıştıran abonelik kaydı. |
+| `http` | WinHTTP tabanlı HTTPS GET istemcisi. |
+| `validate` | Ön yüz girdilerinin doğrulanması (Türkçe hata mesajları). |
 | `tray`, `startup` | Sistem tepsisi, Windows ile başlatma. |
 
 ## 4. Ön Yüz (`src`)

@@ -9,6 +9,9 @@ export const WIDGET_COMPONENTS = {
   note: lazy(() => import('./note/NoteWidget.jsx')),
   clock: lazy(() => import('./clock/ClockWidget.jsx')),
   focus: lazy(() => import('./focus/FocusWidget.jsx')),
+  weather: lazy(() => import('./weather/WeatherWidget.jsx')),
+  music: lazy(() => import('./music/MusicWidget.jsx')),
+  system: lazy(() => import('./system/SystemWidget.jsx')),
 };
 
 export const supportedKinds = Object.keys(WIDGET_COMPONENTS);

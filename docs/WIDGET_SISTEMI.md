@@ -75,6 +75,13 @@ Pencere oluşturan veya taşıyan komutlar `async` tanımlıdır ve işi `state:
 | `note` | Not Kedisi | Evet | Her örnek bir nota bağlı; 600 ms gecikmeli otomatik kayıt; sabitleme; renk; basit biçimlendirme. |
 | `clock` | Saat Kedisi | Evet | Dijital/analog, saniye ayarı, 12/24 saat, tarih, ek saat dilimleri. Güncelleme saniye/dakika sınırına hizalı. |
 | `focus` | Odak Kedisi | Hayır | Rust'taki zamanlayıcının bitiş anına göre kalan süre; yalnızca çalışırken saniyede bir çizim. |
+| `weather` | Hava Durumu Kedisi | Evet | Konum arama (Türkçe sonuçlar), anlık durum, 5 günlük tahmin, önbellek ve çevrim dışı gösterim. Sağlayıcı arayüzü: `WeatherProvider`. |
+| `music` | Müzik Kedisi | Hayır | Windows medya oturumu (GSMTC): parça, sanatçı, kapak, oynat/duraklat, önceki/sonraki. |
+| `system` | Sistem Kedisi | Hayır | CPU, bellek, GPU (3D), disk, açık kalma süresi. |
+
+### Abonelik modeli
+
+Sistem izleme ve medya oturumu gibi arka plan hizmetleri yalnızca onları gösteren bir pencere varken çalışır. Pencere `subscribe('system' | 'media')` çağırır; pencere kapanınca abonelik otomatik silinir. Son abone gidince hizmet durur (iş parçacığı uyur, WinRT olay kayıtları kaldırılır).
 
 ## Yeni Bir Widget Eklemek
 
