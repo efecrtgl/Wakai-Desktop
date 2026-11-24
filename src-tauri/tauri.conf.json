@@ -11,19 +11,7 @@
   },
   "app": {
     "withGlobalTauri": false,
-    "windows": [
-      {
-        "label": "main",
-        "title": "Wakai Desktop",
-        "url": "index.html",
-        "width": 1100,
-        "height": 720,
-        "minWidth": 860,
-        "minHeight": 560,
-        "center": true,
-        "visible": false
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": {
         "default-src": "'self'",

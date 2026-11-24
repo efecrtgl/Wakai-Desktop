@@ -130,14 +130,19 @@ fn on_desktop_event(app: &AppHandle, event: DesktopEvent) {
             crate::widgets::manager::on_windows_lost(app, dead);
         }
         DesktopEvent::DisplayChanged => {
-            let changed = state.lock().on_display_changed();
+            state.lock().ensure_host();
+            crate::widgets::manager::on_display_changed(app);
+            state
+                .scales
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .clear();
             for w in app.webview_windows().into_values() {
                 if let Some(hwnd) = widget_window::hwnd_of(&w).filter(|h| state.lock().contains(*h))
                 {
                     sync_scale(app, &w, hwnd);
                 }
             }
-            crate::widgets::manager::on_rects_changed(app, changed);
         }
         DesktopEvent::SessionEnding => {
             log::info!("Windows oturumu kapanıyor");

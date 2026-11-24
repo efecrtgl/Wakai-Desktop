@@ -376,22 +376,9 @@ impl DesktopLayer {
         dead
     }
 
-    /// Ekran yapılandırması değişti: her widget'ı görünür bir alana sığdırır.
-    /// Konumu değişen pencereleri ve yeni dikdörtgenlerini döndürür.
-    pub fn on_display_changed(&mut self) -> Vec<(isize, Rect)> {
+    /// Masaüstü penceresi değişmiş olabilir (ekran değişikliği); gerekirse yeniden bulur.
+    pub fn ensure_host(&mut self) {
         self.live_host();
-        let mut changed = Vec::new();
-        let handles: Vec<isize> = self.windows.keys().copied().collect();
-        for hwnd in handles {
-            let rect = self.windows[&hwnd].rect;
-            let clamped = monitors::clamp_visible(rect);
-            // Progman yeniden boyutlanmış olabilir; konum değişmese bile yeniden uygula.
-            self.set_rect(hwnd, clamped);
-            if clamped != rect {
-                changed.push((hwnd, clamped));
-            }
-        }
-        changed
     }
 }
 

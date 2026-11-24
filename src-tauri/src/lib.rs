@@ -10,6 +10,7 @@ mod focus;
 mod http;
 mod layer;
 mod logging;
+mod main_window;
 mod media;
 mod monitor;
 mod procstats;
@@ -17,6 +18,7 @@ mod scheduler;
 pub mod settings;
 mod state;
 mod subscriptions;
+mod tray;
 mod validate;
 mod weather;
 mod widgets;
@@ -27,7 +29,7 @@ use tauri::Manager;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            show_main_window(app);
+            main_window::show(app);
         }))
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
@@ -38,6 +40,7 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             logging::init(&dir);
+            install_panic_hook();
             let db_path = dir.join("wakai.db");
             if let Err(e) = backup::apply_pending_restore(&dir, &db_path) {
                 log::error!("yedek geri yüklenemedi: {e}");
@@ -67,13 +70,28 @@ pub fn run() {
                 log::error!("widget'lar geri yüklenemedi: {e}");
             }
 
+            tray::create(app.handle())?;
+
+            // Windows ile başlatıldıysa yalnızca widget'lar gelir; Kontrol Merkezi açılmaz.
             let autostarted = std::env::args().any(|a| a == "--autostart");
             if !autostarted {
-                show_main_window(app.handle());
+                main_window::show(app.handle());
             }
             Ok(())
         })
         .on_window_event(|window, event| {
+            if window.label() == main_window::LABEL
+                && let tauri::WindowEvent::CloseRequested { api, .. } = event
+            {
+                match main_window::on_close_requested(window.app_handle()) {
+                    // Pencereyi gizlemek yerine kapatmaya izin ver: WebView belleği serbest kalır.
+                    main_window::CloseAction::CloseWindowOnly => {}
+                    main_window::CloseAction::ExitApp => {
+                        api.prevent_close();
+                        window.app_handle().exit(0);
+                    }
+                }
+            }
             if let tauri::WindowEvent::Destroyed = event {
                 subscriptions::on_window_destroyed(window.app_handle(), window.label());
             }
@@ -137,17 +155,33 @@ pub fn run() {
         ])
         .build(tauri::generate_context!())
         .expect("Wakai Desktop başlatılamadı")
-        .run(|app, event| {
-            if let tauri::RunEvent::Exit = event {
-                widgets::manager::flush_rects(app);
-            }
+        .run(|app, event| match event {
+            // Son pencere kapandığında (ör. Kontrol Merkezi kapatıldı ve widget'lar gizli)
+            // uygulama tepside çalışmaya devam eder. Açık çıkış (`app.exit`) bir kod taşır.
+            tauri::RunEvent::ExitRequested {
+                code: None, api, ..
+            } => api.prevent_exit(),
+            tauri::RunEvent::Exit => shutdown(app),
+            _ => {}
         });
 }
 
-pub(crate) fn show_main_window(app: &tauri::AppHandle) {
-    if let Some(w) = app.get_webview_window("main") {
-        let _ = w.unminimize();
-        let _ = w.show();
-        let _ = w.set_focus();
+/// Düzenli kapanış: bekleyen konumları yaz, WAL'ı veritabanına aktar.
+fn shutdown(app: &tauri::AppHandle) {
+    widgets::manager::flush_rects(app);
+    if let Some(state) = app.try_state::<AppState>() {
+        let _ = state
+            .db
+            .with(|c| Ok(c.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);")?));
     }
+    log::info!("Wakai Desktop kapandı");
+}
+
+/// Panikler günlük dosyasına yazılır; hata ayıklama için iz bırakır.
+fn install_panic_hook() {
+    let default = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        log::error!("beklenmeyen hata: {info}");
+        default(info);
+    }));
 }

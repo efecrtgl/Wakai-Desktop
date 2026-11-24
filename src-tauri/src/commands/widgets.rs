@@ -114,7 +114,7 @@ pub fn open_control_center(
     section: Option<String>,
     widget_id: Option<String>,
 ) -> AppResult<()> {
-    crate::show_main_window(&app);
+    crate::main_window::show(&app);
     if section.is_some() || widget_id.is_some() {
         crate::events::broadcast(
             &app,

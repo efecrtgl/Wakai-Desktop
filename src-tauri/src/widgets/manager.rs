@@ -343,6 +343,24 @@ pub fn flush_rects(app: &AppHandle) {
     }
 }
 
+/// Ekran yapılandırması değişti. Her widget KAYITLI konumundan görünür alana sığdırılır,
+/// fakat sığdırılmış konum kaydedilmez: bağlantısı kesilen monitör geri gelince widget
+/// eski yerine döner.
+pub fn on_display_changed(app: &AppHandle) {
+    let open: Vec<(String, isize)> = lock(&runtime(app).windows)
+        .iter()
+        .map(|(k, v)| (k.clone(), *v))
+        .collect();
+    let state = app.state::<layer::LayerState>();
+    for (id, hwnd) in open {
+        if let Ok(inst) = db(app).with(|c| repo::get(c, &id)) {
+            state
+                .lock()
+                .set_rect(hwnd, monitors::clamp_visible(inst.rect));
+        }
+    }
+}
+
 /// Bir widget penceresi yok edildi. Bilerek kapatılmadıysa (ör. Explorer çöktü ve
 /// ebeveyniyle birlikte yok edildi) kısa bir gecikmeyle yeniden oluşturulur.
 pub fn on_window_destroyed(app: &AppHandle, id: &str) {

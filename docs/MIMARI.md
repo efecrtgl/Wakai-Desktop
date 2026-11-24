@@ -53,7 +53,10 @@ Wakai Desktop iki ana parçadan oluşur:
 | `subscriptions` | Pahalı hizmetleri yalnızca abone pencere varken çalıştıran abonelik kaydı. |
 | `http` | WinHTTP tabanlı HTTPS GET istemcisi. |
 | `validate` | Ön yüz girdilerinin doğrulanması (Türkçe hata mesajları). |
-| `tray`, `startup` | Sistem tepsisi, Windows ile başlatma. |
+| `tray` | Sistem tepsisi simgesi ve menüsü. |
+| `main_window` | Kontrol Merkezi penceresinin oluşturulması; tepsiye kapatılınca yok edilip gerektiğinde yeniden oluşturulması. |
+| `backup` | Veritabanı yedekleme ve açılışta güvenli geri yükleme. |
+| `procstats` | Uygulamanın kendi süreç ağacının bellek/CPU kullanımı. |
 
 ## 4. Ön Yüz (`src`)
 

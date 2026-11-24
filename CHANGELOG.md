@@ -35,4 +35,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Abonelik modeli: arka plan hizmetleri yalnızca gösteren bir pencere varken çalışır.
 - Özgün piksel kedi ailesi: oturan, mutlu, meraklı, rahat, çalışan, uyuyan kedi ve yüz; göz kırpma, kuyruk sallama, Zz ve kutlama animasyonları.
 - Piksel simge seti ve widget görsel yapı taşları.
+- Sistem tepsisi: Kontrol Merkezi, widget görünürlüğü, toplu etkileşim kilidi açma, çıkış.
+- Tepsiye kapatmada Kontrol Merkezi penceresi tamamen kapatılır (bellek serbest kalır) ve gerektiğinde yeniden oluşturulur.
+- Monitör geri takıldığında widget'lar kayıtlı konumlarına döner.
+- Düzenli kapanış ve panik günlüğü.
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

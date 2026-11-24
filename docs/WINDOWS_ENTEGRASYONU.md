@@ -63,7 +63,20 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 | Oturum kapanışı (`WM_ENDSESSION`) | SQLite WAL kontrol noktası yazılır. | Test edilmedi. |
 | Masaüstü penceresi kaybolursa | Her işlemden önce `IsWindow` ile kontrol edilir, gerekirse hiyerarşi yeniden aranır. Masaüstü bulunamazsa widget normal pencere olarak gösterilir (`Detached`). | Kod yolu mevcut. |
 
-## 5. Widget'ların Kullandığı Windows Hizmetleri
+## 5. Uygulama Yaşam Döngüsü
+
+| Davranış | Uygulama | Doğrulama |
+|---|---|---|
+| Sistem tepsisi | Sol tık: Kontrol Merkezi. Menü: Kontrol Merkezi'ni aç, Widget'ları göster (onay kutusu, ayarla eşitlenir), Tüm widget'ları etkileşimli yap (tıklama geçirgenliğini toplu kapatan güvenlik çıkışı), Çıkış. | Simge oluşturuluyor; menü öğeleri elle tıklanarak test edilmedi. |
+| Tepsiye kapatma | "Kapatınca tepside çalış" açıkken Kontrol Merkezi penceresi gizlenmez, **yok edilir** (WebView belleği serbest kalır); uygulama widget'larla çalışmaya devam eder. Kapalıyken pencereyi kapatmak uygulamadan çıkar. | Her iki durum da doğrulandı. |
+| Son pencere kapanınca | Widget'lar gizli ve Kontrol Merkezi kapalı olsa bile uygulama tepside çalışmayı sürdürür (`ExitRequested` engellenir). Yalnızca açık çıkış uygulamayı kapatır. | Doğrulandı. |
+| Tek örnek | İkinci başlatma yeni süreç açmaz; çalışan örnekte Kontrol Merkezi'ni açar (gerekirse yeniden oluşturur). | Doğrulandı. |
+| Windows ile başlatma | `HKCU\...\Run` kaydı (`--autostart` bağımsız değişkeniyle). Otomatik başlatmada yalnızca widget'lar gelir. | Kayıt ayarla eşitleniyor; gerçek oturum açılışı Aşama 11'de kurulu sürümle doğrulanacak. |
+| Düzenli kapanış | Bekleyen widget konumları yazılır, WAL veritabanına aktarılır. | Kod yolu mevcut. |
+| Beklenmeyen hata | Panikler `wakai.log` dosyasına yazılır. | — |
+| Monitör çıkarılıp geri takılması | Ekran değişince widget'lar **kayıtlı** konumlarından görünür alana sığdırılır ama sığdırılmış konum kaydedilmez; monitör geri gelince widget eski yerine döner. | Mantık birim testleriyle; gerçek monitör değişikliği test edilmedi. |
+
+## 6. Widget'ların Kullandığı Windows Hizmetleri
 
 | Widget | API | Davranış |
 |---|---|---|
@@ -71,7 +84,7 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 | Sistem Kedisi | `GetSystemTimes`, `GlobalMemoryStatusEx`, `GetDiskFreeSpaceExW`, PDH `\GPU Engine(*engtype_3D)\Utilization Percentage` | Yalnızca abone varken, ayarlanan aralıkla (varsayılan 3 sn; düşük kaynak modunda 2 katı). GPU sayacı okunamazsa "Ölçülemiyor" gösterilir. Değerler geliştirme makinesinde gerçek okumalarla doğrulandı. |
 | Hava Durumu Kedisi | WinHTTP (`WinHttpOpen` … `WinHttpReadData`) | Windows sertifika deposu ve SChannel ile HTTPS. WinRT `HttpClient` geliştirme makinesinde Let's Encrypt sertifikalı Open-Meteo sunucularında `0x80072F8F` hatası verdiği (sertifika hatası listelemeden) için WinHTTP tercih edildi. |
 
-## 6. Kullanılan API'ler
+## 7. Kullanılan API'ler
 
 - Hiyerarşi: `FindWindowW`, `FindWindowExW`, `EnumWindows`, `SendMessageTimeoutW(0x052C)` (zaman aşımlı).
 - Yerleşim: `SetParent`, `SetWindowLongPtrW` (yalnızca kendi pencerelerimizde), `SetWindowPos`, `ScreenToClient`, `GetWindow(GW_HWNDPREV)`.
@@ -79,14 +92,14 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 - Monitörler: `EnumDisplayMonitors`, `MonitorFromRect`, `GetMonitorInfoW`, `GetDpiForMonitor`.
 - WebView2: `ICoreWebView2Controller3::SetRasterizationScale`.
 
-## 7. Yapılmayanlar
+## 8. Yapılmayanlar
 
 - `HWND_TOPMOST` kullanılmaz.
 - Explorer sonlandırılmaz veya yeniden başlatılmaz.
 - Explorer pencerelerinin stilleri değiştirilmez, onlara girdi enjekte edilmez.
 - Fare kancası (`WH_MOUSE_LL`) kullanılmaz; sistemin girdi gecikmesine etki edilmez.
 
-## 8. Bilinen Sınırlamalar
+## 9. Bilinen Sınırlamalar
 
 - **Simgelerle çakışma:** İmleç simgelerle çakışan bir widget'ın üzerine geldiğinde widget kaldırılır ve o sırada çakışan simgelerin üstünde görünür. Widget'ları simgelerin bulunmadığı alanlara yerleştirmek önerilir.
 - **Süreçler arası ebeveynlik:** `SetParent` ile Explorer penceresine bağlanmak iki iş parçacığının girdi kuyruklarını ilişkilendirir. Bu yüzden widget pencerelerinin UI iş parçacığında engelleyici iş yapılmaz.
