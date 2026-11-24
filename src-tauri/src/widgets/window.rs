@@ -5,6 +5,13 @@ use crate::desktop::Rect;
 use crate::error::AppResult;
 use tauri::{AppHandle, WebviewUrl, WebviewWindow, WebviewWindowBuilder};
 
+/// Tüm pencerelerde AYNI olmalıdır (WebView2 ortamı paylaşılır).
+/// İlk kısım Tauri/wry'nin varsayılan bayraklarıdır. `--renderer-process-limit` aynı kökenli
+/// sayfaların renderer süreçlerini paylaşmasını sağlar; her widget için ayrı bir renderer süreci
+/// (~25–40 MB) açılmaz. Ölçüm sonuçları: docs/PERFORMANS.md.
+pub const BROWSER_ARGS: &str =
+    "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --renderer-process-limit=2";
+
 pub fn label_for(id: &str) -> String {
     format!("widget-{id}")
 }
@@ -25,9 +32,32 @@ pub fn create(app: &AppHandle, id: &str, rect: Rect) -> AppResult<WebviewWindow>
         .resizable(true)
         .focused(false)
         .visible(false)
+        .additional_browser_args(BROWSER_ARGS)
         .inner_size(rect.width as f64, rect.height as f64)
         .build()?;
+    set_low_memory_target(&window);
     Ok(window)
+}
+
+/// Widget WebView'larına düşük bellek hedefi verir: Chromium önbellekleri daha agresif
+/// boşaltır. Widget'lar nadiren değiştiği için performans etkisi hissedilmez.
+fn set_low_memory_target(window: &WebviewWindow) {
+    let result = window.with_webview(|wv| {
+        use webview2_com::Microsoft::Web::WebView2::Win32::{
+            COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL_LOW, ICoreWebView2_19,
+        };
+        use windows::core::Interface;
+        unsafe {
+            if let Ok(core) = wv.controller().CoreWebView2()
+                && let Ok(v19) = core.cast::<ICoreWebView2_19>()
+            {
+                let _ = v19.SetMemoryUsageTargetLevel(COREWEBVIEW2_MEMORY_USAGE_TARGET_LEVEL_LOW);
+            }
+        }
+    });
+    if let Err(e) = result {
+        log::warn!("bellek hedefi ayarlanamadı: {e}");
+    }
 }
 
 pub fn hwnd_of(window: &WebviewWindow) -> Option<isize> {

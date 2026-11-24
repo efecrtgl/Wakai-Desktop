@@ -1,7 +1,9 @@
 // Piksel kedi bileşeni: sprite katmanlarını tek bir SVG'ye dönüştürür.
 // Aynı renkteki yatay piksel dizileri tek bir <rect> olarak birleştirilir (daha az DOM düğümü).
-// Animasyonlar yalnızca CSS ile ve düşük kare hızında (steps) yapılır; hareket azaltıldığında durur.
-import { memo, useMemo } from 'react';
+// Sürekli animasyonlar seyrek JS zamanlayıcılarıyla yapılır (bkz. useCatMotion.js); CSS yalnızca
+// üzerine gelince kuyruk sallama ve tek seferlik kutlama için kullanılır.
+import { memo } from 'react';
+import { useBlink, useFrame, useMotionAllowed } from './useCatMotion.js';
 import { PALETTE, SPRITES } from './sprites.js';
 import './cats.css';
 
@@ -33,6 +35,19 @@ function layersFor(pose) {
   return cache.get(pose);
 }
 
+const has = (layers, name) => layers.some((l) => l.name === name);
+
+/** Bir katmanın SVG grubu; içerik sabittir, yalnızca görünürlük değişir. */
+const Layer = memo(function Layer({ layer, hidden, dy = 0 }) {
+  return (
+    <g className={`pc-layer pc-layer--${layer.name}`} opacity={hidden ? 0 : 1} transform={dy ? `translate(0 ${dy})` : undefined}>
+      {layer.rects.map((r, i) => (
+        <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.fill} />
+      ))}
+    </g>
+  );
+});
+
 /**
  * @param {object} props
  * @param {string} props.pose       face | sitting | happy | curious | relaxed | working | sleeping
@@ -42,11 +57,11 @@ function layersFor(pose) {
  */
 export const PixelCat = memo(function PixelCat({ pose = 'face', size = 48, celebrate = false, wag = false, className = '', title }) {
   const layers = layersFor(pose);
-  // Her kedi farklı anda göz kırpsın diye rastgele bir gecikme (bileşen ömrü boyunca sabit).
-  const blinkDelay = useMemo(() => `${(Math.random() * 5).toFixed(2)}s`, []);
-  const classes = ['pixel-cat', `pixel-cat--${pose}`, celebrate && 'pixel-cat--celebrate', wag && 'pixel-cat--wag', className]
-    .filter(Boolean)
-    .join(' ');
+  const motion = useMotionAllowed();
+  const blink = useBlink(motion && has(layers, 'blink'));
+  const frame = useFrame(motion && (has(layers, 'zz') || has(layers, 'question')), 1500);
+  const wagFrame = useFrame(motion && wag && has(layers, 'tailB'), 450);
+  const classes = ['pixel-cat', `pixel-cat--${pose}`, celebrate && 'pixel-cat--celebrate', className].filter(Boolean).join(' ');
 
   return (
     <svg
@@ -57,16 +72,25 @@ export const PixelCat = memo(function PixelCat({ pose = 'face', size = 48, celeb
       shapeRendering="crispEdges"
       role={title ? 'img' : undefined}
       aria-hidden={title ? undefined : true}
-      style={{ '--pc-blink-delay': blinkDelay }}
     >
       {title ? <title>{title}</title> : null}
-      {layers.map((layer) => (
-        <g key={layer.name} className={`pc-layer pc-layer--${layer.name}`}>
-          {layer.rects.map((r, i) => (
-            <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.fill} />
-          ))}
-        </g>
-      ))}
+      {layers.map((layer) => {
+        switch (layer.name) {
+          case 'blink':
+            return <Layer key={layer.name} layer={layer} hidden={!blink} />;
+          case 'tailA':
+            return <Layer key={layer.name} layer={layer} hidden={wagFrame === 1} />;
+          case 'tailB':
+            return <Layer key={layer.name} layer={layer} hidden={wagFrame === 0} />;
+          case 'sparkle':
+            return <Layer key={layer.name} layer={layer} hidden={!celebrate} />;
+          case 'zz':
+          case 'question':
+            return <Layer key={layer.name} layer={layer} dy={frame ? -1 : 0} />;
+          default:
+            return <Layer key={layer.name} layer={layer} />;
+        }
+      })}
     </svg>
   );
 });

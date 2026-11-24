@@ -67,12 +67,6 @@ export function PerformanceSection({ settingsApi }) {
           format={(v) => `${v} dk`}
           onChange={(v) => update({ weather_refresh_minutes: v })}
         />
-        <Toggle
-          label="Örtülünce askıya al"
-          description="Masaüstü tamamen pencerelerle kaplıyken widget'ların çizimini duraklatır."
-          checked={s.suspend_when_covered}
-          onChange={(v) => update({ suspend_when_covered: v })}
-        />
       </Card>
       <Card title="Başlangıç">
         <Toggle

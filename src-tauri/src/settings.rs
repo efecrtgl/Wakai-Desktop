@@ -37,8 +37,6 @@ pub struct AppSettings {
     pub monitor_interval_secs: u32,
     /// Hava durumu yenileme aralığı dakika cinsinden (15 – 180).
     pub weather_refresh_minutes: u32,
-    /// Masaüstü tamamen örtüldüğünde widget'ları askıya al.
-    pub suspend_when_covered: bool,
     /// Düşük kaynak modu: animasyonları kapatır, aralıkları uzatır.
     pub reduced_resource_mode: bool,
     pub notifications_enabled: bool,
@@ -58,7 +56,6 @@ impl Default for AppSettings {
             corner_radius: 18,
             monitor_interval_secs: 3,
             weather_refresh_minutes: 30,
-            suspend_when_covered: true,
             reduced_resource_mode: false,
             notifications_enabled: true,
         }

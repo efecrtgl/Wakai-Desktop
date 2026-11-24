@@ -4,6 +4,9 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 
 ## [Yayınlanmadı]
 
+### Kaldırıldı
+- İşlevi olmayan "Örtülünce askıya al" ayarı (gerekçe: docs/PERFORMANS.md §7).
+
 ### Eklendi
 - Tauri 2 + React (JavaScript) proje temeli.
 - SQLite veritabanı, sürümlü göçler ve göç öncesi otomatik yedek.
@@ -39,4 +42,5 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Tepsiye kapatmada Kontrol Merkezi penceresi tamamen kapatılır (bellek serbest kalır) ve gerektiğinde yeniden oluşturulur.
 - Monitör geri takıldığında widget'lar kayıtlı konumlarına döner.
 - Düzenli kapanış ve panik günlüğü.
+- Performans: boşta CPU ≈65 kat azaldı (piksel kedi animasyonları seyrek zamanlayıcılara taşındı), WebView renderer süreçleri paylaşıldı, widget'lara düşük bellek hedefi; ölçüm betiği `scripts/measure.ps1` ve ölçümlerle Türkçe performans raporu.
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

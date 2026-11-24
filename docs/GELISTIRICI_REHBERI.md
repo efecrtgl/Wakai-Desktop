@@ -70,6 +70,7 @@ node scripts/preview-sprites.mjs sprites.png base,tailA,zz
 ### Animasyon kuralları
 
 - Yalnızca `opacity` ve `transform` canlandırılır; `steps()` ile düşük kare hızı kullanılır.
-- Göz kırpma ~6 saniyede bir ve her kedide farklı gecikmeyle; kuyruk yalnızca üzerine gelince sallanır.
+- **SVG öğelerinde sonsuz CSS animasyonu kullanmayın.** Chromium bunları her karede ana iş parçacığında işler (ölçüldü: widget başına %10–16 çekirdek). Sürekli değişimler `src/ui/cats/useCatMotion.js` içindeki seyrek zamanlayıcılarla yapılır: göz kırpma 4–9 sn'de bir, Zz/soru işareti 1,5 sn'de bir.
+- Kuyruk yalnızca üzerine gelince (CSS) ya da `wag` verilince (zamanlayıcı) sallanır.
 - Kutlama (`useCelebration`) tek seferliktir.
 - `<html data-motion="full|reduced|off">` uygulama ayarlarından gelir; `reduced`/`off` ve işletim sisteminin “hareketi azalt” tercihi tüm animasyonları durdurur.

@@ -13,6 +13,7 @@ fn build(app: &AppHandle) -> AppResult<WebviewWindow> {
         .min_inner_size(860.0, 560.0)
         .center()
         .visible(false)
+        .additional_browser_args(crate::widgets::window::BROWSER_ARGS)
         .build()?;
     Ok(window)
 }
