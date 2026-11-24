@@ -290,3 +290,141 @@ pub fn play_with_pet(
 pub fn summon_pet(engine: State<'_, PetEngine>, id: i64) {
     engine.send(Cmd::Animate(id, Anim::Summon));
 }
+
+// ── Kedi Evi ──────────────────────────────────────────────────────────────
+
+/// Kedi Evi'ne yerleştirilebilecek eşyalar (ön yüzdeki çizimlerle eşleşir).
+pub const HOME_KINDS: &[&str] = &[
+    "bed", "cushion", "scratch", "bowl", "yarn", "ball", "plant", "lamp", "rug", "box",
+];
+/// Oda boyutu (piksel sanatı birimi) ve zemin aralığı.
+pub const ROOM_W: i64 = 320;
+pub const FLOOR_TOP: i64 = 104;
+pub const FLOOR_BOTTOM: i64 = 176;
+
+fn clamp_item(x: i64, y: i64) -> (i64, i64) {
+    (x.clamp(8, ROOM_W - 8), y.clamp(FLOOR_TOP, FLOOR_BOTTOM))
+}
+
+/// İlk açılışta varsayılan, sevimli bir oda kurar. Kullanıcı hepsini silerse yeniden kurulmaz.
+fn seed_home(db: &crate::db::Db) -> AppResult<()> {
+    db.with_tx(|tx| {
+        if crate::db::pets::stat(tx, "home_seeded")? > 0 {
+            return Ok(());
+        }
+        for (kind, x, y) in [
+            ("rug", 160, 150),
+            ("bed", 64, 128),
+            ("scratch", 270, 120),
+            ("bowl", 210, 160),
+            ("yarn", 150, 168),
+            ("plant", 22, 112),
+            ("cushion", 112, 162),
+            ("lamp", 300, 108),
+        ] {
+            crate::db::pets::add_home_item(tx, kind, x, y)?;
+        }
+        crate::db::pets::set_stat(tx, "home_seeded", 1)
+    })
+}
+
+#[tauri::command]
+pub fn list_home_items(state: State<'_, AppState>) -> AppResult<Vec<crate::db::pets::HomeItem>> {
+    seed_home(&state.db)?;
+    state.db.with(crate::db::pets::home_items)
+}
+
+#[tauri::command]
+pub fn add_home_item(
+    state: State<'_, AppState>,
+    kind: String,
+    x: i64,
+    y: i64,
+) -> AppResult<crate::db::pets::HomeItem> {
+    if !HOME_KINDS.contains(&kind.as_str()) {
+        return Err(AppError::invalid("Bilinmeyen eşya."));
+    }
+    let count = state.db.with(crate::db::pets::home_items)?.len();
+    if count >= 60 {
+        return Err(AppError::invalid("Odada en fazla 60 eşya olabilir."));
+    }
+    let (x, y) = clamp_item(x, y);
+    state
+        .db
+        .with(|c| crate::db::pets::add_home_item(c, &kind, x, y))
+}
+
+#[tauri::command]
+pub fn move_home_item(
+    state: State<'_, AppState>,
+    id: i64,
+    x: i64,
+    y: i64,
+    flipped: bool,
+) -> AppResult<()> {
+    let (x, y) = clamp_item(x, y);
+    state
+        .db
+        .with(|c| crate::db::pets::move_home_item(c, id, x, y, flipped))
+}
+
+#[tauri::command]
+pub fn delete_home_item(state: State<'_, AppState>, id: i64) -> AppResult<()> {
+    state.db.with(|c| crate::db::pets::delete_home_item(c, id))
+}
+
+#[derive(Serialize, serde::Deserialize, Clone)]
+pub struct HomeStyle {
+    pub wall: String,
+    pub floor: String,
+}
+
+const WALLS: &[&str] = &["pink", "mint", "lavender", "cream", "night"];
+const FLOORS: &[&str] = &["wood", "tile", "carpet"];
+
+#[tauri::command]
+pub fn get_home_style(state: State<'_, AppState>) -> AppResult<HomeStyle> {
+    let v = state
+        .db
+        .with(|c| crate::db::settings::get(c, "pet_home_style"))?;
+    Ok(v.and_then(|v| serde_json::from_value(v).ok())
+        .unwrap_or(HomeStyle {
+            wall: "pink".into(),
+            floor: "wood".into(),
+        }))
+}
+
+#[tauri::command]
+pub fn set_home_style(state: State<'_, AppState>, style: HomeStyle) -> AppResult<HomeStyle> {
+    if !WALLS.contains(&style.wall.as_str()) || !FLOORS.contains(&style.floor.as_str()) {
+        return Err(AppError::invalid("Geçersiz oda görünümü."));
+    }
+    let value = serde_json::to_value(&style)?;
+    state
+        .db
+        .with(|c| crate::db::settings::set(c, "pet_home_style", &value))?;
+    Ok(style)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn home_seeding_happens_once_and_clamps() {
+        let db = crate::db::Db::open_in_memory().unwrap();
+        seed_home(&db).unwrap();
+        let n = db.with(crate::db::pets::home_items).unwrap().len();
+        assert!(n >= 6);
+        for it in db.with(crate::db::pets::home_items).unwrap() {
+            db.with(|c| crate::db::pets::delete_home_item(c, it.id))
+                .unwrap();
+        }
+        seed_home(&db).unwrap();
+        assert!(
+            db.with(crate::db::pets::home_items).unwrap().is_empty(),
+            "silinen oda yeniden kurulmamalı"
+        );
+        assert_eq!(clamp_item(-50, 900), (8, FLOOR_BOTTOM));
+    }
+}

@@ -583,3 +583,53 @@
   font-size: var(--text-lg);
   line-height: 1;
 }
+
+/* Kedi Evi */
+.home-wrap {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  line-height: 0;
+}
+.home-wrap.is-editing {
+  outline: 3px dashed var(--color-focus);
+  outline-offset: 2px;
+}
+.home-canvas {
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+.home-wrap.is-editing .home-canvas {
+  cursor: grab;
+}
+.home-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  gap: var(--space-2);
+}
+.home-catalog__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  min-height: 74px;
+  padding: var(--space-2) var(--space-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+.home-catalog__item:hover {
+  border-color: var(--color-primary);
+}
+.cc-chip.is-on {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+}

@@ -8,6 +8,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Görünüm modları: Wakai (özgün), Siyah ve Beyaz.
 - Yazı tipi seçimi (Windows 11 ile gelen yazı tipleri) ve tutarlı yazı ölçeği.
 - Alışveriş Kedisi: miktar ayrıştırmalı alışveriş listesi.
+- Masaüstü kedileri: yerel, hafif kedi motoru; 8 cins, 6 kişilik, ihtiyaçlar, besleme, sevme, oyuncaklar, aksesuarlar, başarımlar.
+- Kedi Evi: düzenlenebilir piksel sanatı oda.
 
 ### Değişti
 - Takvim Kedisi yeniden tasarlandı (okunaklı başlık, Bugün kısayolu, klavye gezinmesi, renk çubuklu etkinlikler, kompakt düzen).

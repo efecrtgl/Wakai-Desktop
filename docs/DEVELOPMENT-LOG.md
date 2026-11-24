@@ -49,3 +49,11 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - **Kedi ayarları:** açık/kapalı, etkinlik düzeyi, boyut, aynı anda en fazla kedi, tam ekranda gizleme.
 - Ön yüz sprite çizimi Rust ile aynı `sprites.json`'dan (`src/pets/sprite.js`); 2 yeni ön yüz testi (tüm animasyon × cins çizilir, aksesuarlar ızgarayı değiştirir).
 - Doğrulama: ekran görüntüleriyle koleksiyon ve sahiplenme penceresi incelendi; aksesuar seçiminin taşma hatası bulunup düzeltildi.
+
+## Aşama 7 — Kedi Evi
+
+- Kontrol Merkezi'nde yeni bölüm; ayrı pencere açmaz (ek WebView yok). Tek `<canvas>`, tam sayı ölçekli piksel sanatı oda (320×180 birim): çizgili duvar, pencere (gece duvarında ay), süpürgelik, zemin.
+- 10 eşya (kediyle aynı çizim dili, otomatik kontur). Eşyalar `pet_home_items` tablosunda; ilk açılışta bir kez varsayılan oda kurulur (hepsi silinirse yeniden kurulmaz); en fazla 60 eşya; konumlar sunucuda zemine sıkıştırılır.
+- Simülasyon (`src/pets/home/sim.js`, saf): ihtiyaç önceliği (uyku → yatak, açlık → mama), kişilik ağırlıkları (oyuncak, tırmalama, şekerleme, arkadaşının yanına oturma), yalnızca sayfa açık ve görünürken 8 Hz.
+- Düzenleme modu: sürükle, çevir, kaldır, katalogdan ekle; duvar/zemin seçimi kalıcı.
+- Doğrulama: 5 yeni ön yüz testi + 1 Rust testi (tek seferlik varsayılan oda, sıkıştırma). Gerçek uygulamada oda ve kedinin dolaşması ekran görüntüsüyle incelendi; o sırada kullanıcı odayı düzenleyip top ekledi — düzenleme gerçek kullanımda da çalıştı.

@@ -59,6 +59,16 @@ Pembiş, Pamuk (beyaz), Gece (siyah), Tarçın (turuncu), Duman (gri), Benekli (
 
 İlk dost, Mama ustası, Sevgi dolu, Oyun arkadaşı, Sadık dost (3 gün üst üste besleme), Mutlu kedi, Koleksiyoncu (4 farklı cins). Başarımlar bildirim göndermez; Kontrol Merkezi'nde görünür.
 
+## Kedi Evi
+
+Kontrol Merkezi → **Kedi Evi**: kedilerinin dinlendiği piksel sanatı oda.
+
+- Masaüstünde değil evde olan kediler burada yaşar. Yorulunca yatağa, minderde ya da kutuda uyur; acıkınca mama kabına gider; kişiliğine göre oyuncaklarla ve tırmalama tahtasıyla oynar; diğer kedilerin yanına oturur.
+- Kediye tıklamak onu sever (uyuyorsa uyandırmaz).
+- **Odayı düzenle:** eşyaları sürükleyin, seçili eşyayı çevirin ya da kaldırın; katalogdan yeni eşya ekleyin (yatak, minder, tırmalama tahtası, mama kabı, yün yumağı, top, bitki, lamba, halı, karton kutu). Duvar (Pembe, Nane, Lavanta, Krem, Gece) ve zemin (Ahşap, Fayans, Halı kaplama) seçilebilir.
+- Eşya konumları ve oda görünümü kaydedilir. Kedi Evi'ni kapatmak kedilerin durumunu sıfırlamaz.
+- Oda yalnızca açıkken ve pencere görünürken çizilir (~8 kare/sn); kapalıyken hiç kaynak kullanmaz.
+
 ## Performans
 
 Kediler WebView kullanmaz; Rust'ta doğrudan katmanlı pencerelere çizilir. Kare hızı etkinliğe göre değişir: yürürken ~30 Hz konum, otururken birkaç saniyede bir kare, uyurken ~1,6 saniyede bir. Masaüstünde aynı anda en fazla 5 kedi dolaşır (Ayarlar'dan 1–12 arası); sınırın nedeni her kedinin ayrı bir yerel pencere ve kare hesabı olmasıdır.
