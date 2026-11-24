@@ -15,9 +15,32 @@ pub enum AnimationQuality {
     Off,
 }
 
+/// Görünüm modu.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Appearance {
+    /// Özgün pastel Wakai görünümü
+    Wakai,
+    /// Siyah görünüm
+    Dark,
+    /// Beyaz görünüm
+    Light,
+}
+
+/// Yazı tipi seçimi (hepsi Windows 11 ile gelir).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum FontFamily {
+    System,
+    Modern,
+    Mono,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AppSettings {
+    pub appearance: Appearance,
+    pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
     /// Windows açıldığında Wakai Desktop'u başlat.
@@ -45,6 +68,8 @@ pub struct AppSettings {
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
+            appearance: Appearance::Wakai,
+            font_family: FontFamily::System,
             close_to_tray: true,
             launch_on_startup: false,
             widgets_visible: true,
@@ -139,6 +164,19 @@ mod tests {
         assert_eq!(s.widget_opacity, 1.0);
         assert!(!s.shadows);
         assert_eq!(load(&db).unwrap(), s);
+    }
+
+    #[test]
+    fn appearance_roundtrip_and_validation() {
+        let db = Db::open_in_memory().unwrap();
+        let s = update(
+            &db,
+            serde_json::json!({ "appearance": "dark", "font_family": "modern" }),
+        )
+        .unwrap();
+        assert_eq!(s.appearance, Appearance::Dark);
+        assert_eq!(load(&db).unwrap().font_family, FontFamily::Modern);
+        assert!(update(&db, serde_json::json!({ "appearance": "neon" })).is_err());
     }
 
     #[test]

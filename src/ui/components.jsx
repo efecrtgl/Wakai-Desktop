@@ -1,5 +1,5 @@
 // Paylaşılan temel arayüz bileşenleri. Stiller: components.css
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 export function Button({ variant = 'secondary', size = 'md', icon, children, className = '', ...rest }) {
   return (
@@ -123,4 +123,60 @@ export function EmptyState({ cat, title, children }) {
 export function ErrorNote({ error }) {
   if (!error) return null;
   return <p className="wk-error" role="alert">{String(error)}</p>;
+}
+
+/** Yükleniyor göstergesi (piksel noktalar; hareket azaltılınca sabit). */
+export function Loading({ label = 'Yükleniyor…' }) {
+  return (
+    <div className="wk-loading" role="status">
+      <span className="wk-loading__dots" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+/** Kısa açıklama balonu. Fareyle ya da klavye odağıyla görünür. */
+export function Tooltip({ text, children }) {
+  return (
+    <span className="wk-tooltip" tabIndex={0}>
+      {children}
+      <span className="wk-tooltip__bubble" role="tooltip">{text}</span>
+    </span>
+  );
+}
+
+/**
+ * Kalıcı modal iletişim kutusu. Escape ve arka plan tıklaması `onClose` çağırır
+ * (`dismissible` false değilse). Açılınca ilk odaklanabilir öğeye odaklanır.
+ */
+export function Dialog({ open, title, children, actions, onClose, dismissible = true, icon }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const prev = document.activeElement;
+    ref.current?.querySelector('button, [href], input, select, textarea')?.focus();
+    const onKey = (e) => {
+      if (e.key === 'Escape' && dismissible) onClose?.();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      prev?.focus?.();
+    };
+  }, [open, dismissible, onClose]);
+  if (!open) return null;
+  return (
+    <div className="wk-dialog__backdrop" onMouseDown={(e) => e.target === e.currentTarget && dismissible && onClose?.()}>
+      <div ref={ref} className="wk-dialog" role="dialog" aria-modal="true" aria-label={title}>
+        {icon ? <div className="wk-dialog__icon">{icon}</div> : null}
+        <h2 className="wk-dialog__title">{title}</h2>
+        <div className="wk-dialog__body">{children}</div>
+        {actions ? <div className="wk-dialog__actions">{actions}</div> : null}
+      </div>
+    </div>
+  );
 }

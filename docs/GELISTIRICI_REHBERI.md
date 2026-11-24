@@ -53,7 +53,8 @@ Wakai-Desktop/
 
 | Dosya | İçerik |
 |---|---|
-| `src/ui/tokens.css` | Tüm renk, tipografi, boşluk, köşe, gölge ve hareket belirteçleri. Yeni tema = aynı değişkenlerin `:root[data-theme]` altında yeniden tanımlanması. |
+| `src/ui/tokens.css` | Tüm renk, tipografi (boyut, ağırlık, satır yüksekliği), boşluk, köşe, gölge ve hareket belirteçleri. Üç görünüm modu: `data-theme="wakai" | "dark" | "light"`; yazı tipi: `data-font="system" | "modern" | "mono"` (hepsi Windows 11 ile gelir). Bileşenlerde sabit renk ve ham palet değişkeni (`--pink-400` gibi) kullanılmaz; yalnızca anlamsal belirteçler (`--color-*`, `--cat-*`). |
+| `src/ui/components.jsx` (1.1.0) | Ek olarak: `Dialog`, `Loading`, `Tooltip`. |
 | `src/ui/components.jsx` | Düğme, kart, anahtar, kaydırıcı, seçim, alan, rozet, boş durum, hata notu. |
 | `src/ui/widget.jsx` | Widget yapı taşları: başlık (kediyle), ilerleme çubuğu, renk noktası, simge düğmesi. |
 | `src/ui/PixelIcon.jsx` | 12×12 tek renkli piksel simgeler (`currentColor`). |

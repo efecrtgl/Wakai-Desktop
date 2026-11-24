@@ -9,6 +9,18 @@ export const ANIMATION_OPTIONS = [
   { value: 'off', label: 'Kapalı' },
 ];
 
+const THEMES = [
+  { id: 'wakai', name: 'Wakai', desc: 'Özgün pastel pembe' },
+  { id: 'dark', name: 'Siyah', desc: 'Göz yormayan koyu görünüm' },
+  { id: 'light', name: 'Beyaz', desc: 'Sade ve ferah' },
+];
+
+const FONTS = [
+  { value: 'system', label: 'Varsayılan (Segoe UI)' },
+  { value: 'modern', label: 'Modern (Bahnschrift)' },
+  { value: 'mono', label: 'Daktilo (Cascadia)' },
+];
+
 export function AppearanceSection({ settingsApi }) {
   const { settings: s, update, error } = settingsApi;
   if (!s) return null;
@@ -16,6 +28,36 @@ export function AppearanceSection({ settingsApi }) {
     <div className="cc-page">
       <PageHeader title="Görünüm" subtitle="Pastel pembe piksel kedi teması" />
       <ErrorNote error={error} />
+      <Card title="Görünüm modu">
+        <div className="cc-themes" role="radiogroup" aria-label="Görünüm modu">
+          {THEMES.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="radio"
+              aria-checked={s.appearance === t.id}
+              className="cc-theme"
+              data-preview={t.id}
+              onClick={() => update({ appearance: t.id })}
+            >
+              <span className="cc-theme__swatch" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className="cc-theme__name">{t.name}</span>
+              <span className="cc-muted">{t.desc}</span>
+            </button>
+          ))}
+        </div>
+        <Select
+          label="Yazı tipi"
+          value={s.font_family}
+          options={FONTS}
+          onChange={(v) => update({ font_family: v })}
+          description="Tümü Windows 11 ile birlikte gelir; ek dosya indirilmez."
+        />
+      </Card>
       <Card title="Masaüstü widget'ları">
         <Toggle
           label="Widget'ları masaüstünde göster"

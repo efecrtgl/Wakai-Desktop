@@ -33,7 +33,7 @@
   border: none;
   background: transparent;
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--color-text-strong);
   outline: none;
   padding: 0;
@@ -75,7 +75,7 @@
   word-break: break-word;
 }
 .note__h {
-  font-weight: 750;
+  font-weight: var(--weight-heavy);
   color: var(--color-text-strong);
 }
 .note__li {

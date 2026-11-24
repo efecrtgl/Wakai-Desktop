@@ -1,4 +1,5 @@
-// Ayarlardaki hareket tercihini <html data-motion> özniteliğine yansıtır.
+// Ayarlardaki hareket, görünüm ve yazı tipi tercihlerini <html data-motion|data-theme|data-font>
+// özniteliklerine yansıtır. Kontrol Merkezi ve her widget penceresi bu kancayı kullanır.
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function motionMode(settings) {
@@ -10,9 +11,14 @@ export function motionMode(settings) {
 
 export function useMotionAttribute(settings) {
   const mode = motionMode(settings);
+  const theme = settings?.appearance ?? 'wakai';
+  const font = settings?.font_family ?? 'system';
   useEffect(() => {
-    document.documentElement.dataset.motion = mode;
-  }, [mode]);
+    const root = document.documentElement.dataset;
+    root.motion = mode;
+    root.theme = theme;
+    root.font = font;
+  }, [mode, theme, font]);
   return mode;
 }
 

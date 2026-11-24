@@ -2,6 +2,12 @@
 
 Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınarak hazırlanmıştır.
 
+## [Yayınlanmadı] — 1.1.0
+
+### Eklendi
+- Görünüm modları: Wakai (özgün), Siyah ve Beyaz.
+- Yazı tipi seçimi (Windows 11 ile gelen yazı tipleri) ve tutarlı yazı ölçeği.
+
 ## [1.0.0] — 2026-11-24
 
 İlk sürüm.

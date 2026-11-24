@@ -16,7 +16,7 @@
 .clock__time {
   font-family: var(--font-display);
   font-size: clamp(28px, 17vw, 64px);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
   color: var(--color-text-strong);
   letter-spacing: -0.02em;
@@ -72,6 +72,6 @@
 }
 .clock__zone-time {
   font-variant-numeric: tabular-nums;
-  font-weight: 650;
+  font-weight: var(--weight-semibold);
   color: var(--color-text);
 }

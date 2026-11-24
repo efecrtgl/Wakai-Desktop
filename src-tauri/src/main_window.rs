@@ -30,6 +30,7 @@ pub fn show(app: &AppHandle) {
             }
         },
     };
+    apply_theme(app, &window);
     let _ = window.unminimize();
     let _ = window.show();
     let _ = window.set_focus();
@@ -53,4 +54,17 @@ pub fn on_close_requested(app: &AppHandle) -> CloseAction {
 pub enum CloseAction {
     CloseWindowOnly,
     ExitApp,
+}
+
+/// Pencere çerçevesini (başlık çubuğu) seçili görünüme uydurur.
+pub fn apply_theme(app: &AppHandle, window: &WebviewWindow) {
+    let dark = app
+        .try_state::<crate::state::AppState>()
+        .and_then(|s| crate::settings::load(&s.db).ok())
+        .is_some_and(|s| s.appearance == crate::settings::Appearance::Dark);
+    let _ = window.set_theme(Some(if dark {
+        tauri::Theme::Dark
+    } else {
+        tauri::Theme::Light
+    }));
 }

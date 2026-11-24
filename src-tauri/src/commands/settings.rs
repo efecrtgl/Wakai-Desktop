@@ -28,6 +28,11 @@ pub fn apply_settings_patch(app: &AppHandle, patch: serde_json::Value) -> AppRes
     if before.widgets_visible != next.widgets_visible {
         crate::widgets::manager::apply_global_visibility(app, next.widgets_visible)?;
     }
+    if before.appearance != next.appearance
+        && let Some(w) = app.get_webview_window(crate::main_window::LABEL)
+    {
+        crate::main_window::apply_theme(app, &w);
+    }
     if before.widgets_visible != next.widgets_visible {
         crate::tray::sync(app, next.widgets_visible);
     }

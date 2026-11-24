@@ -16,8 +16,8 @@ export const PALETTE = {
   k: 'var(--cat-eye)',
   n: 'var(--cat-nose)',
   c: 'var(--cat-cheek)',
-  y: 'var(--lavender-400)',
-  g: 'var(--lavender-200)',
+  y: 'var(--cat-accent)',
+  g: 'var(--cat-accent-soft)',
   h: '#ffffff',
 };
 

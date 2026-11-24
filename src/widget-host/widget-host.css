@@ -17,7 +17,7 @@ body.widget-body {
 }
 :root[data-shadows='on'] .widget-frame {
   inset: 6px;
-  box-shadow: 0 3px 10px rgba(91, 74, 79, 0.16);
+  box-shadow: var(--shadow-widget);
 }
 .widget-frame--error {
   padding: var(--space-3);
