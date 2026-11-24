@@ -1,63 +1,90 @@
 # Windows 11 Masaüstü Entegrasyonu
 
-Bu belge Wakai Desktop'un widget'ları Windows 11 masaüstü katmanına nasıl yerleştirdiğini, kullanılan API'leri ve **bilinen sınırlamaları** açıklar.
+Bu belge Wakai Desktop'un widget'ları Windows 11 masaüstü katmanına nasıl yerleştirdiğini, kullanılan API'leri, **gerçekten doğrulanan** davranışları ve bilinen sınırlamaları açıklar.
 
-> Durum: Aşama 0 — araştırma ve plan. Uygulama ve doğrulama sonuçları Aşama 2'de bu belgeye eklenecektir.
+Kod: `src-tauri/src/desktop/` (tüm `unsafe` Win32 kodu yalnızca bu klasördedir) ve `src-tauri/src/layer.rs` (Tauri pencereleriyle bağlantı).
 
 ## 1. Masaüstü Pencere Hiyerarşisi
 
-Windows masaüstü, Explorer sürecine ait birkaç pencereden oluşur:
-
 | Pencere sınıfı | Görevi |
 |---|---|
-| `Progman` | “Program Manager”; masaüstünün kök penceresi. |
+| `Progman` | Masaüstünün kök penceresi. |
 | `SHELLDLL_DefView` | Masaüstü simgelerini barındıran kabuk görünümü. |
-| `SysListView32` | Simgelerin kendisi (DefView'in alt penceresi). |
+| `SysListView32` | Simgelerin kendisi. |
 | `WorkerW` | Duvar kağıdını çizen yardımcı pencere. |
 
-### 1.1 Windows 11 24H2 ve sonrası (bu makinede doğrulandı)
+### 1.1 Windows 11 24H2 ve sonrası (geliştirme makinesinde doğrulandı)
 
-Geliştirme makinesinde (Windows 11, derleme 26200) `Progman`'a `0x052C` mesajı gönderildikten sonra yapılan incelemenin sonucu:
+Derleme 26200 üzerinde `Progman`'a `0x052C` gönderildikten sonraki gerçek hiyerarşi:
 
 ```
-Progman
- ├─ SHELLDLL_DefView   (z-sırasında üstte — simgeler)
- └─ WorkerW            (z-sırasında altta — duvar kağıdı)
+Progman                    (üst düzey, sanal ekranın tamamını kaplar)
+ ├─ SHELLDLL_DefView       (simgeler, z-sırasında üstte)
+ └─ WorkerW                (duvar kağıdı, altta)
+      └─ Wakai widget'ları ← buraya bağlanır
 ```
 
-Bu düzende widget pencereleri `Progman`'ın alt penceresi yapılıp `SHELLDLL_DefView`'in hemen altına yerleştirilir. Sonuç olarak widget duvar kağıdının üstünde, simgelerin altında görünür.
+**Önemli bulgu:** Widget'ı doğrudan `Progman`'ın alt penceresi yapıp z-sırasında `SHELLDLL_DefView`'in altına koymak yeterli değildir. WebView2 içeriği ayrı bir kompozisyon yüzeyinde çizildiği için, z-sırası doğru olsa bile widget simgelerin **üstünde** görünüyordu (ekran görüntüsüyle doğrulandı). Widget, `Progman` altındaki duvar kağıdı `WorkerW`'sinin alt penceresi yapıldığında simgeler doğru şekilde widget'ın üstünde çizilir.
 
 ### 1.2 Eski düzen (24H2 öncesi)
 
-`0x052C` mesajı, `SHELLDLL_DefView`'i barındıran üst düzey `WorkerW`'nin hemen arkasında ikinci bir üst düzey `WorkerW` oluşturur. Widget'lar bu ikinci `WorkerW`'ye bağlanır. Kod her iki düzeni de algılar.
+`0x052C`, `SHELLDLL_DefView`'i barındıran üst düzey `WorkerW`'nin arkasında ikinci bir üst düzey `WorkerW` oluşturur; widget'lar bu pencereye bağlanır. Kod bu düzeni de algılar ancak **bu düzen geliştirme ortamında çalışma zamanında test edilmemiştir** (makine 24H2+).
 
-## 2. Kullanılan API'ler
+## 2. Etkileşim Modeli: "Üzerine Gelince Kaldır"
 
-- `FindWindowW`, `FindWindowExW`, `EnumWindows`, `GetWindow` — hiyerarşi tespiti.
-- `SendMessageTimeoutW(Progman, 0x052C)` — duvar kağıdı `WorkerW`'sinin oluşturulmasını ister (belgelenmemiş ama yaygın kullanılan davranış; yalnızca `desktop::hierarchy` içinde kullanılır).
-- `SetParent`, `SetWindowLongPtrW` (`WS_CHILD`, `WS_EX_NOACTIVATE`, `WS_EX_TOOLWINDOW`) — pencereyi katmana bağlama.
-- `SetWindowPos` — konum ve z-sırası.
-- `RegisterWindowMessageW("TaskbarCreated")` — Explorer yeniden başladığında haber alma.
-- `WM_DISPLAYCHANGE`, `WM_SETTINGCHANGE` — çözünürlük, monitör ve çalışma alanı değişiklikleri.
-- `RegisterRawInputDevices` (`RIDEV_INPUTSINK`) — simge katmanının altında kalan widget'lara fare girdisi yönlendirme.
+Simge katmanı (`SysListView32`) tüm ekranı kapladığından, simgelerin altındaki bir pencere fare olaylarını doğrudan alamaz. Wakai Desktop bunu şöyle çözer:
 
-## 3. Etkileşim Stratejisi
+1. **Dinlenme durumu (Sunk):** Widget duvar kağıdı katmanındadır; simgeler üstündedir, masaüstü tıklamaları Explorer'a gider.
+2. **İmleç widget'ın üzerine gelir:** Gizli bir izleyici pencere Raw Input (`RIDEV_INPUTSINK`) ile fare hareketlerini dinler. İmleç bir widget'ın sınırları içindeyse ve `WindowFromPoint` imlecin altında gerçekten masaüstü olduğunu söylüyorsa (üstte bir uygulama penceresi yoksa) widget **kaldırılır**.
+3. **Kaldırılmış durum (Lifted):** Widget, `Progman`'ın z-sırasında hemen üstüne, **tüm uygulama pencerelerinin altına** üst düzey pencere olarak yerleştirilir (etkinleştirilmeden). Artık fare, tekerlek ve klavye girdisini doğal yoldan alır; sürükleme ve boyutlandırma normal pencere işlemleriyle yapılır.
+4. **Geri dönüş:** İmleç widget'tan ayrıldığında ve widget odakta değilse (ör. not yazılmıyorsa) widget katmana geri döner. Odaktayken imleç ayrılırsa, odak kaybedilene kadar beklenir.
 
-Simge katmanı (`SysListView32`) tüm ekranı kapladığından widget'lar fare olaylarını doğrudan alamaz. Planlanan çözüm:
+Bu modelde olaylar yutulmaz veya taklit edilmez; Explorer'a hiçbir girdi enjekte edilmez.
 
-1. Gizli bir pencere Raw Input ile fare olaylarını dinler.
-2. İmlecin altındaki pencere masaüstü simge katmanıysa ve imleç bir widget'ın sınırları içindeyse,
-3. ve imlecin altında bir masaüstü simgesi yoksa,
-4. olay widget'ın WebView girdi penceresine iletilir.
+**Tıklama geçirgenliği:** Etkileşimsiz (click-through) işaretlenen widget hiç kaldırılmaz; masaüstü tıklamaları altından geçer. Bu ayar Kontrol Merkezi'nden her zaman geri alınabilir, bu yüzden widget kalıcı olarak erişilemez hale gelmez.
 
-Klavye girdisi bu yolla iletilemez. Metin girmek gereken durumlarda widget geçici olarak etkileşim moduna alınır ve odak verilir.
+## 3. DPI ve Çoklu Monitör
 
-## 4. Yapılmayacaklar
+Bir alt pencerenin DPI değeri, üst düzey atası olan `Progman`'ın DPI değeridir (birincil monitör). Geliştirme makinesinde sol monitör %125, birincil monitör %100 ölçekliydi ve iki sorun gözlendi:
+
+| Sorun | Çözüm |
+|---|---|
+| Katmandaki widget'ın içeriği %125 monitörde %100 ölçekle (küçük) çiziliyordu; kaldırılınca büyüyordu. | WebView2'nin otomatik ölçek algılaması kapatılır (`ShouldDetectMonitorScaleChanges = false`) ve `RasterizationScale`, widget'ın bulunduğu monitörün etkin DPI'ına göre elle ayarlanır. Doğrulandı. |
+| Üst düzey ↔ alt pencere geçişlerinde `WM_DPICHANGED`, pencere çerçevesinin (tao) boyutu önerilen dikdörtgene göre değiştirmesine yol açabilir. | Widget pencereleri bir alt sınıfla (`SetWindowSubclass`) `WM_DPICHANGED` mesajını yutar; geometri yalnızca `desktop` modülü tarafından yönetilir. |
+
+Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olarak saklanır; alt pencere yerleşiminde `ScreenToClient` ile ebeveyn koordinatına çevrilir. Bu sayede sanal ekranın negatif koordinatlı bölgelerindeki monitörler (birincil monitörün solundaki) doğru çalışır — geliştirme makinesinde sol monitörde doğrulandı.
+
+## 4. Kurtarma
+
+| Olay | Davranış | Doğrulama |
+|---|---|---|
+| Explorer yeniden başlar (`TaskbarCreated`) | Hiyerarşi yeniden bulunur; yaşayan pencereler yeniden bağlanır; ebeveyniyle birlikte yok edilen pencereler widget yöneticisine bildirilir ve yeniden oluşturulur. | Kod yolu mevcut. Kullanıcının çalışan oturumunda Explorer yeniden başlatılmadığı için **çalışma zamanında henüz test edilmedi**. |
+| Çözünürlük / monitör değişikliği (`WM_DISPLAYCHANGE`, `SPI_SETWORKAREA`) | Her widget en yakın monitörün çalışma alanına sığdırılır; bağlantısı kesilen monitördeki widget görünür bir monitöre taşınır; ölçek yeniden hesaplanır. | Sığdırma mantığı birim testleriyle doğrulandı; gerçek monitör değişikliği **henüz test edilmedi**. |
+| Oturum kapanışı (`WM_ENDSESSION`) | SQLite WAL kontrol noktası yazılır. | Test edilmedi. |
+| Masaüstü penceresi kaybolursa | Her işlemden önce `IsWindow` ile kontrol edilir, gerekirse hiyerarşi yeniden aranır. Masaüstü bulunamazsa widget normal pencere olarak gösterilir (`Detached`). | Kod yolu mevcut. |
+
+## 5. Kullanılan API'ler
+
+- Hiyerarşi: `FindWindowW`, `FindWindowExW`, `EnumWindows`, `SendMessageTimeoutW(0x052C)` (zaman aşımlı).
+- Yerleşim: `SetParent`, `SetWindowLongPtrW` (yalnızca kendi pencerelerimizde), `SetWindowPos`, `ScreenToClient`, `GetWindow(GW_HWNDPREV)`.
+- İzleme: `RegisterRawInputDevices`, `WindowFromPoint`, `GetCursorPos`, `RegisterWindowMessageW("TaskbarCreated")`.
+- Monitörler: `EnumDisplayMonitors`, `MonitorFromRect`, `GetMonitorInfoW`, `GetDpiForMonitor`.
+- WebView2: `ICoreWebView2Controller3::SetRasterizationScale`.
+
+## 6. Yapılmayanlar
 
 - `HWND_TOPMOST` kullanılmaz.
 - Explorer sonlandırılmaz veya yeniden başlatılmaz.
-- Explorer pencerelerinin stilleri değiştirilmez; yalnızca kendi pencerelerimiz taşınır.
+- Explorer pencerelerinin stilleri değiştirilmez, onlara girdi enjekte edilmez.
+- Fare kancası (`WH_MOUSE_LL`) kullanılmaz; sistemin girdi gecikmesine etki edilmez.
 
-## 5. Sınırlamalar
+## 7. Bilinen Sınırlamalar
 
-Aşama 2 doğrulamasından sonra bu bölüm gerçek bulgularla doldurulacaktır.
+- **Simgelerle çakışma:** İmleç simgelerle çakışan bir widget'ın üzerine geldiğinde widget kaldırılır ve o sırada çakışan simgelerin üstünde görünür. Widget'ları simgelerin bulunmadığı alanlara yerleştirmek önerilir.
+- **Süreçler arası ebeveynlik:** `SetParent` ile Explorer penceresine bağlanmak iki iş parçacığının girdi kuyruklarını ilişkilendirir. Bu yüzden widget pencerelerinin UI iş parçacığında engelleyici iş yapılmaz.
+- `0x052C` mesajı belgelenmemiş bir Explorer davranışıdır; gelecekteki Windows sürümlerinde değişebilir. Bu durumda kod `Progman`'a bağlanmaya, o da olmazsa normal pencereye geri düşer.
+- Ölçüm aracı notu: Sistem DPI'ına duyarlı (`SetProcessDPIAware`) araçlar, %125 monitördeki widget koordinatlarını sanallaştırılmış (0.8 katı) gösterir. Doğrulama araçları Per-Monitor-V2 bağlamında çalıştırılmalıdır.
+
+## 8. Geliştirici Tanı Aracı
+
+`WAKAI_LAYER_PROBE="x,y,genişlik,yükseklik"` ortam değişkeniyle başlatılan geliştirme derlemesi, verilen konumda bir deneme widget'ı oluşturur. (Aşama 3'te widget yöneticisi devreye girdiğinde kaldırılacaktır.)

@@ -12,3 +12,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Kontrol Merkezi kabuğu: Genel Bakış ve Ayarlar.
 - Windows ile başlatma ayarı (gerçek başlangıç kaydı ile).
 - Tek örnek (single-instance) davranışı.
+- Windows 11 masaüstü katmanı: widget'lar duvar kağıdının üstünde, simgelerin altında (24H2 hiyerarşisi doğrulandı).
+- "Üzerine gelince kaldır" etkileşim modeli (Raw Input ile olay güdümlü).
+- Karma DPI'lı çoklu monitörlerde doğru içerik ölçeği.
+- Explorer yeniden başlatma, ekran değişikliği ve oturum kapanışı izleme.
+- Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

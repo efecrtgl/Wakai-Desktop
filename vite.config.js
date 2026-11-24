@@ -13,6 +13,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
+        widget: resolve(import.meta.dirname, 'widget.html'),
       },
     },
   },

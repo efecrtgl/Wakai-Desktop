@@ -65,9 +65,9 @@ Wakai Desktop iki ana parçadan oluşur:
 Ayrıntılar: [WINDOWS_ENTEGRASYONU.md](WINDOWS_ENTEGRASYONU.md).
 
 - Her widget örneği ayrı bir Tauri penceresidir; hepsi **aynı WebView2 ortamını** (tarayıcı ve GPU sürecini) paylaşır.
-- Pencere oluşturulduktan sonra `desktop` modülü pencereyi `Progman` altına alt pencere (child) olarak bağlar ve `SHELLDLL_DefView`'in **altına**, duvar kağıdı `WorkerW`'nin **üstüne** yerleştirir.
-- Simge katmanı tüm ekranı kapladığı için fare olayları widget'a doğrudan ulaşmaz. Bu nedenle bir girdi izleyici (Raw Input) imleç masaüstü üzerindeyken ve altında simge yokken fare olaylarını ilgili widget'a yönlendirir.
-- Klavye gerektiren düzenlemeler (not yazmak vb.) için widget geçici olarak “etkileşim moduna” alınır.
+- Pencere oluşturulduktan sonra `desktop` modülü pencereyi `Progman` altındaki duvar kağıdı `WorkerW`'sinin alt penceresi yapar: simgelerin altında, duvar kağıdının üstünde.
+- Simge katmanı fare olaylarını engellediği için, imleç bir widget'ın üzerine geldiğinde (Raw Input ile olay güdümlü algılanır) widget geçici olarak masaüstünün hemen üstüne, tüm uygulama pencerelerinin altına kaldırılır ve doğal fare/klavye girdisi alır.
+- İmleç ayrılıp widget odağı kaybettiğinde widget katmana geri döner.
 
 ## 6. Veri Akışı Örneği (görev tamamlama)
 

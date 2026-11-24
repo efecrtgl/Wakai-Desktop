@@ -1,0 +1,12 @@
+html,
+body.widget-body {
+  background: transparent;
+}
+.widget-frame {
+  position: absolute;
+  inset: 0;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
