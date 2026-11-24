@@ -8,19 +8,25 @@ use std::collections::HashMap;
 use std::sync::{Mutex, MutexGuard};
 use tauri::{AppHandle, Manager, WebviewWindow, WindowEvent};
 
-#[derive(Default)]
 pub struct LayerState {
     layer: Mutex<DesktopLayer>,
     /// Her pencereye en son uygulanan WebView ölçeği (gereksiz çağrıları önler).
     scales: Mutex<HashMap<isize, f64>>,
+    /// Kullanıcının "widget ölçeği" ayarı; monitör ölçeğiyle çarpılır.
+    widget_scale: Mutex<f64>,
 }
 
 impl LayerState {
-    pub fn new() -> Self {
+    pub fn new(widget_scale: f64) -> Self {
         Self {
             layer: Mutex::new(DesktopLayer::new()),
             scales: Mutex::default(),
+            widget_scale: Mutex::new(widget_scale),
         }
+    }
+
+    pub fn widget_scale(&self) -> f64 {
+        *self.widget_scale.lock().unwrap_or_else(|e| e.into_inner())
     }
 
     pub fn lock(&self) -> MutexGuard<'_, DesktopLayer> {
@@ -49,7 +55,7 @@ fn sync_scale(app: &AppHandle, window: &WebviewWindow, hwnd: isize) {
     let Some(rect) = state.lock().rect(hwnd) else {
         return;
     };
-    let scale = monitors::scale_for(rect);
+    let scale = monitors::scale_for(rect) * state.widget_scale();
     let mut scales = state.scales.lock().unwrap_or_else(|e| e.into_inner());
     if scales
         .get(&hwnd)
@@ -65,6 +71,22 @@ fn sync_scale(app: &AppHandle, window: &WebviewWindow, hwnd: isize) {
 fn sync_scale_by_hwnd(app: &AppHandle, hwnd: isize) {
     if let Some(w) = window_by_hwnd(app, hwnd) {
         sync_scale(app, &w, hwnd);
+    }
+}
+
+/// Widget ölçeği ayarı değişti: tüm pencerelerin içerik ölçeğini yeniden uygular.
+pub fn set_widget_scale(app: &AppHandle, scale: f64) {
+    let state = app.state::<LayerState>();
+    *state.widget_scale.lock().unwrap_or_else(|e| e.into_inner()) = scale;
+    state
+        .scales
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .clear();
+    for w in app.webview_windows().into_values() {
+        if let Some(hwnd) = widget_window::hwnd_of(&w).filter(|h| state.lock().contains(*h)) {
+            sync_scale(app, &w, hwnd);
+        }
     }
 }
 

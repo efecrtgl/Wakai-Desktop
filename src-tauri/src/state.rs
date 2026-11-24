@@ -1,9 +1,12 @@
 //! Uygulama genelinde paylaşılan durum.
 
 use crate::db::Db;
+use std::path::PathBuf;
 
 pub struct AppState {
     pub db: Db,
+    /// %APPDATA%com.wakai.desktop
+    pub data_dir: PathBuf,
 }
 
 use crate::error::{AppError, AppResult};

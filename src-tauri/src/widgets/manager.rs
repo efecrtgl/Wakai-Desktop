@@ -72,7 +72,7 @@ fn hwnd_for_id(app: &AppHandle, id: &str) -> Option<isize> {
 }
 
 /// Yeni bir widget için varsayılan konum: birincil monitörün sağ üstünden kademeli.
-fn default_rect(def: &WidgetDefinition, index: usize) -> Rect {
+fn default_rect(app: &AppHandle, def: &WidgetDefinition, index: usize) -> Rect {
     let mons = monitors::all();
     let area = mons
         .iter()
@@ -80,7 +80,7 @@ fn default_rect(def: &WidgetDefinition, index: usize) -> Rect {
         .or(mons.first())
         .map(|m| m.work_area)
         .unwrap_or(Rect::new(0, 0, 1920, 1040));
-    let scale = monitors::scale_for(area);
+    let scale = monitors::scale_for(area) * app.state::<layer::LayerState>().widget_scale();
     let w = (def.default_size.width as f64 * scale).round() as i32;
     let h = (def.default_size.height as f64 * scale).round() as i32;
     let step = (28.0 * scale) as i32 * (index % 8) as i32;
@@ -167,7 +167,7 @@ pub fn add(app: &AppHandle, kind: &str) -> AppResult<WidgetInstance> {
     let inst = WidgetInstance {
         id: new_id(kind),
         kind: kind.to_string(),
-        rect: default_rect(def, existing.len()),
+        rect: default_rect(app, def, existing.len()),
         visible: true,
         click_through: false,
         config: def.default_config(),
@@ -235,7 +235,7 @@ pub fn update_config(
 pub fn set_rect(app: &AppHandle, id: &str, rect: Rect) -> AppResult<WidgetInstance> {
     let inst = db(app).with(|c| repo::get(c, id))?;
     let def = registry::require(&inst.kind)?;
-    let scale = monitors::scale_for(rect);
+    let scale = monitors::scale_for(rect) * app.state::<layer::LayerState>().widget_scale();
     let min_w = (def.min_size.width as f64 * scale).round() as i32;
     let min_h = (def.min_size.height as f64 * scale).round() as i32;
     let rect = monitors::clamp_visible(Rect::new(
@@ -261,7 +261,7 @@ pub fn reset_position(app: &AppHandle, id: &str) -> AppResult<WidgetInstance> {
         .iter()
         .position(|w| w.id == id)
         .unwrap_or(0);
-    set_rect(app, id, default_rect(def, index))
+    set_rect(app, id, default_rect(app, def, index))
 }
 
 /// Widget'ı varsayılan ayarlarına ve konumuna döndürür. İçerik verisine dokunmaz.
@@ -273,6 +273,26 @@ pub fn reset(app: &AppHandle, id: &str) -> AppResult<WidgetInstance> {
         set_click_through(app, id, false)?;
     }
     reset_position(app, id)
+}
+
+/// Widget ölçeği ayarı değiştiğinde tüm widget'ları orantılı büyütür/küçültür.
+pub fn apply_widget_scale(app: &AppHandle, old: f64, new: f64) -> AppResult<()> {
+    if old <= 0.0 || (old - new).abs() < f64::EPSILON {
+        return Ok(());
+    }
+    layer::set_widget_scale(app, new);
+    let factor = new / old;
+    for inst in db(app).with(repo::list)? {
+        let r = inst.rect;
+        let scaled = Rect::new(
+            r.x,
+            r.y,
+            (r.width as f64 * factor).round() as i32,
+            (r.height as f64 * factor).round() as i32,
+        );
+        set_rect(app, &inst.id, scaled)?;
+    }
+    Ok(())
 }
 
 /// Katman, kullanıcının taşıdığı/boyutlandırdığı pencerelerin yeni konumunu bildirir.

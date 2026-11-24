@@ -29,7 +29,8 @@ Wakai Desktop tüm kalıcı verileri yerel bir **SQLite** veritabanında saklar.
 ## Yedekleme
 
 - Mevcut bir veritabanında bekleyen göç varsa, göçten **önce** `VACUUM INTO` ile tutarlı bir yedek alınır: `wakai.db.bak-v<eski sürüm>`.
-- `Db::backup_to` aynı yöntemle istenen konuma yedek alır (Kontrol Merkezi'nden kullanılacak).
+- Kontrol Merkezi → Ayarlar → Yedekler: `VACUUM INTO` ile `backups/wakai-YYYYMMDD-HHMMSS.db` oluşturulur; en fazla 20 yedek tutulur.
+- **Geri yükleme** çalışan veritabanının üzerine yazmaz: `restore.pending` işaret dosyası bırakılır, uygulama yeniden başlatılır ve veritabanı açılmadan önce yedek yerine konur. Bundan hemen önce mevcut veritabanı `...-geri-yukleme-oncesi.db` olarak yedeklenir. Yedek dosyasının gerçek bir Wakai veritabanı olduğu doğrulanır; dosya adları yol geçişine (path traversal) karşı denetlenir.
 
 ## Şema
 

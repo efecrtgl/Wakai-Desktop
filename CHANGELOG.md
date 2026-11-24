@@ -18,7 +18,10 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Explorer yeniden başlatma, ekran değişikliği ve oturum kapanışı izleme.
 - Widget çalışma zamanı: kayıt defteri, örnekler, yaşam döngüsü, doğrulanmış yapılandırma, gecikmeli konum kaydı, kaybolan pencerelerin yeniden oluşturulması.
 - Widget çerçevesi: sürükleme, boyutlandırma ve sağ tık menüsü.
-- Kontrol Merkezi'nde "Widget'larım" bölümü.
+- Kontrol Merkezi'nin tamamı: Genel Bakış (istatistikler, yaklaşanlar, görevler, performans, hızlı kontroller), Widget'larım (widget'a özel ayar formları, boyut, görünürlük, tıklama geçirgenliği, sıfırlama), Widget Mağazası, Takvim, Görevler, Notlar, Görünüm, Performans, Bildirimler ve Ayarlar.
+- Veritabanı yedekleme ve güvenli geri yükleme (bir sonraki açılışta, öncesinde otomatik yedekle).
+- Widget ölçeği: tüm widget'ları ve içeriklerini orantılı büyütme/küçültme.
+- Deneme bildirimi ve uygulamanın kendi kaynak kullanımı göstergesi.
 - Takvim Kedisi: Türkçe aylık takvim, etkinlik ekleme/düzenleme/silme, kategoriler, renk etiketleri, hatırlatıcılar, yaklaşan etkinlikler.
 - Görev Kedisi: öncelik, son tarih, kategori, hatırlatıcı, ilerleme çubuğu ve tamamlama kutlaması.
 - Not Kedisi: otomatik kayıt, sabitleme, renkler, basit biçimlendirme (başlık, madde, yapılacak kutusu, kalın, italik).

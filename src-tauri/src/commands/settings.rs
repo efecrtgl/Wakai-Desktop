@@ -22,6 +22,9 @@ fn apply_settings_patch(app: &AppHandle, patch: serde_json::Value) -> AppResult<
     if before.launch_on_startup != next.launch_on_startup {
         apply_autostart(app, next.launch_on_startup)?;
     }
+    if (before.widget_scale - next.widget_scale).abs() > f64::EPSILON {
+        crate::widgets::manager::apply_widget_scale(app, before.widget_scale, next.widget_scale)?;
+    }
     if before.widgets_visible != next.widgets_visible {
         crate::widgets::manager::apply_global_visibility(app, next.widgets_visible)?;
     }

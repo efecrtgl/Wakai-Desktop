@@ -24,7 +24,7 @@ Wakai-Desktop/
 ## Kurallar
 
 - **TypeScript kullanılmaz.** Ön yüz yalnızca `.js` / `.jsx` dosyalarından oluşur.
-- Kod tanımlayıcıları İngilizce, kullanıcıya görünen tüm metinler Türkçedir ve `src/lib/i18n.js` içinde tutulur.
+- Kod tanımlayıcıları İngilizce, kullanıcıya görünen tüm metinler Türkçedir. Birden çok yerde kullanılan metinler `src/lib/i18n.js` içindedir; yalnızca tek bir bileşene özgü metinler o bileşende durabilir.
 - Renkler, boşluklar ve köşe değerleri yalnızca `src/ui/tokens.css` değişkenleriyle kullanılır.
 - Kalıcı veri yalnızca Rust üzerinden SQLite'a yazılır; `localStorage` kullanılmaz.
 - Veri değiştiren her komut ilgili olayı yayınlar (`src-tauri/src/events.rs`).

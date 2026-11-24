@@ -1,5 +1,6 @@
 //! Wakai Desktop — Rust çekirdeği.
 
+mod backup;
 mod commands;
 pub mod db;
 pub mod desktop;
@@ -11,6 +12,7 @@ mod layer;
 mod logging;
 mod media;
 mod monitor;
+mod procstats;
 mod scheduler;
 pub mod settings;
 mod state;
@@ -36,10 +38,18 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             logging::init(&dir);
-            let db = db::Db::open(&dir.join("wakai.db"))?;
+            let db_path = dir.join("wakai.db");
+            if let Err(e) = backup::apply_pending_restore(&dir, &db_path) {
+                log::error!("yedek geri yüklenemedi: {e}");
+            }
+            let db = db::Db::open(&db_path)?;
+            let initial = settings::load(&db).unwrap_or_default();
             app.manage(focus::FocusTimer::new(&db));
-            app.manage(AppState { db });
-            app.manage(layer::LayerState::new());
+            app.manage(AppState {
+                db,
+                data_dir: dir.clone(),
+            });
+            app.manage(layer::LayerState::new(initial.widget_scale));
             app.manage(subscriptions::Subscriptions::default());
             app.manage(monitor::SystemMonitor::default());
             app.manage(media::MediaService::default());
@@ -75,6 +85,12 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::app::app_info,
+            commands::app::create_backup,
+            commands::app::list_backups,
+            commands::app::delete_backup,
+            commands::app::restore_backup,
+            commands::app::send_test_notification,
+            commands::app::app_resource_usage,
             commands::settings::get_settings,
             commands::settings::update_settings,
             commands::widgets::list_widget_definitions,
