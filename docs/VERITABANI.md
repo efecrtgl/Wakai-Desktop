@@ -55,18 +55,18 @@ Widget yapılandırması widget **içeriğinden** (etkinlikler, görevler, notla
 
 | Tablo | İçerik | Notlar |
 |---|---|---|
-|  | Etkinlik kategorileri (Kişisel, İş, Sağlık, Sosyal varsayılan) | Kategori silinirse etkinlik kalır (). |
-|  | Takvim etkinlikleri |  dizinli; bekleyen hatırlatıcılar için kısmi dizin. Başlangıç ya da hatırlatıcı değişince  sıfırlanır. |
-|  | Görevler | Öncelik 0–2, son tarih, kategori, hatırlatıcı;  dizini. |
-|  | Notlar | İçerik değişmediyse otomatik kayıt diske yazmaz. |
-|  | Odak oturumları geçmişi | Tamamlanan/yarıda kalan her oturum. |
+| `event_categories` | Etkinlik kategorileri (Kişisel, İş, Sağlık, Sosyal varsayılan) | Kategori silinirse etkinlik kalır (`ON DELETE SET NULL`). |
+| `events` | Takvim etkinlikleri | `start_at` dizinli; bekleyen hatırlatıcılar için kısmi dizin. Başlangıç ya da hatırlatıcı değişince `reminded_at` sıfırlanır. |
+| `tasks` | Görevler | Öncelik 0–2, son tarih, kategori, hatırlatıcı; `(completed, due_at)` dizini. |
+| `notes` | Notlar | İçerik değişmediyse otomatik kayıt diske yazmaz. |
+| `focus_sessions` | Odak oturumları geçmişi | Tamamlanan ve yarıda kalan her oturum. |
 
-İçerik tabloları  tablosuna bağlı değildir. Not Kedisi örneği yapılandırmasında yalnızca  tutar; widget silinince not silinmez.
+İçerik tabloları `widget_instances` tablosuna bağlı değildir. Not Kedisi örneği yapılandırmasında yalnızca `note_id` tutar; widget silinince not silinmez.
 
 ### Zaman biçimi
 
-Etkinlik ve görev zamanları yerel saatle  biçiminde saklanır (saat dilimi bilgisi yoktur). Takvim uygulaması kullanıcının yerel saatine göre çalışır.
+Etkinlik ve görev zamanları yerel saatle `YYYY-MM-DDTHH:MM` biçiminde saklanır (saat dilimi bilgisi yoktur). Takvim kullanıcının yerel saatine göre çalışır.
 
 ### Geliştirme aracı
 
- uygulama veritabanında salt okunur sorgu çalıştırır (Node 24 ).
+`node scripts/db-query.mjs "SELECT ..."` uygulama veritabanında salt okunur sorgu çalıştırır (Node 24 `node:sqlite`).

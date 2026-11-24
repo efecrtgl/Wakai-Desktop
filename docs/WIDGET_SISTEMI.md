@@ -70,11 +70,11 @@ Pencere oluşturan veya taşıyan komutlar `async` tanımlıdır ve işi `state:
 
 | Tür | Ad | Çoklu örnek | Öne çıkanlar |
 |---|---|---|---|
-|  | Takvim Kedisi | Evet | Pazartesiyle başlayan Türkçe ay görünümü, bugün vurgusu, hafta sonu rengi, etkinlik noktaları, hızlı ekleme/düzenleme, yaklaşanlar. |
-|  | Görev Kedisi | Evet | Hızlı ekleme, öncelik/son tarih/kategori/hatırlatıcı, gecikme vurgusu, ilerleme çubuğu, tamamlama kutlaması, kategori filtresi. |
-|  | Not Kedisi | Evet | Her örnek bir nota bağlı; 600 ms gecikmeli otomatik kayıt; sabitleme; renk; basit biçimlendirme. |
-|  | Saat Kedisi | Evet | Dijital/analog, saniye ayarı, 12/24 saat, tarih, ek saat dilimleri. Güncelleme saniye/dakika sınırına hizalı. |
-|  | Odak Kedisi | Hayır | Rust'taki zamanlayıcının bitiş anına göre kalan süre; yalnızca çalışırken saniyede bir çizim. |
+| `calendar` | Takvim Kedisi | Evet | Pazartesiyle başlayan Türkçe ay görünümü, bugün vurgusu, hafta sonu rengi, etkinlik noktaları, hızlı ekleme/düzenleme, yaklaşanlar. |
+| `tasks` | Görev Kedisi | Evet | Hızlı ekleme, öncelik/son tarih/kategori/hatırlatıcı, gecikme vurgusu, ilerleme çubuğu, tamamlama kutlaması, kategori filtresi. |
+| `note` | Not Kedisi | Evet | Her örnek bir nota bağlı; 600 ms gecikmeli otomatik kayıt; sabitleme; renk; basit biçimlendirme. |
+| `clock` | Saat Kedisi | Evet | Dijital/analog, saniye ayarı, 12/24 saat, tarih, ek saat dilimleri. Güncelleme saniye/dakika sınırına hizalı. |
+| `focus` | Odak Kedisi | Hayır | Rust'taki zamanlayıcının bitiş anına göre kalan süre; yalnızca çalışırken saniyede bir çizim. |
 
 ## Yeni Bir Widget Eklemek
 
