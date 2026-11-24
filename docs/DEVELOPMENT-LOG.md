@@ -94,3 +94,8 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - Seçmeli geri yükleme (9 kategori): açılışta, veriler kullanılmadan önce, tek işlemde; ortak sütunlarla şema farklarına dayanıklı; önce `-secmeli-oncesi` yedeği.
 - Geri yükleme öncesi kedi durumu da kaydedilir. Kontrol Merkezi'nde yeni "Yedeği geri yükle" penceresi.
 - Doğrulama: 3 yeni Rust testi (94 birim test). Yalıtılmış ortamda arayüzden seçmeli geri yükleme ve bozuk yedek reddi denendi. Ayrıntılar: `docs/YEDEKLER.md`.
+
+## Aşama 12 — Performans ölçümü (kısmi)
+
+- Sürüm derlemesiyle yalıtılmış ortamda ölçüldü (bkz. `docs/PERFORMANCE.md`): 8 widget'ta özel bellek 375,3 → 362,2 MB; 2 masaüstü kedisi eklenince fark ölçülemeyecek kadar küçük; yalnızca kediler açıkken 1 süreç, 3,0 MB, ~%0 CPU.
+- Kalan: açılış süresi ölçümü, güvenlik incelemesi.
