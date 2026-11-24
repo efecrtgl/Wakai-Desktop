@@ -5,7 +5,10 @@
 use crate::error::AppResult;
 use rusqlite::Connection;
 
-pub const MIGRATIONS: &[&str] = &[include_str!("migrations/001_initial.sql")];
+pub const MIGRATIONS: &[&str] = &[
+    include_str!("migrations/001_initial.sql"),
+    include_str!("migrations/002_content.sql"),
+];
 
 pub fn current_version(conn: &Connection) -> AppResult<usize> {
     let v: i64 = conn.query_row("PRAGMA user_version", [], |r| r.get(0))?;

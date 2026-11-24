@@ -50,3 +50,23 @@ Wakai Desktop tüm kalıcı verileri yerel bir **SQLite** veritabanında saklar.
 | `config` | TEXT | Örneğe özel JSON yapılandırması. |
 
 Widget yapılandırması widget **içeriğinden** (etkinlikler, görevler, notlar) ayrı tutulur; bir widget örneğini silmek içerik verisini silmez.
+
+### 002 — İçerik tabloları
+
+| Tablo | İçerik | Notlar |
+|---|---|---|
+|  | Etkinlik kategorileri (Kişisel, İş, Sağlık, Sosyal varsayılan) | Kategori silinirse etkinlik kalır (). |
+|  | Takvim etkinlikleri |  dizinli; bekleyen hatırlatıcılar için kısmi dizin. Başlangıç ya da hatırlatıcı değişince  sıfırlanır. |
+|  | Görevler | Öncelik 0–2, son tarih, kategori, hatırlatıcı;  dizini. |
+|  | Notlar | İçerik değişmediyse otomatik kayıt diske yazmaz. |
+|  | Odak oturumları geçmişi | Tamamlanan/yarıda kalan her oturum. |
+
+İçerik tabloları  tablosuna bağlı değildir. Not Kedisi örneği yapılandırmasında yalnızca  tutar; widget silinince not silinmez.
+
+### Zaman biçimi
+
+Etkinlik ve görev zamanları yerel saatle  biçiminde saklanır (saat dilimi bilgisi yoktur). Takvim uygulaması kullanıcının yerel saatine göre çalışır.
+
+### Geliştirme aracı
+
+ uygulama veritabanında salt okunur sorgu çalıştırır (Node 24 ).

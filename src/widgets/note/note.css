@@ -1,0 +1,111 @@
+.note {
+  --note-tint: var(--label-butter);
+  height: calc(100% + var(--space-3) + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin: calc(var(--space-3) * -1) calc(var(--space-4) * -1) calc(var(--space-4) * -1);
+  padding: var(--space-3) var(--space-4) var(--space-3);
+  background: color-mix(in srgb, var(--note-tint) 22%, transparent);
+}
+.note[data-color='pink'] {
+  --note-tint: var(--label-pink);
+}
+.note[data-color='lavender'] {
+  --note-tint: var(--label-lavender);
+}
+.note[data-color='peach'] {
+  --note-tint: var(--label-peach);
+}
+.note[data-color='mint'] {
+  --note-tint: var(--label-mint);
+}
+.note[data-color='sky'] {
+  --note-tint: var(--label-sky);
+}
+.note--missing {
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.note__title {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-text-strong);
+  outline: none;
+  padding: 0;
+}
+.note__title::placeholder {
+  color: var(--color-text-faint);
+}
+.note__colors {
+  margin-bottom: var(--space-2);
+}
+
+.note__text,
+.note__scroll {
+  flex: 1;
+  min-height: 0;
+  font-size: var(--note-font, 14px);
+  line-height: 1.5;
+}
+.note__text {
+  width: 100%;
+  resize: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+  padding: var(--space-1) var(--space-2);
+  outline: none;
+  font-family: inherit;
+}
+.note__scroll {
+  overflow-y: auto;
+  cursor: text;
+  padding: var(--space-1) 2px;
+}
+.note__placeholder {
+  color: var(--color-text-faint);
+}
+.note__view p {
+  margin: 0;
+  word-break: break-word;
+}
+.note__h {
+  font-weight: 750;
+  color: var(--color-text-strong);
+}
+.note__li {
+  padding-left: 14px;
+  position: relative;
+}
+.note__li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0.65em;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--color-primary);
+}
+.note__blank {
+  height: 0.6em;
+}
+.note__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+}
+.note__check input {
+  margin-top: 0.3em;
+  accent-color: var(--color-primary);
+}
+.note__check.is-done span {
+  text-decoration: line-through;
+  color: var(--color-text-faint);
+}

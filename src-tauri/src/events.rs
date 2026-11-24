@@ -17,3 +17,10 @@ pub fn broadcast<S: serde::Serialize + Clone>(app: &AppHandle, event: &str, payl
         log::warn!("olay yayınlanamadı ({event}): {e}");
     }
 }
+
+pub const EVENTS_CHANGED: &str = "events:changed";
+pub const TASKS_CHANGED: &str = "tasks:changed";
+/// Yük: değişen notun kimliği.
+pub const NOTES_CHANGED: &str = "notes:changed";
+/// Yük: `FocusState`.
+pub const FOCUS_CHANGED: &str = "focus:changed";

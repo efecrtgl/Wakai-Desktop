@@ -19,7 +19,13 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Widget çalışma zamanı: kayıt defteri, örnekler, yaşam döngüsü, doğrulanmış yapılandırma, gecikmeli konum kaydı, kaybolan pencerelerin yeniden oluşturulması.
 - Widget çerçevesi: sürükleme, boyutlandırma ve sağ tık menüsü.
 - Kontrol Merkezi'nde "Widget'larım" bölümü.
-- Saat Kedisi (ilk sürüm: dijital saat ve tarih).
+- Takvim Kedisi: Türkçe aylık takvim, etkinlik ekleme/düzenleme/silme, kategoriler, renk etiketleri, hatırlatıcılar, yaklaşan etkinlikler.
+- Görev Kedisi: öncelik, son tarih, kategori, hatırlatıcı, ilerleme çubuğu ve tamamlama kutlaması.
+- Not Kedisi: otomatik kayıt, sabitleme, renkler, basit biçimlendirme (başlık, madde, yapılacak kutusu, kalın, italik).
+- Saat Kedisi: dijital/analog, saniye, 12/24 saat, tarih ve ek saat dilimleri.
+- Odak Kedisi: duvar saatine dayalı Pomodoro zamanlayıcısı, kısa/uzun molalar, oturum geçmişi, bildirimler.
+- Olay güdümlü hatırlatıcı zamanlayıcısı ve Windows bildirimleri.
+- Veritabanı göçü 002 (içerik tabloları).
 - Özgün piksel kedi ailesi: oturan, mutlu, meraklı, rahat, çalışan, uyuyan kedi ve yüz; göz kırpma, kuyruk sallama, Zz ve kutlama animasyonları.
 - Piksel simge seti ve widget görsel yapı taşları.
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

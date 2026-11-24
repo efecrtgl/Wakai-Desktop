@@ -66,6 +66,16 @@ Explorer çöktüğünde ebeveyni olan `WorkerW` ile birlikte widget pencereleri
 
 Pencere oluşturan veya taşıyan komutlar `async` tanımlıdır ve işi `state::on_main` ile ana iş parçacığına devreder. Windows'ta senkron komut içinde WebView oluşturmak kilitlenmeye yol açar (geliştirme sırasında gözlendi).
 
+## Yerleşik Widget'lar
+
+| Tür | Ad | Çoklu örnek | Öne çıkanlar |
+|---|---|---|---|
+|  | Takvim Kedisi | Evet | Pazartesiyle başlayan Türkçe ay görünümü, bugün vurgusu, hafta sonu rengi, etkinlik noktaları, hızlı ekleme/düzenleme, yaklaşanlar. |
+|  | Görev Kedisi | Evet | Hızlı ekleme, öncelik/son tarih/kategori/hatırlatıcı, gecikme vurgusu, ilerleme çubuğu, tamamlama kutlaması, kategori filtresi. |
+|  | Not Kedisi | Evet | Her örnek bir nota bağlı; 600 ms gecikmeli otomatik kayıt; sabitleme; renk; basit biçimlendirme. |
+|  | Saat Kedisi | Evet | Dijital/analog, saniye ayarı, 12/24 saat, tarih, ek saat dilimleri. Güncelleme saniye/dakika sınırına hizalı. |
+|  | Odak Kedisi | Hayır | Rust'taki zamanlayıcının bitiş anına göre kalan süre; yalnızca çalışırken saniyede bir çizim. |
+
 ## Yeni Bir Widget Eklemek
 
 1. `registry.rs` içindeki `DEFINITIONS` dizisine bir tanım ekleyin. `default_config` içindeki her anahtar, kabul edilen yapılandırmayı belirler.

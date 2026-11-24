@@ -4,7 +4,11 @@
 import { lazy } from 'react';
 
 export const WIDGET_COMPONENTS = {
+  calendar: lazy(() => import('./calendar/CalendarWidget.jsx')),
+  tasks: lazy(() => import('./tasks/TaskWidget.jsx')),
+  note: lazy(() => import('./note/NoteWidget.jsx')),
   clock: lazy(() => import('./clock/ClockWidget.jsx')),
+  focus: lazy(() => import('./focus/FocusWidget.jsx')),
 };
 
 export const supportedKinds = Object.keys(WIDGET_COMPONENTS);

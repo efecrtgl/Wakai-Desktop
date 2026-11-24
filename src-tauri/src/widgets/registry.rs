@@ -10,6 +10,7 @@ use serde_json::{Map, Value, json};
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Category {
+    Productivity,
     Time,
 }
 
@@ -101,26 +102,95 @@ const fn size(width: i32, height: i32) -> Size {
     Size { width, height }
 }
 
-pub static DEFINITIONS: &[WidgetDefinition] = &[WidgetDefinition {
-    kind: "clock",
-    name: "Saat Kedisi",
-    description: "Dijital ya da analog saat, tarih ve ek saat dilimleri.",
-    category: Category::Time,
-    default_size: size(280, 150),
-    min_size: size(180, 100),
-    multi_instance: true,
-    interactions: &["sürükle", "boyutlandır", "ayarlar"],
-    cat: "sitting",
-    default_config: || {
-        json!({
-            "mode": "digital",
-            "show_seconds": false,
-            "hour12": false,
-            "show_date": true,
-            "time_zones": []
-        })
+pub static DEFINITIONS: &[WidgetDefinition] = &[
+    WidgetDefinition {
+        kind: "calendar",
+        name: "Takvim Kedisi",
+        description: "Aylık takvim, etkinlikler, hatırlatıcılar ve yaklaşan planlar.",
+        category: Category::Productivity,
+        default_size: size(320, 380),
+        min_size: size(260, 300),
+        multi_instance: true,
+        interactions: &[
+            "ay gezinme",
+            "etkinlik ekle/düzenle/sil",
+            "sürükle",
+            "boyutlandır",
+        ],
+        cat: "curious",
+        default_config: || json!({ "show_upcoming": true, "upcoming_count": 3 }),
     },
-}];
+    WidgetDefinition {
+        kind: "tasks",
+        name: "Görev Kedisi",
+        description: "Öncelikli görevler, son tarihler, kategoriler ve ilerleme.",
+        category: Category::Productivity,
+        default_size: size(300, 340),
+        min_size: size(240, 220),
+        multi_instance: true,
+        interactions: &[
+            "görev ekle/düzenle/sil",
+            "tamamla",
+            "sürükle",
+            "boyutlandır",
+        ],
+        cat: "working",
+        default_config: || json!({ "show_completed": false, "category_filter": "" }),
+    },
+    WidgetDefinition {
+        kind: "note",
+        name: "Not Kedisi",
+        description: "Otomatik kaydedilen yapışkan notlar; basit biçimlendirme.",
+        category: Category::Productivity,
+        default_size: size(260, 260),
+        min_size: size(180, 160),
+        multi_instance: true,
+        interactions: &["yaz", "sabitle", "renk seç", "sürükle", "boyutlandır"],
+        cat: "relaxed",
+        default_config: || json!({ "note_id": null, "font_size": 14 }),
+    },
+    WidgetDefinition {
+        kind: "clock",
+        name: "Saat Kedisi",
+        description: "Dijital ya da analog saat, tarih ve ek saat dilimleri.",
+        category: Category::Time,
+        default_size: size(280, 150),
+        min_size: size(180, 100),
+        multi_instance: true,
+        interactions: &["sürükle", "boyutlandır", "ayarlar"],
+        cat: "sitting",
+        default_config: || {
+            json!({
+                "mode": "digital",
+                "show_seconds": false,
+                "hour12": false,
+                "show_date": true,
+                "time_zones": []
+            })
+        },
+    },
+    WidgetDefinition {
+        kind: "focus",
+        name: "Odak Kedisi",
+        description: "Pomodoro zamanlayıcısı: çalışma, kısa ve uzun molalar, oturum takibi.",
+        category: Category::Productivity,
+        default_size: size(260, 250),
+        min_size: size(200, 200),
+        multi_instance: false,
+        interactions: &["başlat/duraklat/sıfırla", "atla", "sürükle"],
+        cat: "working",
+        default_config: || {
+            json!({
+                "work_minutes": 25,
+                "short_break_minutes": 5,
+                "long_break_minutes": 15,
+                "long_break_every": 4,
+                "auto_start": false,
+                "notify": true
+            })
+        },
+    },
+];
 
 pub fn find(kind: &str) -> Option<&'static WidgetDefinition> {
     DEFINITIONS.iter().find(|d| d.kind == kind)

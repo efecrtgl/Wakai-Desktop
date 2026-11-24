@@ -1,0 +1,127 @@
+.tasks {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+.tasks .wg-header {
+  margin-bottom: 0;
+}
+.tasks__quick .wg-input {
+  width: 100%;
+}
+.tasks__editor {
+  overflow-y: auto;
+  min-height: 0;
+}
+.tasks__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+.tasks__empty {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-2);
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px 0;
+}
+.task__check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 5px;
+  background: var(--color-surface);
+  color: var(--color-text-on-primary);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--duration-fast), border-color var(--duration-fast);
+}
+.task__check:hover {
+  border-color: var(--color-primary);
+}
+.task.is-done .task__check {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+.task__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px var(--space-1);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.task__body:hover {
+  background: var(--color-primary-soft);
+}
+.task__prio {
+  flex: none;
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+}
+.task__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.task.is-done .task__title {
+  text-decoration: line-through;
+  color: var(--color-text-faint);
+}
+.task__cat {
+  flex: none;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-sunken);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.task__due {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.task__due.is-overdue {
+  color: var(--color-danger);
+  font-weight: 650;
+}
+
+.tone-mint {
+  background: var(--label-mint);
+}
+.tone-lavender {
+  background: var(--label-lavender);
+}
+.tone-pink {
+  background: var(--color-primary-strong);
+}

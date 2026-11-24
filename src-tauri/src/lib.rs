@@ -5,10 +5,13 @@ pub mod db;
 pub mod desktop;
 pub mod error;
 mod events;
+mod focus;
 mod layer;
 mod logging;
+mod scheduler;
 pub mod settings;
 mod state;
+mod validate;
 mod widgets;
 
 use state::AppState;
@@ -29,9 +32,14 @@ pub fn run() {
             std::fs::create_dir_all(&dir)?;
             logging::init(&dir);
             let db = db::Db::open(&dir.join("wakai.db"))?;
+            app.manage(focus::FocusTimer::new(&db));
             app.manage(AppState { db });
             app.manage(layer::LayerState::new());
             layer::start(app.handle());
+
+            let scheduler = scheduler::Scheduler::default();
+            scheduler.start(app.handle().clone());
+            app.manage(scheduler);
 
             app.manage(widgets::manager::WidgetRuntime::default());
             if let Err(e) = widgets::manager::restore_all(app.handle()) {
@@ -67,6 +75,28 @@ pub fn run() {
             commands::widgets::reset_widget_position,
             commands::widgets::reset_widget,
             commands::widgets::open_control_center,
+            commands::content::list_event_categories,
+            commands::content::list_events,
+            commands::content::upcoming_events,
+            commands::content::create_event,
+            commands::content::update_event,
+            commands::content::delete_event,
+            commands::content::list_tasks,
+            commands::content::create_task,
+            commands::content::update_task,
+            commands::content::set_task_completed,
+            commands::content::delete_task,
+            commands::content::clear_completed_tasks,
+            commands::content::list_notes,
+            commands::content::get_note,
+            commands::content::create_note,
+            commands::content::update_note,
+            commands::content::delete_note,
+            commands::focus::focus_state,
+            commands::focus::focus_start,
+            commands::focus::focus_pause,
+            commands::focus::focus_reset,
+            commands::focus::focus_skip,
         ])
         .build(tauri::generate_context!())
         .expect("Wakai Desktop başlatılamadı")

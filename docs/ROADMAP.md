@@ -7,7 +7,7 @@
 | 2 | Yerel Windows masaüstü motoru (Progman/WorkerW, z-sırası, Explorer kurtarma, monitörler) | ✅ Tamamlandı |
 | 3 | Widget çalışma zamanı (kayıt defteri, örnekler, yaşam döngüsü, sürükleme, boyutlandırma, kalıcılık) | ✅ Tamamlandı |
 | 4 | Pastel piksel kedi tasarım sistemi | ✅ Tamamlandı |
-| 5 | Temel widget'lar: Takvim, Görev, Not, Saat, Odak Kedisi | ⏳ |
+| 5 | Temel widget'lar: Takvim, Görev, Not, Saat, Odak Kedisi | ✅ Tamamlandı |
 | 6 | Gelişmiş widget'lar: Hava Durumu, Müzik, Sistem Kedisi | ⏳ |
 | 7 | Kontrol Merkezi | ⏳ |
 | 8 | Sistem tepsisi, başlangıç, tek örnek, kurtarma, çoklu monitör | ⏳ |

@@ -1,8 +1,11 @@
 //! SQLite erişim katmanı. Tek bir bağlantı bir `Mutex` ile korunur; sorgular kısa
 //! ve parametrelidir, bu nedenle kilit çekişmesi pratikte oluşmaz.
 
+pub mod events;
 pub mod migrations;
+pub mod notes;
 pub mod settings;
+pub mod tasks;
 pub mod widgets;
 
 use crate::error::AppResult;
