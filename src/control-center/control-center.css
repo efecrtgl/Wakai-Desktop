@@ -122,3 +122,39 @@
   word-break: break-all;
   user-select: text;
 }
+
+.cc-muted {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.cc-note {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--lavender-100);
+  font-size: var(--text-sm);
+}
+.cc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.cc-store {
+  display: flex;
+  flex-direction: column;
+}
+.cc-store__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+.cc-store__item:last-child {
+  border-bottom: none;
+}
+.cc-store__name {
+  font-weight: 650;
+  color: var(--color-text-strong);
+}

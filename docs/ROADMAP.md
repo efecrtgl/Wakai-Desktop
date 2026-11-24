@@ -5,7 +5,7 @@
 | 0 | Depo incelemesi, ortam doğrulama, mimari ve plan | ✅ Tamamlandı |
 | 1 | Proje temeli: Tauri 2 + React (JS), SQLite ve göçler, tasarım sistemi başlangıcı, uygulama kabuğu | ✅ Tamamlandı |
 | 2 | Yerel Windows masaüstü motoru (Progman/WorkerW, z-sırası, Explorer kurtarma, monitörler) | ✅ Tamamlandı |
-| 3 | Widget çalışma zamanı (kayıt defteri, örnekler, yaşam döngüsü, sürükleme, boyutlandırma, kalıcılık) | ⏳ |
+| 3 | Widget çalışma zamanı (kayıt defteri, örnekler, yaşam döngüsü, sürükleme, boyutlandırma, kalıcılık) | ✅ Tamamlandı |
 | 4 | Pastel piksel kedi tasarım sistemi | ⏳ |
 | 5 | Temel widget'lar: Takvim, Görev, Not, Saat, Odak Kedisi | ⏳ |
 | 6 | Gelişmiş widget'lar: Hava Durumu, Müzik, Sistem Kedisi | ⏳ |

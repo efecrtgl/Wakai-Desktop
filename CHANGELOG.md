@@ -16,4 +16,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - "Üzerine gelince kaldır" etkileşim modeli (Raw Input ile olay güdümlü).
 - Karma DPI'lı çoklu monitörlerde doğru içerik ölçeği.
 - Explorer yeniden başlatma, ekran değişikliği ve oturum kapanışı izleme.
+- Widget çalışma zamanı: kayıt defteri, örnekler, yaşam döngüsü, doğrulanmış yapılandırma, gecikmeli konum kaydı, kaybolan pencerelerin yeniden oluşturulması.
+- Widget çerçevesi: sürükleme, boyutlandırma ve sağ tık menüsü.
+- Kontrol Merkezi'nde "Widget'larım" bölümü.
+- Saat Kedisi (ilk sürüm: dijital saat ve tarih).
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

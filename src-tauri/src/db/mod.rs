@@ -3,6 +3,7 @@
 
 pub mod migrations;
 pub mod settings;
+pub mod widgets;
 
 use crate::error::AppResult;
 use rusqlite::Connection;

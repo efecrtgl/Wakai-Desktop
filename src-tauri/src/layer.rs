@@ -105,7 +105,7 @@ fn on_desktop_event(app: &AppHandle, event: DesktopEvent) {
         DesktopEvent::ExplorerRestarted => {
             let dead = state.lock().reattach_all();
             log::info!("Explorer yeniden başladı; kaybolan pencere: {}", dead.len());
-            crate::widgets_runtime_hook::on_windows_lost(app, dead);
+            crate::widgets::manager::on_windows_lost(app, dead);
         }
         DesktopEvent::DisplayChanged => {
             let changed = state.lock().on_display_changed();
@@ -115,7 +115,7 @@ fn on_desktop_event(app: &AppHandle, event: DesktopEvent) {
                     sync_scale(app, &w, hwnd);
                 }
             }
-            crate::widgets_runtime_hook::on_rects_changed(app, changed);
+            crate::widgets::manager::on_rects_changed(app, changed);
         }
         DesktopEvent::SessionEnding => {
             log::info!("Windows oturumu kapanıyor");
@@ -149,7 +149,7 @@ pub fn on_widget_window_event(window: &WebviewWindow, event: &WindowEvent) {
             let rect = state.lock().record_actual_rect(hwnd);
             if let Some(rect) = rect {
                 sync_scale(app, window, hwnd);
-                crate::widgets_runtime_hook::on_rects_changed(app, vec![(hwnd, rect)]);
+                crate::widgets::manager::on_rects_changed(app, vec![(hwnd, rect)]);
             }
         }
         WindowEvent::Destroyed => {
@@ -159,6 +159,9 @@ pub fn on_widget_window_event(window: &WebviewWindow, event: &WindowEvent) {
                 .lock()
                 .unwrap_or_else(|e| e.into_inner())
                 .remove(&hwnd);
+            if let Some(id) = widget_window::id_from_label(window.label()) {
+                crate::widgets::manager::on_window_destroyed(app, id);
+            }
         }
         _ => {}
     }

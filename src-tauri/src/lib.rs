@@ -10,7 +10,6 @@ mod logging;
 pub mod settings;
 mod state;
 mod widgets;
-mod widgets_runtime_hook;
 
 use state::AppState;
 use tauri::Manager;
@@ -34,20 +33,9 @@ pub fn run() {
             app.manage(layer::LayerState::new());
             layer::start(app.handle());
 
-            // Aşama 2 doğrulama penceresi (Aşama 3'te widget yöneticisiyle değişecek).
-            if let Ok(spec) = std::env::var("WAKAI_LAYER_PROBE") {
-                let n: Vec<i32> = spec
-                    .split(',')
-                    .filter_map(|v| v.trim().parse().ok())
-                    .collect();
-                let rect = if n.len() == 4 {
-                    desktop::Rect::new(n[0], n[1], n[2], n[3])
-                } else {
-                    desktop::Rect::new(120, 120, 340, 200)
-                };
-                let w = widgets::window::create(app.handle(), "probe", rect)?;
-                let p = layer::attach_window(app.handle(), &w, rect, true);
-                eprintln!("probe placement: {p:?}");
+            app.manage(widgets::manager::WidgetRuntime::default());
+            if let Err(e) = widgets::manager::restore_all(app.handle()) {
+                log::error!("widget'lar geri yüklenemedi: {e}");
             }
 
             let autostarted = std::env::args().any(|a| a == "--autostart");
@@ -67,9 +55,26 @@ pub fn run() {
             commands::app::app_info,
             commands::settings::get_settings,
             commands::settings::update_settings,
+            commands::widgets::list_widget_definitions,
+            commands::widgets::list_widgets,
+            commands::widgets::get_widget,
+            commands::widgets::add_widget,
+            commands::widgets::remove_widget,
+            commands::widgets::set_widget_visible,
+            commands::widgets::set_widget_click_through,
+            commands::widgets::update_widget_config,
+            commands::widgets::set_widget_rect,
+            commands::widgets::reset_widget_position,
+            commands::widgets::reset_widget,
+            commands::widgets::open_control_center,
         ])
-        .run(tauri::generate_context!())
-        .expect("Wakai Desktop başlatılamadı");
+        .build(tauri::generate_context!())
+        .expect("Wakai Desktop başlatılamadı")
+        .run(|app, event| {
+            if let tauri::RunEvent::Exit = event {
+                widgets::manager::flush_rects(app);
+            }
+        });
 }
 
 pub(crate) fn show_main_window(app: &tauri::AppHandle) {

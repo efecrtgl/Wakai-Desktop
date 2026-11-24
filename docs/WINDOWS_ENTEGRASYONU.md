@@ -84,7 +84,3 @@ Konumlar ve boyutlar her zaman **fiziksel piksel** ve **ekran koordinatı** olar
 - **Süreçler arası ebeveynlik:** `SetParent` ile Explorer penceresine bağlanmak iki iş parçacığının girdi kuyruklarını ilişkilendirir. Bu yüzden widget pencerelerinin UI iş parçacığında engelleyici iş yapılmaz.
 - `0x052C` mesajı belgelenmemiş bir Explorer davranışıdır; gelecekteki Windows sürümlerinde değişebilir. Bu durumda kod `Progman`'a bağlanmaya, o da olmazsa normal pencereye geri düşer.
 - Ölçüm aracı notu: Sistem DPI'ına duyarlı (`SetProcessDPIAware`) araçlar, %125 monitördeki widget koordinatlarını sanallaştırılmış (0.8 katı) gösterir. Doğrulama araçları Per-Monitor-V2 bağlamında çalıştırılmalıdır.
-
-## 8. Geliştirici Tanı Aracı
-
-`WAKAI_LAYER_PROBE="x,y,genişlik,yükseklik"` ortam değişkeniyle başlatılan geliştirme derlemesi, verilen konumda bir deneme widget'ı oluşturur. (Aşama 3'te widget yöneticisi devreye girdiğinde kaldırılacaktır.)

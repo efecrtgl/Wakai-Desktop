@@ -1,15 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import '../ui/tokens.css';
 import '../ui/base.css';
+import '../ui/components.css';
 import './widget-host.css';
+import { WidgetHost } from './WidgetHost.jsx';
 
-function Probe() {
-  return (
-    <div className="widget-frame">
-      <p style={{ fontWeight: 700 }}>Wakai katman testi</p>
-      <input placeholder="Klavye testi" style={{ marginTop: 8 }} />
-    </div>
-  );
-}
-
-createRoot(document.getElementById('root')).render(<Probe />);
+const id = new URLSearchParams(location.search).get('id');
+createRoot(document.getElementById('root')).render(<WidgetHost id={id} />);

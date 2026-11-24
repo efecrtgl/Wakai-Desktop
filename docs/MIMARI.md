@@ -41,7 +41,8 @@ Wakai Desktop iki ana parçadan oluşur:
 | `db` | Bağlantı, göç (migration) çalıştırıcı, depo (repository) fonksiyonları. |
 | `commands` | Ön yüze açılan Tauri komutları; tüm girdiler burada doğrulanır. |
 | `events` | Olay adları ve yayın yardımcıları. |
-| `widgets` | Widget kayıt defteri, örnek modeli, yaşam döngüsü yöneticisi, pencere oluşturma. |
+| `widgets` | Widget kayıt defteri, örnek modeli, yaşam döngüsü yöneticisi, pencere oluşturma. Ayrıntılar: [WIDGET_SISTEMI.md](WIDGET_SISTEMI.md). |
+| `layer` | Masaüstü katmanı olaylarını Tauri pencerelerine bağlar (ana iş parçacığında). |
 | `desktop` | Windows masaüstü hiyerarşisi (Progman/WorkerW/DefView), pencere yerleştirme, z-sırası, fare girdisi yönlendirme, Explorer yeniden başlatma ve ekran değişikliği izleme. |
 | `monitor` | Sistem kaynak ölçümü (CPU, bellek, GPU) — yalnızca abone varken ve ayarlanan aralıkla. |
 | `media` | Windows Global System Media Transport Controls (GSMTC) entegrasyonu. |
