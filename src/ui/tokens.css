@@ -1,0 +1,125 @@
+/*
+ * Wakai Desktop tasarım belirteçleri (design tokens).
+ * Bileşenlerde sabit renk KULLANILMAZ; her şey buradaki değişkenlerden gelir.
+ * Yeni bir tema eklemek için :root[data-theme="..."] altında aynı değişkenleri yeniden tanımlamak yeterlidir.
+ */
+:root {
+  /* Ham palet */
+  --pink-50: #fff3f6;
+  --pink-100: #ffe4ec;
+  --pink-200: #fcd0dd;
+  --pink-300: #f7b8c8;
+  --pink-400: #f49ab2;
+  --pink-500: #e88aa3;
+  --pink-600: #cf6b88;
+  --cream-50: #fffaf6;
+  --cream-100: #fff4ec;
+  --cream-200: #fbe9da;
+  --lavender-100: #efe9fb;
+  --lavender-200: #ddd2f5;
+  --lavender-400: #b4a2e3;
+  --peach-100: #ffeee4;
+  --peach-200: #ffd9c4;
+  --peach-400: #f6b08f;
+  --mint-200: #cdeedd;
+  --mint-500: #6fbf97;
+  --gray-900: #3d3034;
+  --gray-800: #4a3f44;
+  --gray-600: #7a6b71;
+  --gray-400: #a8999f;
+  --gray-200: #e9dfe2;
+  --rose-500: #d9607c;
+
+  /* Anlamsal renkler */
+  --color-bg: var(--cream-50);
+  --color-surface: #ffffff;
+  --color-surface-soft: var(--cream-100);
+  --color-surface-sunken: var(--cream-200);
+  --color-primary: var(--pink-400);
+  --color-primary-strong: var(--pink-600);
+  --color-primary-soft: var(--pink-100);
+  --color-secondary: var(--cream-200);
+  --color-accent-lavender: var(--lavender-200);
+  --color-accent-peach: var(--peach-200);
+  --color-text: var(--gray-800);
+  --color-text-strong: var(--gray-900);
+  --color-text-muted: var(--gray-600);
+  --color-text-faint: var(--gray-400);
+  --color-text-on-primary: #ffffff;
+  --color-border: #efdde3;
+  --color-border-strong: #e2c6cf;
+  --color-focus: var(--lavender-400);
+  --color-success: var(--mint-500);
+  --color-success-soft: var(--mint-200);
+  --color-danger: var(--rose-500);
+  --color-weekend: var(--pink-600);
+
+  /* Piksel kedi renkleri */
+  --cat-outline: #5b4a4f;
+  --cat-fur: var(--pink-300);
+  --cat-fur-shade: var(--pink-400);
+  --cat-belly: #fff1f4;
+  --cat-eye: #3d3034;
+  --cat-nose: var(--pink-500);
+  --cat-cheek: var(--pink-400);
+
+  /* Etiket renkleri (takvim/görev kategorileri) */
+  --label-pink: #f49ab2;
+  --label-lavender: #b4a2e3;
+  --label-peach: #f6b08f;
+  --label-mint: #7fcfa6;
+  --label-sky: #8fc3ee;
+  --label-butter: #f3d27a;
+
+  /* Tipografi */
+  --font-sans: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, monospace;
+  --text-xs: 11px;
+  --text-sm: 12.5px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+  --text-3xl: 34px;
+
+  /* Boşluk */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Köşeler ve gölgeler */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(91, 74, 79, 0.08);
+  --shadow-md: 0 4px 14px rgba(91, 74, 79, 0.1);
+  --shadow-lg: 0 10px 30px rgba(91, 74, 79, 0.14);
+
+  /* Hareket */
+  --ease-soft: cubic-bezier(0.25, 0.8, 0.35, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+}
+
+/* Hareket azaltma: kullanıcı/işletim sistemi tercihi veya uygulama ayarı */
+:root[data-motion='reduced'],
+:root[data-motion='off'] {
+  --duration-fast: 0ms;
+  --duration-base: 0ms;
+  --duration-slow: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
