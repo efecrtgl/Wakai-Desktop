@@ -15,6 +15,7 @@ mod media;
 mod monitor;
 pub mod pets;
 mod procstats;
+mod profiles;
 mod scheduler;
 pub mod settings;
 mod state;
@@ -82,6 +83,8 @@ pub fn run() {
             let engine = pets::engine::PetEngine::default();
             engine.start(app.handle().clone(), pets::engine_settings(&initial));
             app.manage(engine);
+            app.manage(profiles::AutoGaming::default());
+            profiles::sync_auto_gaming(app.handle(), initial.auto_gaming_profile);
             if let Some(q) = quarantined {
                 notify_recovered(app.handle(), &q);
             }
@@ -182,6 +185,12 @@ pub fn run() {
             commands::pets::stroke_pet,
             commands::pets::play_with_pet,
             commands::pets::summon_pet,
+            commands::profiles::list_profiles,
+            commands::profiles::apply_profile,
+            commands::profiles::create_profile,
+            commands::profiles::update_profile,
+            commands::profiles::delete_profile,
+            commands::profiles::reset_profile,
             commands::pets::list_home_items,
             commands::pets::add_home_item,
             commands::pets::move_home_item,

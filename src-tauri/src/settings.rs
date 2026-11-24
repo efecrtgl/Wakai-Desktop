@@ -50,6 +50,10 @@ pub struct AppSettings {
     pub pets_max_active: u32,
     /// Tam ekran bir uygulama (oyun, video) öndeyken kedileri gizle.
     pub pets_hide_fullscreen: bool,
+    /// Etkin masaüstü profili (yoksa `None`).
+    pub active_profile: Option<i64>,
+    /// Tam ekran uygulama algılanınca "Oyun" profiline otomatik geç.
+    pub auto_gaming_profile: bool,
     pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
@@ -84,6 +88,8 @@ impl Default for AppSettings {
             pet_size: 3,
             pets_max_active: 5,
             pets_hide_fullscreen: true,
+            active_profile: None,
+            auto_gaming_profile: false,
             font_family: FontFamily::System,
             close_to_tray: true,
             launch_on_startup: false,

@@ -10,6 +10,7 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Alışveriş Kedisi: miktar ayrıştırmalı alışveriş listesi.
 - Masaüstü kedileri: yerel, hafif kedi motoru; 8 cins, 6 kişilik, ihtiyaçlar, besleme, sevme, oyuncaklar, aksesuarlar, başarımlar.
 - Kedi Evi: düzenlenebilir piksel sanatı oda.
+- Masaüstü profilleri (Çalışma, Oyun, Dinlenme, Odaklanma, özel profiller), tepsiden hızlı geçiş ve isteğe bağlı tam ekranda otomatik Oyun profili.
 
 ### Değişti
 - Takvim Kedisi yeniden tasarlandı (okunaklı başlık, Bugün kısayolu, klavye gezinmesi, renk çubuklu etkinlikler, kompakt düzen).

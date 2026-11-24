@@ -57,3 +57,12 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - Simülasyon (`src/pets/home/sim.js`, saf): ihtiyaç önceliği (uyku → yatak, açlık → mama), kişilik ağırlıkları (oyuncak, tırmalama, şekerleme, arkadaşının yanına oturma), yalnızca sayfa açık ve görünürken 8 Hz.
 - Düzenleme modu: sürükle, çevir, kaldır, katalogdan ekle; duvar/zemin seçimi kalıcı.
 - Doğrulama: 5 yeni ön yüz testi + 1 Rust testi (tek seferlik varsayılan oda, sıkıştırma). Gerçek uygulamada oda ve kedinin dolaşması ekran görüntüsüyle incelendi; o sırada kullanıcı odayı düzenleyip top ekledi — düzenleme gerçek kullanımda da çalıştı.
+
+## Aşama 8 — Masaüstü profilleri
+
+- Göç 005 (`desktop_profiles`), yerleşik profiller: **Çalışma, Oyun, Dinlenme, Odaklanma** (silinemez, varsayılana döndürülebilir) + özel profiller (oluştur, adlandır, düzenle, sil).
+- Profil ayarların üstünde bir katmandır: genel widget görünürlüğü, widget görünürlük kuralı (dokunma / hepsi / türler / seçili widget'lar), kediler açık/kapalı, kedi etkinliği, tam ekranda gizleme, animasyon, bildirimler. Widget konumlarına ve kedi durumuna dokunmaz.
+- Hızlı geçiş: Kontrol Merkezi → Profiller ve tepsi menüsü → Profil (etkin profil işaretli; menü ayar/profil değişince yeniden kurulur). Tepsiye "Masaüstü kedileri" onay kutusu da eklendi.
+- İsteğe bağlı **otomatik Oyun profili**: tam ekran uygulama algılanınca geçer, çıkınca önceki profile döner. Varsayılan kapalı; açıkken 3 sn'de bir hafif kontrol yapan iş parçacığı çalışır, kapatılınca biter.
+- Doğrulama: 3 yeni Rust testi. Gerçek uygulamada Odaklanma ve Dinlenme uygulandı: görünürlük kuralları doğru, tüm widget konumları üç durumda da aynı. Test sonrası kullanıcının önceki widget görünürlüğü ve ayarları geri yüklendi.
+- Elle doğrulanacaklar: tepsi profil menüsü tıklaması; otomatik geçişin gerçek bir tam ekran oyunla denenmesi.

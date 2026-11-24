@@ -40,8 +40,14 @@ pub fn apply_settings_patch(app: &AppHandle, patch: serde_json::Value) -> AppRes
     {
         engine.send(crate::pets::engine::Cmd::Settings(pets_next));
     }
-    if before.widgets_visible != next.widgets_visible {
+    if before.widgets_visible != next.widgets_visible
+        || before.pets_enabled != next.pets_enabled
+        || before.active_profile != next.active_profile
+    {
         crate::tray::sync(app, next.widgets_visible);
+    }
+    if next.auto_gaming_profile && !before.auto_gaming_profile {
+        crate::profiles::sync_auto_gaming(app, true);
     }
     events::broadcast(app, events::SETTINGS_CHANGED, next.clone());
     Ok(next)

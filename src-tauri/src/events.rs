@@ -32,3 +32,5 @@ pub const MEDIA_CHANGED: &str = "media:changed";
 pub const SHOPPING_CHANGED: &str = "shopping:changed";
 /// Kediler ya da ihtiyaçları değişti (etkileşimlerde; yüksek frekanslı değildir).
 pub const PETS_CHANGED: &str = "pets:changed";
+/// Profiller ya da etkin profil değişti.
+pub const PROFILES_CHANGED: &str = "profiles:changed";
