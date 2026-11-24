@@ -6,6 +6,7 @@ import { StoreSection } from './Store.jsx';
 import { CalendarSection } from './Calendar.jsx';
 import { TasksSection } from './Tasks.jsx';
 import { NotesSection } from './Notes.jsx';
+import { PetsSection } from './Pets.jsx';
 import { AppearanceSection } from './Appearance.jsx';
 import { PerformanceSection } from './Performance.jsx';
 import { NotificationsSection } from './Notifications.jsx';
@@ -18,6 +19,7 @@ export const SECTIONS = [
   { id: 'calendar', label: tr.nav.calendar, icon: 'calendar', component: CalendarSection },
   { id: 'tasks', label: tr.nav.tasks, icon: 'tasks', component: TasksSection },
   { id: 'notes', label: tr.nav.notes, icon: 'notes', component: NotesSection },
+  { id: 'pets', label: 'Kediler', icon: 'paw', component: PetsSection },
   { id: 'appearance', label: tr.nav.appearance, icon: 'palette', component: AppearanceSection },
   { id: 'performance', label: tr.nav.performance, icon: 'bolt', component: PerformanceSection },
   { id: 'notifications', label: tr.nav.notifications, icon: 'bell', component: NotificationsSection },

@@ -39,3 +39,13 @@ Aşama 3 ve 4 tek commit'te birleştirildi: motorun gerçek davranışla test ed
 - **Bulunan hatalar:** `WM_MOUSELEAVE` kapsamda olmadığı için Rust onu her mesajı yakalayan bir *değişken deseni* sayıyordu (sağ tık ve `WM_MOUSEACTIVATE` hiç çalışmazdı) — derleyici uyarısıyla yakalandı ve düzeltildi. `PetStore` başlangıçta kaydedilmiyordu — ilk gerçek çalıştırmada yakalandı.
 - **Doğrulama (gerçek Windows 11):** iki kedi oluşturuldu; pencere stilleri doğrulandı; kediler görev çubuğu üstünde, açık tarayıcının üstünde saydam çizildi (ekran görüntüsü); bir kedi uyudu (Zz), diğeri uyandıktan sonra yürüdü; besleme (tokluk 80→100, balık 3→2), başarımlar (İlk dost, Mutlu kedi) ve oyuncak penceresinin kedi tarafından itilmesi (konum izlendi) doğrulandı. 81 Rust birim testi.
 - **Elle doğrulanması gerekenler:** fareyle okşama, sürükle-bırak, sağ tık menüsü ve pencere üstüne zıplama gerçek fareyle denenmedi (kullanıcının faresi kullanılmadı).
+
+## Aşama 5–6 — İhtiyaçlar, etkileşimler, oyuncaklar, aksesuarlar ve koleksiyon
+
+Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı arayüzüne bağlandı.
+
+- **Kontrol Merkezi → Kediler:** sahiplenme penceresi (ad, 8 cins önizlemesi, kişilik açıklaması), her kedi için kart: canlı ihtiyaç çubukları (30 sn'de bir ve `pets:changed` ile tazelenir), ruh hâli, Sev / Besle (bugünkü yiyecek sayılarıyla) / Oyna (açık oyuncaklar) / Çağır, masaüstü–Kedi Evi geçişi, yerinde dursun, baş ve boyun aksesuarı (kilitliler kilit nedeniyle gösterilir), çift tıkla yeniden adlandırma, onaylı koleksiyondan çıkarma.
+- **Başarımlar** ve istatistikler (besleme, sevgi, oyun, üst üste besleme günü) — bildirim göndermez.
+- **Kedi ayarları:** açık/kapalı, etkinlik düzeyi, boyut, aynı anda en fazla kedi, tam ekranda gizleme.
+- Ön yüz sprite çizimi Rust ile aynı `sprites.json`'dan (`src/pets/sprite.js`); 2 yeni ön yüz testi (tüm animasyon × cins çizilir, aksesuarlar ızgarayı değiştirir).
+- Doğrulama: ekran görüntüleriyle koleksiyon ve sahiplenme penceresi incelendi; aksesuar seçiminin taşma hatası bulunup düzeltildi.
