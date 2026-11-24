@@ -4,6 +4,10 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 
 ## [Yayınlanmadı]
 
+### Düzeltildi
+- Bozuk ayar kaydı ayarların yüklenmesini engelliyordu.
+- Eksi sıfır sıcaklık "-0°" görünüyordu.
+
 ### Kaldırıldı
 - İşlevi olmayan "Örtülünce askıya al" ayarı (gerekçe: docs/PERFORMANS.md §7).
 
@@ -43,4 +47,6 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Monitör geri takıldığında widget'lar kayıtlı konumlarına döner.
 - Düzenli kapanış ve panik günlüğü.
 - Performans: boşta CPU ≈65 kat azaldı (piksel kedi animasyonları seyrek zamanlayıcılara taşındı), WebView renderer süreçleri paylaşıldı, widget'lara düşük bellek hedefi; ölçüm betiği `scripts/measure.ps1` ve ölçümlerle Türkçe performans raporu.
+- Bozuk veritabanı dosyası karantinaya alınır; uygulama yeni veritabanıyla açılır ve kullanıcıyı bilgilendirir.
+- Bütünleşme testleri, Windows çalışma zamanı testleri ve uçtan uca test betiği (`scripts/e2e.mjs`).
 - Hafif günlük kaydı (`wakai.log`, yalnızca uyarı ve üstü).

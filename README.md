@@ -19,4 +19,5 @@ Wakai Desktop; takvim, görevler, notlar, saat, odak zamanlayıcısı, hava duru
 - [Widget Sistemi](docs/WIDGET_SISTEMI.md)
 - [Veritabanı](docs/VERITABANI.md)
 - [Performans](docs/PERFORMANS.md)
+- [Testler](docs/TESTLER.md)
 - [Yol Haritası](docs/ROADMAP.md)

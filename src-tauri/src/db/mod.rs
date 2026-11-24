@@ -37,6 +37,32 @@ impl Db {
         })
     }
 
+    /// Veritabanını açar; dosya bozuksa (SQLite okuyamıyorsa) onu `*.db.bozuk-<zaman>` adıyla
+    /// karantinaya alır ve boş bir veritabanıyla başlar. Karantina dosyasının yolunu döndürür.
+    /// Dosya izni gibi G/Ç hatalarında karantina YAPILMAZ (veri kaybı riskini önlemek için).
+    pub fn open_or_recover(path: &Path) -> AppResult<(Self, Option<PathBuf>)> {
+        match Self::open(path) {
+            Ok(db) => Ok((db, None)),
+            Err(crate::error::AppError::Db(e)) if path.exists() => {
+                log::error!("veritabanı açılamadı, karantinaya alınıyor: {e}");
+                let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
+                let quarantine = path.with_extension(format!("db.bozuk-{stamp}"));
+                std::fs::rename(path, &quarantine)?;
+                for ext in ["db-wal", "db-shm"] {
+                    let side = path.with_extension(ext);
+                    if side.exists() {
+                        let _ = std::fs::rename(
+                            &side,
+                            quarantine.with_extension(format!("{ext}.bozuk-{stamp}")),
+                        );
+                    }
+                }
+                Ok((Self::open(path)?, Some(quarantine)))
+            }
+            Err(e) => Err(e),
+        }
+    }
+
     /// Testler için bellek içi veritabanı.
     pub fn open_in_memory() -> AppResult<Self> {
         let mut conn = Connection::open_in_memory()?;
@@ -156,6 +182,32 @@ mod tests {
             .query_row("SELECT x FROM legacy", [], |r| r.get(0))
             .unwrap();
         assert_eq!(x, 7);
+    }
+
+    #[test]
+    fn corrupt_file_is_quarantined_and_fresh_db_created() {
+        let path = temp_db_path("corrupt");
+        std::fs::write(
+            &path,
+            b"bu bir sqlite dosyasi degil, bozuk veri bozuk veri bozuk veri",
+        )
+        .unwrap();
+        let (db, quarantined) = Db::open_or_recover(&path).unwrap();
+        let q = quarantined.expect("karantina dosyası");
+        assert!(q.exists());
+        assert_eq!(std::fs::read(&q).unwrap()[..4], *b"bu b");
+        assert_eq!(
+            db.with(migrations::current_version).unwrap(),
+            migrations::MIGRATIONS.len()
+        );
+    }
+
+    #[test]
+    fn healthy_file_is_not_quarantined() {
+        let path = temp_db_path("healthy");
+        drop(Db::open(&path).unwrap());
+        let (_db, q) = Db::open_or_recover(&path).unwrap();
+        assert!(q.is_none());
     }
 
     #[test]

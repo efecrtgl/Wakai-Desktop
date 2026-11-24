@@ -78,7 +78,12 @@ impl AppSettings {
 
 pub fn load(db: &Db) -> AppResult<AppSettings> {
     db.with(|c| {
-        let value = db::settings::get(c, KEY)?;
+        // Bozuk JSON kaydı yok sayılır (varsayılanlara düşülür); gerçek veritabanı hataları iletilir.
+        let value = match db::settings::get(c, KEY) {
+            Ok(v) => v,
+            Err(crate::error::AppError::Json(_)) => None,
+            Err(e) => return Err(e),
+        };
         // Bozuk ya da eski biçimli kayıt varsayılanlara düşer; eksik alanlar `serde(default)` ile tamamlanır.
         let parsed = value
             .and_then(|v| serde_json::from_value::<AppSettings>(v).ok())

@@ -23,5 +23,6 @@ export function duration(secs) {
 }
 
 export function temperature(v) {
-  return `${nf0.format(Math.round(v))}°`;
+  // `|| 0` eksi sıfırı (-0) önler: -0,4° → "0°".
+  return `${nf0.format(Math.round(v) || 0)}°`;
 }

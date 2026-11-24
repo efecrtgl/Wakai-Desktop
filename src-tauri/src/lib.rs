@@ -1,12 +1,12 @@
 //! Wakai Desktop — Rust çekirdeği.
 
-mod backup;
+pub mod backup;
 mod commands;
 pub mod db;
 pub mod desktop;
 pub mod error;
 mod events;
-mod focus;
+pub mod focus;
 mod http;
 mod layer;
 mod logging;
@@ -45,7 +45,7 @@ pub fn run() {
             if let Err(e) = backup::apply_pending_restore(&dir, &db_path) {
                 log::error!("yedek geri yüklenemedi: {e}");
             }
-            let db = db::Db::open(&db_path)?;
+            let (db, quarantined) = db::Db::open_or_recover(&db_path)?;
             let initial = settings::load(&db).unwrap_or_default();
             app.manage(focus::FocusTimer::new(&db));
             app.manage(AppState {
@@ -71,6 +71,9 @@ pub fn run() {
             }
 
             tray::create(app.handle())?;
+            if let Some(q) = quarantined {
+                notify_recovered(app.handle(), &q);
+            }
 
             // Windows ile başlatıldıysa yalnızca widget'lar gelir; Kontrol Merkezi açılmaz.
             let autostarted = std::env::args().any(|a| a == "--autostart");
@@ -175,6 +178,23 @@ fn shutdown(app: &tauri::AppHandle) {
             .with(|c| Ok(c.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);")?));
     }
     log::info!("Wakai Desktop kapandı");
+}
+
+/// Bozuk veritabanı karantinaya alındıysa kullanıcıyı bilgilendirir.
+fn notify_recovered(app: &tauri::AppHandle, quarantine: &std::path::Path) {
+    use tauri_plugin_notification::NotificationExt;
+    let name = quarantine
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let _ = app
+        .notification()
+        .builder()
+        .title("Wakai Desktop verileri okunamadı")
+        .body(format!(
+            "Bozuk veritabanı {name} olarak saklandı ve yeni bir başlangıç yapıldı. Ayarlar → Yedekler bölümünden bir yedeği geri yükleyebilirsiniz."
+        ))
+        .show();
 }
 
 /// Panikler günlük dosyasına yazılır; hata ayıklama için iz bırakır.

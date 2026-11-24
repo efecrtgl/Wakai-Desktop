@@ -124,3 +124,15 @@ unsafe extern "system" fn find_icon_host(hwnd: HWND, lparam: LPARAM) -> BOOL {
     }
     BOOL(1)
 }
+
+#[cfg(test)]
+mod tests {
+    /// Gerçek Windows masaüstü oturumu gerektirir: `cargo test locates_desktop -- --ignored`
+    #[test]
+    #[ignore]
+    fn locates_desktop() {
+        let host = super::locate().expect("masaüstü hiyerarşisi bulunmalı");
+        assert!(host.is_alive());
+        println!("düzen: {:?}", host.layout);
+    }
+}
