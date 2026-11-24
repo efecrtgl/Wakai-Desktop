@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, Dialog, ErrorNote, Toggle } from '../../ui/components.jsx';
+import { Badge, Button, Card, Dialog, ErrorNote, Loading, Toggle } from '../../ui/components.jsx';
 import { call } from '../../lib/ipc.js';
 import { bytes } from '../../lib/format.js';
 import { tr } from '../../lib/i18n.js';
@@ -132,6 +132,98 @@ function VersionHistory() {
   );
 }
 
+const BACKUP_CATEGORIES = {
+  settings: 'Ayarlar',
+  widgets: "Widget'lar ve konumları",
+  calendar: 'Takvim etkinlikleri',
+  tasks: 'Görevler',
+  notes: 'Notlar',
+  shopping: 'Alışveriş listeleri',
+  focus: 'Odak geçmişi',
+  pets: 'Kediler ve Kedi Evi',
+  profiles: 'Profiller',
+};
+
+function RestoreDialog({ name, onClose, onError }) {
+  const [info, setInfo] = useState(null);
+  const [mode, setMode] = useState('all');
+  const [picked, setPicked] = useState([]);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    call('inspect_backup', { name }).then(setInfo, (e) => onError(e.message));
+  }, [name, onError]);
+
+  const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+
+  const restore = async () => {
+    setBusy(true);
+    try {
+      if (mode === 'all') await call('restore_backup', { name });
+      else await call('restore_backup_selective', { name, categories: picked });
+    } catch (e) {
+      onError(e.message);
+      setBusy(false);
+      onClose();
+    }
+  };
+
+  const ready = info?.valid && (mode === 'all' || picked.length > 0);
+
+  return (
+    <Dialog
+      open
+      title="Yedeği geri yükle"
+      onClose={() => !busy && onClose()}
+      dismissible={!busy}
+      actions={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={busy}>Vazgeç</Button>
+          <Button variant="primary" onClick={restore} disabled={!ready || busy}>{busy ? 'Yeniden başlatılıyor…' : 'Geri yükle'}</Button>
+        </>
+      }
+    >
+      {!info ? <Loading label="Yedek denetleniyor…" /> : null}
+      {info && !info.valid ? <p className="wk-error">Bu yedek bozuk ya da geçerli bir Wakai Desktop yedeği değil; geri yüklenemez.</p> : null}
+      {info?.valid ? (
+        <>
+          <p>
+            <strong>{info.created}</strong> · {bytes(info.size)} · <Badge tone="mint">Bütünlük denetimi geçti</Badge>
+          </p>
+          {info.newer ? (
+            <p className="cc-note">Bu yedek daha yeni bir Wakai Desktop sürümüyle alınmış. Bu sürümün tanımadığı veriler korunur ama kullanılmaz.</p>
+          ) : info.schema_version < info.supported_version ? (
+            <p className="cc-muted">Daha eski bir sürümden alınmış; geri yüklendikten sonra otomatik olarak güncellenir.</p>
+          ) : null}
+          <div className="cc-chips cc-gap">
+            <button type="button" className={`cc-chip ${mode === 'all' ? 'is-on' : ''}`} onClick={() => setMode('all')}>Tümünü geri yükle</button>
+            <button type="button" className={`cc-chip ${mode === 'pick' ? 'is-on' : ''}`} onClick={() => setMode('pick')}>Yalnızca seçtiklerim</button>
+          </div>
+          {mode === 'pick' ? (
+            <ul className="bk-cats">
+              {info.categories.map((c) => (
+                <li key={c.id}>
+                  <label className={c.count === null ? 'is-disabled' : ''}>
+                    <input type="checkbox" checked={picked.includes(c.id)} disabled={c.count === null} onChange={() => toggle(c.id)} />
+                    <span>{BACKUP_CATEGORIES[c.id] ?? c.id}</span>
+                    <span className="cc-muted">{c.count === null ? 'bu yedekte yok' : `${c.count} kayıt`}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <p className="cc-muted">
+            {mode === 'all'
+              ? 'Tüm veriler yedekteki hâline döner.'
+              : 'Yalnızca seçilen kategoriler yedekteki hâline döner; diğer verileriniz olduğu gibi kalır.'}{' '}
+            Uygulama yeniden başlatılır ve mevcut veriler önce ayrıca yedeklenir.
+          </p>
+        </>
+      ) : null}
+    </Dialog>
+  );
+}
+
 function Backups() {
   const [list, setList] = useState(null);
   const [error, setError] = useState(null);
@@ -155,13 +247,13 @@ function Backups() {
       setBusy(false);
     }
   };
+  const closeDialog = useCallback(() => setConfirm(null), []);
   const remove = (name) => call('delete_backup', { name }).then(reload, (e) => setError(e.message));
-  const restore = (name) => call('restore_backup', { name }).catch((e) => setError(e.message));
 
   return (
     <Card title="Yedekler" action={<Button size="sm" onClick={create} disabled={busy}>Şimdi yedekle</Button>}>
       <p className="cc-muted">
-        Takvim, görev, not ve widget ayarlarınızın tam kopyası. En fazla 20 yedek tutulur. Ayrıca her veritabanı güncellemesinden önce otomatik yedek alınır.
+        Tüm verilerinizin (widget'lar, takvim, görevler, notlar, alışveriş, kediler, profiller, ayarlar) doğrulanmış tam kopyası. En fazla 20 yedek tutulur. Veritabanı ve uygulama güncellemelerinden önce otomatik yedek alınır. Geri yüklerken tümünü ya da yalnızca seçtiğiniz kategorileri geri alabilirsiniz.
       </p>
       <ErrorNote error={error} />
       {list?.length === 0 ? <p className="cc-muted">Henüz yedek yok.</p> : null}
@@ -174,21 +266,12 @@ function Backups() {
                 {b.name} · {bytes(b.size)}
               </span>
             </span>
-            {confirm === b.name ? (
-              <>
-                <span className="cc-muted">Uygulama yeniden başlatılacak. Mevcut veriler de önce yedeklenir.</span>
-                <Button size="sm" variant="primary" onClick={() => restore(b.name)}>Geri yükle</Button>
-                <Button size="sm" variant="ghost" onClick={() => setConfirm(null)}>Vazgeç</Button>
-              </>
-            ) : (
-              <>
-                <Button size="sm" onClick={() => setConfirm(b.name)}>Geri yükle…</Button>
-                <Button size="sm" variant="ghost" onClick={() => remove(b.name)}>Sil</Button>
-              </>
-            )}
+            <Button size="sm" onClick={() => setConfirm(b.name)}>Geri yükle…</Button>
+            <Button size="sm" variant="ghost" onClick={() => remove(b.name)}>Sil</Button>
           </li>
         ))}
       </ul>
+      {confirm ? <RestoreDialog name={confirm} onClose={closeDialog} onError={setError} /> : null}
     </Card>
   );
 }

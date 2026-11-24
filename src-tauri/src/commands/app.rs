@@ -1,7 +1,7 @@
 use crate::error::AppResult;
 use crate::state::AppState;
 use serde::Serialize;
-use tauri::State;
+use tauri::{Manager, State};
 
 #[derive(Serialize)]
 pub struct AppInfo {
@@ -44,6 +44,34 @@ pub fn restore_backup(
 ) -> AppResult<()> {
     crate::backup::schedule_restore(&state.data_dir, &name)?;
     crate::widgets::manager::flush_rects(&app);
+    if let Some(store) = app.try_state::<crate::pets::store::PetStore>() {
+        let _ = store.flush(&state.db);
+    }
+    app.restart();
+}
+
+/// Yedeği inceler: bütünlük, şema uyumluluğu, kategori başına kayıt sayısı.
+#[tauri::command]
+pub fn inspect_backup(
+    state: State<'_, AppState>,
+    name: String,
+) -> AppResult<crate::backup::BackupDetails> {
+    crate::backup::inspect(&state.data_dir, &name)
+}
+
+/// Yalnızca seçilen kategorileri bir sonraki açılışta geri yükler ve uygulamayı yeniden başlatır.
+#[tauri::command]
+pub fn restore_backup_selective(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+    name: String,
+    categories: Vec<String>,
+) -> AppResult<()> {
+    crate::backup::schedule_selective_restore(&state.data_dir, &name, &categories)?;
+    crate::widgets::manager::flush_rects(&app);
+    if let Some(store) = app.try_state::<crate::pets::store::PetStore>() {
+        let _ = store.flush(&state.db);
+    }
     app.restart();
 }
 

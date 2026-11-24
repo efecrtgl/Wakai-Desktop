@@ -57,6 +57,11 @@ pub fn run() {
                 log::error!("yedek geri yüklenemedi: {e}");
             }
             let (db, quarantined) = db::Db::open_or_recover(&db_path)?;
+            match backup::apply_pending_selective(&db, &dir) {
+                Ok(c) if !c.is_empty() => log::info!("seçmeli geri yükleme: {c:?}"),
+                Ok(_) => {}
+                Err(e) => log::error!("seçmeli geri yükleme başarısız: {e}"),
+            }
             let initial = settings::load(&db).unwrap_or_default();
             record_version(&db, &version);
             app.manage(focus::FocusTimer::new(&db));
@@ -148,6 +153,8 @@ pub fn run() {
             commands::app::list_backups,
             commands::app::delete_backup,
             commands::app::restore_backup,
+            commands::app::inspect_backup,
+            commands::app::restore_backup_selective,
             commands::app::send_test_notification,
             commands::app::app_resource_usage,
             commands::settings::get_settings,

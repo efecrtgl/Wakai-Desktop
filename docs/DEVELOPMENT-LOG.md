@@ -86,3 +86,11 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - Yalıtılmış test ortamı için `WAKAI_DATA_DIR`.
 - Doğrulama: 3 yeni Rust testi (91 birim test). Yalıtılmış ortamda otomatik ve elle geri dönüş gerçek exe ile denendi (SHA-256 ile doğrulandı). Test sırasında bulunan hata: geçersiz sürümle çağrıda önce yedek alınıyordu — doğrulama öne alındı ve yeniden denendi.
 - Not: gerçek bir NSIS güncellemesinden sonraki geri dönüş, imzalı ilk sürüm yayınlandıktan sonra ayrıca denenmelidir; değiştirilen mekanizma (exe değişimi + yeniden başlatma) burada denendi.
+
+## Aşama 11 — Yedek iyileştirmeleri
+
+- Atomik yedek (`.tmp` → `quick_check` → yeniden adlandırma) ve atomik tam geri yükleme (geçici kopya → doğrulama → tek adımda yerine koyma; bozuk yedek mevcut veritabanına dokunmadan atlanır).
+- `inspect_backup`: bütünlük, şema uyumluluğu (eski/yeni), kategori başına kayıt sayısı.
+- Seçmeli geri yükleme (9 kategori): açılışta, veriler kullanılmadan önce, tek işlemde; ortak sütunlarla şema farklarına dayanıklı; önce `-secmeli-oncesi` yedeği.
+- Geri yükleme öncesi kedi durumu da kaydedilir. Kontrol Merkezi'nde yeni "Yedeği geri yükle" penceresi.
+- Doğrulama: 3 yeni Rust testi (94 birim test). Yalıtılmış ortamda arayüzden seçmeli geri yükleme ve bozuk yedek reddi denendi. Ayrıntılar: `docs/YEDEKLER.md`.
