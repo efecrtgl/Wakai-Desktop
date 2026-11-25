@@ -67,6 +67,10 @@ pub struct AppSettings {
     pub ui_sounds: bool,
     /// Kedi Evi ortam efektleri (yağmur, yapraklar, yıldızlar).
     pub ambient_effects: bool,
+    /// Kedi Evi saati: "real" (yerel saat) ya da "fast" (bir oyun saati = bir dakika).
+    pub world_time: String,
+    /// Kedi Evi'nde hava durumu (yağmur, kar) gösterilsin mi?
+    pub world_weather: bool,
     /// Masaüstü kedileri açık mı?
     pub pets_enabled: bool,
     /// Kedilerin genel etkinlik düzeyi (profiller değiştirir).
@@ -121,6 +125,8 @@ impl Default for AppSettings {
             high_contrast: false,
             ui_sounds: false,
             ambient_effects: true,
+            world_time: "real".into(),
+            world_weather: true,
             pets_enabled: true,
             pet_activity: crate::pets::behavior::ActivityLevel::Normal,
             pet_size: 3,
@@ -160,6 +166,9 @@ impl AppSettings {
         self.monitor_interval_secs = self.monitor_interval_secs.clamp(1, 60);
         self.weather_refresh_minutes = self.weather_refresh_minutes.clamp(15, 180);
         self.text_scale = clamp_f(self.text_scale, 0.85, 1.4, 1.0);
+        if self.world_time != "fast" {
+            self.world_time = "real".into();
+        }
         if !crate::themes::valid_id(&self.theme) {
             self.theme = crate::themes::DEFAULT_THEME.to_string();
         }

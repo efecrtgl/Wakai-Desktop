@@ -145,6 +145,7 @@ pub fn pet_progress(state: State<'_, AppState>) -> AppResult<Progress> {
 }
 
 #[tauri::command]
+#[allow(clippy::too_many_arguments)]
 pub fn adopt_pet(
     app: AppHandle,
     state: State<'_, AppState>,
@@ -153,8 +154,19 @@ pub fn adopt_pet(
     name: String,
     breed: String,
     personality: String,
+    quirk: Option<String>,
 ) -> AppResult<PetRecord> {
-    let p = service::adopt(&state.db, &store, &name, &breed, &personality)?;
+    let mut p = service::adopt(&state.db, &store, &name, &breed, &personality)?;
+    if let Some(q) = quirk.filter(|q| q != "none") {
+        if !["mischievous", "shy", "lazy"].contains(&q.as_str()) {
+            return Err(AppError::invalid("Bilinmeyen özellik."));
+        }
+        store.update(p.id, |r| r.quirk = q.clone())?;
+        p = store.persist(&state.db, p.id)?;
+    }
+    state
+        .db
+        .with(|c| crate::world::add_memory(c, p.id, "Ivily ailesine katıldı."))?;
     changed(&app, &engine, true);
     Ok(p)
 }

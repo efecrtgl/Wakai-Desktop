@@ -97,6 +97,54 @@ pub fn frame_count(anim: &str) -> usize {
     sprites().animations.get(anim).map_or(0, Vec::len)
 }
 
+static PALETTE: std::sync::RwLock<String> = std::sync::RwLock::new(String::new());
+
+/// Etkin temanın kedi paleti (none | grayscale | warm | cool | neon | pastel).
+pub fn set_palette(p: &str) {
+    if let Ok(mut g) = PALETTE.write() {
+        *g = p.to_string();
+    }
+}
+
+/// Tema paleti dönüşümü; ön yüzdeki src/theme/palette.js ile aynı formüller.
+pub fn palette_transform(rgb: u32, palette: &str) -> u32 {
+    let (r, g, b) = (
+        ((rgb >> 16) & 255) as f64,
+        ((rgb >> 8) & 255) as f64,
+        (rgb & 255) as f64,
+    );
+    let l = 0.299 * r + 0.587 * g + 0.114 * b;
+    let mix = |c: [f64; 3], t: [f64; 3], k: f64| {
+        [
+            c[0] + (t[0] - c[0]) * k,
+            c[1] + (t[1] - c[1]) * k,
+            c[2] + (t[2] - c[2]) * k,
+        ]
+    };
+    let c = [r, g, b];
+    let out = match palette {
+        "grayscale" => [l, l, l],
+        "warm" => mix(mix(c, [l, l, l], 0.15), [240.0, 160.0, 96.0], 0.14),
+        "cool" => mix(c, [111.0, 160.0, 255.0], 0.14),
+        "neon" => {
+            let s = [l + (r - l) * 1.8, l + (g - l) * 1.8, l + (b - l) * 1.8];
+            mix(
+                s,
+                if l > 150.0 {
+                    [230.0, 140.0, 255.0]
+                } else {
+                    [40.0, 210.0, 255.0]
+                },
+                0.28,
+            )
+        }
+        "pastel" => mix(c, [255.0, 255.0, 255.0], 0.35),
+        _ => return rgb,
+    };
+    let q = |v: f64| v.round().clamp(0.0, 255.0) as u32;
+    (q(out[0]) << 16) | (q(out[1]) << 8) | q(out[2])
+}
+
 /// Sprite'ı tuval ızgarasına (renk kodu, 0 = saydam) yerleştirir.
 fn grid(r: &Render) -> Vec<u32> {
     let s = sprites();
@@ -111,11 +159,14 @@ fn grid(r: &Render) -> Vec<u32> {
     };
     let f = &frames[r.frame % frames.len()];
     let breed = s.breeds.get(r.breed).or_else(|| s.breeds.get("pink"));
+    let palette = PALETTE.read().map(|p| p.clone()).unwrap_or_default();
     let color = |ch: char| -> u32 {
         breed
             .and_then(|b| b.colors.get(&ch.to_string()))
             .and_then(|c| hex(c))
-            .map_or(0, |c| c | 0xFF00_0000)
+            .map_or(0, |c| {
+                palette_transform(c & 0xFF_FFFF, &palette) | 0xFF00_0000
+            })
     };
     let mut put = |x: i32, y: i32, c: u32| {
         let (gx, gy) = (x + PAD_SIDE, y + PAD_TOP);
@@ -231,6 +282,14 @@ pub fn toy_pixels(toy: &str, scale: i32) -> (i32, i32, Vec<u32>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn palette_matches_frontend_formulas() {
+        // Ön yüz: transformColor("#f7b8c8", "grayscale") → #cdcdcd
+        assert_eq!(palette_transform(0xF7B8C8, "grayscale"), 0xCDCDCD);
+        assert_eq!(palette_transform(0xF7B8C8, "none"), 0xF7B8C8);
+        assert_eq!(palette_transform(0x000000, "pastel"), 0x595959);
+    }
 
     fn opaque(px: &[u32]) -> usize {
         px.iter().filter(|p| **p != 0).count()

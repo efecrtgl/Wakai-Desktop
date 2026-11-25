@@ -1,0 +1,250 @@
+/* Kedi Evi dünyası */
+.pw {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  user-select: none;
+}
+.pw-hud {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.pw-rooms {
+  border-bottom: none;
+  flex: 1;
+}
+.pw-count {
+  margin-left: 4px;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+.pw-clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.pw-level {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.pw-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: var(--space-3);
+  align-items: start;
+}
+@media (max-width: 980px) {
+  .pw-main {
+    grid-template-columns: 1fr;
+  }
+}
+.pw-stage {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: var(--border-width, 1px) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-sunken);
+  line-height: 0;
+}
+.pw-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+.pw-canvas:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+.pw-tip,
+.pw-toast {
+  position: absolute;
+  z-index: 3;
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: var(--border-width, 1px) solid var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-text-strong);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.pw-toast {
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  white-space: normal;
+  max-width: 80%;
+  text-align: center;
+  font-size: var(--text-sm);
+  animation: pw-toast var(--duration-slow) var(--ease-soft);
+}
+@keyframes pw-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+}
+.pw-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  text-align: center;
+  line-height: var(--leading-normal);
+}
+.pw-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width, 1px) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+.pw-cat__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pw-cat__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--color-text-strong);
+}
+.pw-cat__doing {
+  margin: var(--space-2) 0;
+}
+.pw-needs {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.pw-needs > div {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  align-items: center;
+  gap: var(--space-2);
+}
+.pw-needs dt {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.pw-needs dd {
+  margin: 0;
+}
+.pw-habits {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.pw-help__title {
+  font-weight: var(--weight-bold);
+  color: var(--color-text-strong);
+  margin-bottom: var(--space-1);
+}
+.pw-help ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: grid;
+  gap: 4px;
+  color: var(--color-text-muted);
+}
+.pw-style {
+  display: grid;
+  gap: var(--space-2);
+}
+.pw-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: var(--border-width, 1px) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.pw-tools,
+.pw-inv__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pw-tool,
+.pw-inv__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px var(--space-2);
+  border: var(--border-width, 1px) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-soft);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  cursor: grab;
+  touch-action: none;
+}
+.pw-tool:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pw-tool:hover:not(:disabled),
+.pw-inv__item:hover {
+  border-color: var(--color-primary);
+}
+.pw-inv > .wk-row {
+  border: none;
+  padding: 0;
+}
+.pw-inv__icon {
+  image-rendering: pixelated;
+}
+.pw-food {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #c8734f;
+}
+.pw-food--fish {
+  background: #8fc3ee;
+}
+.pw-food--milk {
+  background: #f6f3ef;
+  border: 1px solid #cfc6bd;
+}
+.pw-food--treat {
+  background: #f49ab2;
+}
+.pw-food--brush {
+  background: linear-gradient(90deg, #b88a5e 50%, #e8d3a8 50%);
+}
+.pw-dragging {
+  position: fixed;
+  z-index: 80;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-size: var(--text-xs);
+  pointer-events: none;
+}

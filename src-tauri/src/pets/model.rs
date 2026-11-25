@@ -63,6 +63,28 @@ pub struct Needs {
     pub happiness: f64,
     /// Uyku (uyanıkken azalır, uyurken dolar)
     pub rest: f64,
+    /// Sosyallik: ilgi ve diğer kedilerle vakit geçirince dolar (1.1.5).
+    #[serde(default = "d70")]
+    pub social: f64,
+    /// Sana güven: bakım ve nazik etkileşimle yavaşça artar; zamanla azalmaz.
+    #[serde(default = "d50")]
+    pub trust: f64,
+    /// Merak doyumu: keşfedince ve yeni eşyalarla dolar; aynı yerde kalınca azalır.
+    #[serde(default = "d70")]
+    pub curiosity: f64,
+    /// Temizlik: tımarlanınca ve taranınca dolar.
+    #[serde(default = "d85")]
+    pub cleanliness: f64,
+}
+
+fn d70() -> f64 {
+    70.0
+}
+fn d50() -> f64 {
+    50.0
+}
+fn d85() -> f64 {
+    85.0
 }
 
 impl Default for Needs {
@@ -72,6 +94,10 @@ impl Default for Needs {
             energy: 80.0,
             happiness: 80.0,
             rest: 80.0,
+            social: 70.0,
+            trust: 50.0,
+            curiosity: 70.0,
+            cleanliness: 85.0,
         }
     }
 }
@@ -112,11 +138,16 @@ impl Needs {
                 self.happiness = clamp(self.happiness - 3.0 * joy_k * h);
                 self.energy = clamp(self.energy - (2.0 + 14.0 * i) * energy_k * h);
                 self.rest = clamp(self.rest - 5.0 * h);
+                self.social = clamp(self.social - 4.0 * joy_k * h);
+                self.curiosity = clamp(self.curiosity - 3.0 * h);
+                self.cleanliness = clamp(self.cleanliness - 1.5 * (1.0 + i) * h);
             }
             Activity::Sleeping => {
                 self.satiety = clamp(self.satiety - 3.0 * hunger_k * h);
                 self.energy = clamp(self.energy + 30.0 * h);
                 self.rest = clamp(self.rest + 35.0 * h);
+                self.social = clamp(self.social - 1.0 * h);
+                self.curiosity = clamp(self.curiosity + 4.0 * h);
             }
             Activity::Offline => {
                 let h = secs.min(MAX_OFFLINE_SECS) / 3600.0;
@@ -131,6 +162,9 @@ impl Needs {
                 self.happiness = floor(self.happiness, 1.5 * joy_k * h);
                 self.energy = clamp(self.energy + 20.0 * h);
                 self.rest = clamp(self.rest + 25.0 * h);
+                self.social = floor(self.social, 1.5 * joy_k * h);
+                self.cleanliness = floor(self.cleanliness, 0.8 * h);
+                self.curiosity = clamp(self.curiosity + 2.0 * h);
             }
         }
     }
@@ -140,6 +174,10 @@ impl Needs {
         self.energy = clamp(self.energy + d.energy);
         self.happiness = clamp(self.happiness + d.happiness);
         self.rest = clamp(self.rest + d.rest);
+        self.social = clamp(self.social + d.social);
+        self.trust = clamp(self.trust + d.trust);
+        self.curiosity = clamp(self.curiosity + d.curiosity);
+        self.cleanliness = clamp(self.cleanliness + d.cleanliness);
     }
 }
 
@@ -149,6 +187,10 @@ pub struct NeedsDelta {
     pub energy: f64,
     pub happiness: f64,
     pub rest: f64,
+    pub social: f64,
+    pub trust: f64,
+    pub curiosity: f64,
+    pub cleanliness: f64,
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -335,6 +377,7 @@ mod tests {
             energy: 20.0,
             happiness: 90.0,
             rest: 20.0,
+            ..Needs::default()
         };
         n.advance(
             30.0 * 24.0 * 3600.0,
@@ -359,12 +402,14 @@ mod tests {
             energy: 99.0,
             happiness: 99.0,
             rest: 99.0,
+            ..Needs::default()
         };
         n.apply(NeedsDelta {
             satiety: 50.0,
             energy: 50.0,
             happiness: 50.0,
             rest: 50.0,
+            ..Default::default()
         });
         assert_eq!(
             n,
@@ -372,7 +417,8 @@ mod tests {
                 satiety: 100.0,
                 energy: 100.0,
                 happiness: 100.0,
-                rest: 100.0
+                rest: 100.0,
+                ..n
             }
         );
         n.advance(

@@ -109,7 +109,10 @@ function frame(o = {}) {
   else if (eyes === 'happy') set(c, ex - 1, ey + 1, 'k'), set(c, ex, ey, 'k'), set(c, ex + 1, ey + 1, 'k');
   else set(c, ex - 1, ey + 1, 'k'), set(c, ex, ey + 1, 'k');
 
-  // Pati kaldırma (oyun)
+  // Esneme: açık ağız
+  if (o.mouth) set(c, hx0 + 5, hy0 + 4, 'k'), set(c, hx0 + 6, hy0 + 4, 'k');
+
+  // Pati kaldırma (oyun, yalanma, tırmalama)
   if (o.paw) for (const [x, y] of o.paw) set(c, x, y, 'p');
 
   const done = outline(c);
@@ -151,6 +154,21 @@ const ANIMATIONS = {
     frame({ body: 'sit', legs: [[12, 2]], tail: TAIL_SIT, eyes: 'wide', paw: [[19, 10], [20, 9]] }),
     frame({ body: 'sit', legs: [[12, 2]], tail: TAIL_SIT, eyes: 'wide', paw: [[19, 12], [20, 12]] }),
   ],
+  // 1.1.5 Kedi Evi: tımarlanma, gerinme, esneme, tırmalama, sinme
+  groom: [
+    frame({ body: 'sit', legs: [[12, 2]], tail: TAIL_SIT, eyes: 'closed', hy: 1, paw: [[18, 9], [19, 8]] }),
+    frame({ body: 'sit', legs: [[12, 2]], tail: TAIL_SIT, eyes: 'closed', hy: 2, paw: [[18, 10], [19, 9]] }),
+  ],
+  stretch: [
+    frame({ body: 'stretch', legs: [[5, 2], [7, 2], [17, 1], [19, 1]], tail: TAIL_UP, hy: 2, eyes: 'closed' }),
+    frame({ body: 'stretch', legs: [[5, 2], [7, 2], [18, 1], [20, 1]], tail: TAIL_SWAY, hy: 3, eyes: 'closed' }),
+  ],
+  yawn: [frame({ body: 'sit', legs: [[12, 2], [14, 2]], tail: TAIL_SIT, eyes: 'closed', mouth: true, hy: -1 })],
+  scratch: [
+    frame({ body: 'stretch', legs: [[5, 2], [7, 2]], tail: TAIL_UP, hy: -1, paw: [[20, 7], [21, 6], [20, 8]] }),
+    frame({ body: 'stretch', legs: [[5, 2], [7, 2]], tail: TAIL_SWAY, hy: -1, paw: [[20, 9], [21, 8], [20, 10]] }),
+  ],
+  crouch: [frame({ body: 'loaf', legs: [], tail: TAIL_LOAF, eyes: 'wide', hy: 1 })],
   eat: [frame({ legs: [[7, 2], [9, 2], [12, 2], [14, 2]], tail: TAIL_UP, hy: 3, hx: 1, eyes: 'closed' }), frame({ legs: [[7, 2], [9, 2], [12, 2], [14, 2]], tail: TAIL_SWAY, hy: 4, hx: 1, eyes: 'closed' })],
 };
 

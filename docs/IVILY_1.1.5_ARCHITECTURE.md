@@ -132,3 +132,56 @@ an in-memory preview in the theme hook (`PreviewBar` offers Uygula / Vazgeç); n
 to settings until "Uygula". Import reads the file in the WebView (no path crosses IPC), validates
 it client-side for the preview dialog and then server-side in Rust (`import_theme`). Export
 writes `<id>.ivilytheme` to the Downloads known folder without overwriting existing files.
+
+## 5. Pet World (phases 7–17)
+
+```
+src/pets/world/catalog.json   items + rooms (shared with Rust: include_str! in world.rs)
+src/pets/world/catalog.js     pixel art per item, footprint()
+src/pets/world/world.js       World Engine: fits/overlaps (same rules as Rust), blocked grid,
+                              A* (8-dir, no corner cutting, node budget), nearestFree, interaction points
+src/pets/world/ai.js          Pet AI Engine: utility scoring + reason strings
+src/pets/world/sim.js         Animation Engine (state machine) and Simulation Engine (step, movement,
+                              actions, toy physics, game clock, weather)
+src/pets/world/render.js      renderer (cached backgrounds/sprites, depth sort, lighting, weather)
+src/control-center/sections/PetWorld.jsx  Interaction Engine (pointer/keyboard), inventory UI, HUD
+src-tauri/src/world.rs        Save/Inventory/Progression: validation, persistence, events, offline
+src-tauri/src/commands/world.rs  IPC surface + per-(pet, event) reward cooldown
+```
+
+**Data flow.** Rendering and movement run in the WebView only while the Kedi Evi tab is visible
+(requestAnimationFrame capped at 30 fps; 12 fps with reduced motion, 6 fps with animations off;
+paused while the window is hidden). Meaningful outcomes are sent to Rust as discrete events
+(world_event: eat, drink, play, pet, brush, carried, groom, scratch, climb, observe, explore, sleep,
+socialize, hide). Rust applies the needs delta, XP, habits, relationships and memories in one
+transaction and returns the updated pet. Continuous need decay stays in the existing PetStore
+(time-based, using the activity reported by set_world_activity). Positions are saved in batches
+every 30 s and when leaving the page, never per frame.
+
+**World model.** Rooms are 20×12 tiles of 16 px; rows 0–3 are wall (windows, paintings, shelves),
+rows 4–11 floor. Items have a footprint (swapped on 90° rotation), a layer and a use (bed, hide,
+climb, perch, food, water, scratch, toy, window). Walkable items (rug, toys) never block. Placement
+is validated client-side for the preview and again server-side.
+
+**Pet AI.** Each decision scores about 15 actions from needs (hunger, rest, energy, social,
+curiosity, cleanliness, trust), personality (6) and quirk (mischievous, shy, lazy) multipliers,
+habits (favourite bed spot, toy, furniture), time of day, weather, available objects, moving toys,
+the cursor (attention seeking), relationships, a fear timer (after being carried, for shy and
+independent cats) and a variety penalty for repeating recent actions. The winner's reason is shown
+in the side panel. Unreachable targets never trap a cat: A* returns null → short rest → new
+decision; no progress for 4 s → re-settle on the nearest free tile.
+
+**Animation.** States with frame timing; "once" animations (wake, stretch, yawn, jump, fall) lock
+until finished unless interrupted by carried/fall/petted; sleeping cats go wake → stretch before any
+other state; idle variation (yawn, look) while resting.
+
+**Progression and persistence (migration 008).** New pet columns (social, trust, curiosity,
+cleanliness, quirk, xp, room, wx, wy, habits JSON) with defaults; new tables world_rooms,
+world_items, world_inventory, pet_relations, pet_memories, world_state. Household level
+1 + ⌊√(xp/40)⌋ unlocks items once. Rewards per (pet, event) have cooldowns so repeated clicking
+cannot farm XP. The 1.1.0 pet_home_items table is copied once into the living room and left
+untouched (a rollback keeps the old layout).
+
+**Offline progress.** On opening, elapsed time since the last visit (capped at 24 h) is applied in
+closed form: about one meal per cat per 6 h from filled bowls; playful or mischievous cats nudge
+toys. Needs use the existing gentle offline model (floors, no punishment).

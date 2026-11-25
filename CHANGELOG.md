@@ -12,6 +12,13 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Uygulama geneli arama (Ctrl+K): ayarları ve özellikleri Türkçe karakter duyarsız bulur, ilgili ayara gidip vurgular. Ctrl+1…7 ile bölümler arasında geçiş.
 - Tema kitaplığı: yalıtılmış önizlemeler, uygulamanın tamamında geçici önizleme (Uygula / Vazgeç), favoriler, sürüm ve uyumluluk bilgisi, `.ivilytheme` içe/dışa aktarma, özel tema kaldırma.
 - Kişiselleştirme: vurgu rengi (okunabilir metin rengi otomatik), arayüz yoğunluğu, yazı tipi, widget görünümü.
+- **Kedi Evi dünyası:** üç oda (Oturma odası, Yatak odası, Oyun odası), kapılardan geçiş, karo tabanlı yerleşim, çarpışma ve A* yol bulma. Doğrudan fareyle oynanır: kediyi üzerinde gezinerek sev, sürükleyip taşı, kapıya bırakıp diğer odaya geçir; oyuncağı fırlat, kediler kovalar; mamayı kaba ya da kediye sürükle; tarakla tara. Düzenle kipinde mobilyayı taşı, döndür (R), envantere kaldır (Delete); yeşil/kırmızı yerleşim önizlemesi.
+- Kendi kararını veren kediler: ihtiyaçlar, kişilik, ikincil özellik (Yaramaz, Utangaç, Tembel), alışkanlıklar, günün saati, eşyalar ve diğer kedilerle ilişkiler; uyuma, yeme, su içme, oynama, tımarlanma, tırmalama, tırmanma, pencereden bakma, keşif, arkadaşına sokulma, ilgi isteme, saklanma. Kedinin ne yaptığı ve nedeni yan panelde görünür.
+- Yeni ihtiyaçlar: sosyallik, güven, merak, temizlik. Kedi ve ev seviyeleri, seviyeyle açılan eşyalar, anılar, arkadaşlıklar, alışkanlıklar (en sevdiği oyuncak, eşya, uyku yeri, saat dilimi).
+- Yeni animasyonlar: tımarlanma, gerinme, esneme, tırmalama, sinme; uyanma → gerinme geçişi.
+- Gün döngüsü (gerçek saat ya da hızlı gün), akşam/gece ışığı, gece yanan lambalar, pencereden yağmur, kar ve yıldızlar, temaya göre ortam parçacıkları.
+- Çevrim dışı ilerleme (en fazla 24 saat): kediler kaptan yer, oyuncakları dağıtır; dönüşte kısa bir özet.
+- Masaüstü kedileri de temanın kedi paletini kullanır.
 - Erişilebilirlik: yazı boyutu (%85–140), yüksek karşıtlık, animasyon yoğunluğu, arayüz sesleri (varsayılan kapalı), klavye kısayolları listesi.
 
 ### Değişti

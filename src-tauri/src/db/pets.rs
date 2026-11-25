@@ -20,9 +20,19 @@ pub struct PetRecord {
     pub needs: Needs,
     /// İhtiyaçların en son hesaplandığı an (Unix ms)
     pub needs_at: i64,
+    /// İkincil kişilik özelliği: none | mischievous | shy | lazy (1.1.5)
+    pub quirk: String,
+    /// Deneyim puanı (seviye bundan hesaplanır)
+    pub xp: i64,
+    /// Kedi Evi'nde bulunduğu oda ve son konumu (dünya birimi, piksel)
+    pub room: String,
+    pub wx: Option<f64>,
+    pub wy: Option<f64>,
+    /// Hafif, açıklanabilir alışkanlıklar (sevdiği yer, oyuncak, eşya, saat dilimi)
+    pub habits: serde_json::Value,
 }
 
-const COLUMNS: &str = "id, name, breed, personality, location, paused, acc_head, acc_neck, satiety, energy, happiness, rest, needs_at";
+const COLUMNS: &str = "id, name, breed, personality, location, paused, acc_head, acc_neck, satiety, energy, happiness, rest, needs_at, social, trust, curiosity, cleanliness, quirk, xp, room, wx, wy, habits";
 
 fn from_row(r: &Row) -> rusqlite::Result<PetRecord> {
     let personality: String = r.get(3)?;
@@ -40,8 +50,19 @@ fn from_row(r: &Row) -> rusqlite::Result<PetRecord> {
             energy: r.get(9)?,
             happiness: r.get(10)?,
             rest: r.get(11)?,
+            social: r.get(13)?,
+            trust: r.get(14)?,
+            curiosity: r.get(15)?,
+            cleanliness: r.get(16)?,
         },
         needs_at: r.get(12)?,
+        quirk: r.get(17)?,
+        xp: r.get(18)?,
+        room: r.get(19)?,
+        wx: r.get(20)?,
+        wy: r.get(21)?,
+        habits: serde_json::from_str(&r.get::<_, String>(22)?)
+            .unwrap_or_else(|_| serde_json::json!({})),
     })
 }
 
@@ -81,7 +102,9 @@ pub fn insert(
 pub fn save(conn: &Connection, p: &PetRecord) -> AppResult<()> {
     conn.execute(
         "UPDATE pets SET name = ?2, breed = ?3, personality = ?4, location = ?5, paused = ?6, acc_head = ?7, acc_neck = ?8,
-             satiety = ?9, energy = ?10, happiness = ?11, rest = ?12, needs_at = ?13 WHERE id = ?1",
+             satiety = ?9, energy = ?10, happiness = ?11, rest = ?12, needs_at = ?13,
+             social = ?14, trust = ?15, curiosity = ?16, cleanliness = ?17, quirk = ?18, xp = ?19,
+             room = ?20, wx = ?21, wy = ?22, habits = ?23 WHERE id = ?1",
         params![
             p.id,
             p.name,
@@ -95,7 +118,17 @@ pub fn save(conn: &Connection, p: &PetRecord) -> AppResult<()> {
             p.needs.energy,
             p.needs.happiness,
             p.needs.rest,
-            p.needs_at
+            p.needs_at,
+            p.needs.social,
+            p.needs.trust,
+            p.needs.curiosity,
+            p.needs.cleanliness,
+            p.quirk,
+            p.xp,
+            p.room,
+            p.wx,
+            p.wy,
+            p.habits.to_string()
         ],
     )?;
     Ok(())

@@ -28,6 +28,7 @@ mod updater;
 mod validate;
 mod weather;
 mod widgets;
+pub mod world;
 
 use state::AppState;
 use tauri::Manager;
@@ -65,6 +66,9 @@ pub fn run() {
                 Err(e) => log::error!("seçmeli geri yükleme başarısız: {e}"),
             }
             let initial = settings::load(&db).unwrap_or_default();
+            if let Ok(p) = db.with(|c| Ok(themes::pet_palette(c, &initial.theme))) {
+                pets::art::set_palette(&p);
+            }
             record_version(&db, &version);
             app.manage(focus::FocusTimer::new(&db));
             let pet_store = pets::store::PetStore::default();
@@ -101,6 +105,7 @@ pub fn run() {
             engine.start(app.handle().clone(), pets::engine_settings(&initial));
             app.manage(engine);
             app.manage(updater::UpdateState::default());
+            app.manage(commands::world::Cooldowns::default());
             updater::spawn_startup_check(app.handle());
             app.manage(profiles::AutoGaming::default());
             profiles::sync_auto_gaming(app.handle(), initial.auto_gaming_profile);
@@ -253,6 +258,16 @@ pub fn run() {
             commands::updates::version_history,
             commands::updates::rollback_to_version,
             commands::updates::brand_notice,
+            commands::world::get_world,
+            commands::world::world_event,
+            commands::world::set_world_activity,
+            commands::world::save_world_positions,
+            commands::world::place_world_item,
+            commands::world::move_world_item,
+            commands::world::remove_world_item,
+            commands::world::fill_world_bowl,
+            commands::world::set_world_room_style,
+            commands::world::pet_memories,
             commands::themes::list_custom_themes,
             commands::themes::import_theme,
             commands::themes::delete_custom_theme,

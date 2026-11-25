@@ -11,6 +11,7 @@ pub mod shopping;
 pub mod themes;
 pub mod updates;
 pub mod widgets;
+pub mod world;
 
 /// Yıkıcı işlemler (geri yükleme, geri dönüş, güncelleme kurulumu) yalnızca Kontrol Merkezi'nden
 /// istenebilir; widget pencereleri bu komutları çağıramaz.

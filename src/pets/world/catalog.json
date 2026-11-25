@@ -1,0 +1,185 @@
+{
+  "room": {
+    "w": 20,
+    "h": 12,
+    "wall": 4
+  },
+  "rooms": [
+    {
+      "id": "living",
+      "name": "Oturma odası"
+    },
+    {
+      "id": "bedroom",
+      "name": "Yatak odası"
+    },
+    {
+      "id": "playroom",
+      "name": "Oyun odası"
+    }
+  ],
+  "items": {
+    "bed": {
+      "name": "Kedi yatağı",
+      "cat": "furniture",
+      "w": 2,
+      "h": 1,
+      "use": "bed",
+      "start": 1
+    },
+    "cushion": {
+      "name": "Minder",
+      "cat": "furniture",
+      "w": 1,
+      "h": 1,
+      "use": "bed",
+      "start": 1
+    },
+    "box": {
+      "name": "Karton kutu",
+      "cat": "furniture",
+      "w": 1,
+      "h": 1,
+      "use": "hide",
+      "start": 1
+    },
+    "cathouse": {
+      "name": "Kedi kulübesi",
+      "cat": "furniture",
+      "w": 2,
+      "h": 2,
+      "use": "hide",
+      "unlock": 2
+    },
+    "tree": {
+      "name": "Kedi ağacı",
+      "cat": "furniture",
+      "w": 2,
+      "h": 2,
+      "use": "climb",
+      "start": 1
+    },
+    "scratch": {
+      "name": "Tırmalama tahtası",
+      "cat": "furniture",
+      "w": 1,
+      "h": 1,
+      "use": "scratch",
+      "start": 1
+    },
+    "sofa": {
+      "name": "Kanepe",
+      "cat": "furniture",
+      "w": 3,
+      "h": 1,
+      "use": "perch",
+      "unlock": 3
+    },
+    "bowl": {
+      "name": "Mama kabı",
+      "cat": "equipment",
+      "w": 1,
+      "h": 1,
+      "use": "food",
+      "start": 1
+    },
+    "water": {
+      "name": "Su kabı",
+      "cat": "equipment",
+      "w": 1,
+      "h": 1,
+      "use": "water",
+      "start": 1
+    },
+    "ball": {
+      "name": "Top",
+      "cat": "toy",
+      "w": 1,
+      "h": 1,
+      "use": "toy",
+      "walk": true,
+      "start": 1
+    },
+    "yarn": {
+      "name": "Yün yumağı",
+      "cat": "toy",
+      "w": 1,
+      "h": 1,
+      "use": "toy",
+      "walk": true,
+      "start": 1
+    },
+    "mouse": {
+      "name": "Oyuncak fare",
+      "cat": "toy",
+      "w": 1,
+      "h": 1,
+      "use": "toy",
+      "walk": true,
+      "unlock": 2
+    },
+    "feather": {
+      "name": "Tüy oyuncağı",
+      "cat": "toy",
+      "w": 1,
+      "h": 1,
+      "use": "toy",
+      "walk": true,
+      "unlock": 4
+    },
+    "plant": {
+      "name": "Saksı bitkisi",
+      "cat": "decor",
+      "w": 1,
+      "h": 1,
+      "start": 2
+    },
+    "lamp": {
+      "name": "Lamba",
+      "cat": "decor",
+      "w": 1,
+      "h": 1,
+      "start": 1
+    },
+    "rug": {
+      "name": "Halı",
+      "cat": "decor",
+      "w": 3,
+      "h": 2,
+      "walk": true,
+      "start": 1
+    },
+    "window": {
+      "name": "Pencere",
+      "cat": "decor",
+      "w": 2,
+      "h": 2,
+      "wall": true,
+      "use": "window",
+      "start": 1
+    },
+    "painting": {
+      "name": "Tablo",
+      "cat": "decor",
+      "w": 2,
+      "h": 1,
+      "wall": true,
+      "start": 1
+    },
+    "shelf": {
+      "name": "Duvar rafı",
+      "cat": "decor",
+      "w": 2,
+      "h": 1,
+      "wall": true,
+      "unlock": 3
+    },
+    "lantern": {
+      "name": "Fener",
+      "cat": "decor",
+      "w": 1,
+      "h": 1,
+      "unlock": 5
+    }
+  }
+}

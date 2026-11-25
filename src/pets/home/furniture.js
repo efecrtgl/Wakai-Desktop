@@ -1,7 +1,7 @@
 // Kedi Evi eşyaları: kedilerle aynı çizim dili (şekiller + otomatik kontur).
 // Her eşya bir ızgaradır; konum, eşyanın ALT ORTA noktasıdır (zemin üzerindeki ayak izi).
 
-function makeGrid(w, h, draw) {
+export function makeGrid(w, h, draw) {
   const g = Array.from({ length: h }, () => Array(w).fill(null));
   const set = (x, y, c) => {
     if (x >= 0 && y >= 0 && x < w && y < h) g[y][x] = c;
@@ -25,7 +25,7 @@ function makeGrid(w, h, draw) {
   return out;
 }
 
-const OUTLINE = '#5b4a4f';
+export const OUTLINE = '#5b4a4f';
 
 export const FURNITURE = {
   bed: {

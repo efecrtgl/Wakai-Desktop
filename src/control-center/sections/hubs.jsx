@@ -7,7 +7,7 @@ import { CalendarSection } from './Calendar.jsx';
 import { TasksSection } from './Tasks.jsx';
 import { NotesSection } from './Notes.jsx';
 import { PetsSection } from './Pets.jsx';
-import { PetHomeSection } from './PetHome.jsx';
+import { PetWorldSection } from './PetWorld.jsx';
 import { ProfilesSection } from './Profiles.jsx';
 import { LookSection } from './Look.jsx';
 
@@ -26,5 +26,5 @@ function Hub({ id, title, subtitle, views, route, onNavigate, ...props }) {
 
 export const WidgetsHub = (p) => <Hub id="widgets" title="Widget'lar" subtitle="Masaüstünüzdeki widget'ları yönetin ya da yenisini ekleyin" views={{ mine: WidgetsSection, store: StoreSection }} {...p} />;
 export const PlannerHub = (p) => <Hub id="planner" title="Planlayıcı" subtitle="Takvim, görevler ve notlar; widget'larla eş zamanlı" views={{ calendar: CalendarSection, tasks: TasksSection, notes: NotesSection }} {...p} />;
-export const PetHub = (p) => <Hub id="pethome" title="Kedi Evi" subtitle="Kedilerinizin yaşadığı küçük dünya" views={{ world: PetHomeSection, cats: PetsSection }} {...p} />;
+export const PetHub = (p) => <Hub id="pethome" title="Kedi Evi" subtitle="Kedilerinizin yaşadığı küçük dünya" views={{ world: PetWorldSection, cats: PetsSection }} {...p} />;
 export const PersonalizeHub = (p) => <Hub id="personalize" title="Kişiselleştirme" subtitle="Görünümü kendinize göre ayarlayın, masaüstü profilleri oluşturun" views={{ look: LookSection, profiles: ProfilesSection }} {...p} />;
