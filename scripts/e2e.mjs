@@ -9,7 +9,7 @@
 
 const PORT = process.env.CDP_PORT ?? 9222;
 const targets = await (await fetch(`http://127.0.0.1:${PORT}/json`)).json();
-const main = targets.find((t) => t.type === 'page' && t.url.endsWith('localhost/'));
+const main = targets.find((t) => t.type === 'page' && (t.url.endsWith('localhost/') || t.url.endsWith(':1420/')));
 if (!main) {
   console.error('Kontrol Merkezi sayfası bulunamadı. Uygulama CDP ile mi çalışıyor?');
   process.exit(2);
@@ -101,7 +101,9 @@ await test('en küçük boyut korunur', async () => {
   const w = await ok('add_widget', { kind: 'clock' });
   cleanup.push(['remove_widget', { id: w.id }]);
   const r = await ok('set_widget_rect', { id: w.id, rect: { ...w.rect, width: 20, height: 20 } });
-  assert(r.rect.width >= 180 && r.rect.height >= 100, `boyut ${r.rect.width}x${r.rect.height}`);
+  // En küçük boyut widget ölçeğiyle (ve monitör ölçeğiyle) çarpılır.
+  const k = (await ok('get_settings')).widget_scale;
+  assert(r.rect.width >= Math.floor(180 * k) && r.rect.height >= Math.floor(100 * k), `boyut ${r.rect.width}x${r.rect.height} (ölçek ${k})`);
 });
 
 await test('takvim: oluştur → listele → güncelle → sil', async () => {
@@ -177,7 +179,89 @@ await test('kaynak kullanımı ölçülebilir', async () => {
   assert(u.processes >= 1 && u.private_bytes > 0, 'ölçüm yok');
 });
 
+// --- 1.1.0 ---
+
+await test('alışveriş listesi: oluştur → ekle → işaretle → sil', async () => {
+  const list = await ok('create_shopping_list', { name: 'E2E market' });
+  cleanup.push(['delete_shopping_list', { id: list.id }]);
+  const item = await ok('add_shopping_item', { listId: list.id, name: 'Süt', quantity: '2' });
+  await ok('set_shopping_item_checked', { id: item.id, checked: true });
+  const items = await ok('list_shopping_items', { listId: list.id });
+  assert(items.length === 1 && items[0].checked, 'öğe işaretlenmedi');
+  await fails('add_shopping_item', { listId: list.id, name: '   ' });
+  await ok('delete_shopping_list', { id: list.id });
+  cleanup.pop();
+});
+
+await test('kedi: sahiplen → besle → koleksiyondan çıkar; geçersiz girdiler reddedilir', async () => {
+  await fails('adopt_pet', { name: 'E2E', breed: 'ejderha', personality: 'playful' });
+  await fails('adopt_pet', { name: '', breed: 'pink', personality: 'playful' });
+  const pet = await ok('adopt_pet', { name: 'E2E Kedi', breed: 'pink', personality: 'calm' });
+  cleanup.push(['release_pet', { id: pet.id }]);
+  await ok('set_pet_location', { id: pet.id, location: 'home' });
+  const fed = await invoke('feed_pet', { id: pet.id, food: 'kibble' });
+  // Günlük yiyecek bitmişse anlaşılır bir hata beklenir; başka hata olmamalı.
+  assert(fed.ok || /kalmadı|yok/i.test(fed.error), `besleme: ${fed.error}`);
+  await fails('feed_pet', { id: pet.id, food: 'taş' });
+  await ok('release_pet', { id: pet.id });
+  cleanup.pop();
+  assert(!(await ok('list_pets')).some((x) => x.id === pet.id), 'kedi silinmedi');
+});
+
+await test('Kedi Evi: eşya ekle → taşı → sil', async () => {
+  await fails('add_home_item', { kind: 'roket', x: 10, y: 10 }, 'Bilinmeyen');
+  const item = await ok('add_home_item', { kind: 'plant', x: 40, y: 150 });
+  cleanup.push(['delete_home_item', { id: item.id }]);
+  await ok('delete_home_item', { id: item.id });
+  cleanup.pop();
+});
+
+await test('profiller: yerleşikler var, özel profil oluştur → sil, yerleşik silinemez', async () => {
+  const list = await ok('list_profiles');
+  assert(list.filter((p) => p.builtin).length === 4, 'yerleşik profil sayısı 4 değil');
+  const custom = await ok('create_profile', { name: 'E2E profil', config: list[0].config });
+  cleanup.push(['delete_profile', { id: custom.id }]);
+  await fails('delete_profile', { id: list.find((p) => p.builtin).id });
+  await ok('delete_profile', { id: custom.id });
+  cleanup.pop();
+});
+
+await test('güncellemeler ve sürüm geçmişi', async () => {
+  const st = await ok('update_status');
+  const info = await ok('app_info');
+  assert(st.current === info.version, 'sürüm uyuşmuyor');
+  const h = await ok('version_history');
+  assert(h.history.some((v) => v.version === info.version), 'şu anki sürüm geçmişte yok');
+  await fails('rollback_to_version', { version: '../../x' });
+  await fails('install_update', {}, 'Bekleyen');
+});
+
+await test('yedek inceleme ve seçmeli geri yükleme doğrulaması', async () => {
+  const b = await ok('create_backup');
+  const d = await ok('inspect_backup', { name: b.name });
+  assert(d.valid && !d.newer, 'yedek geçersiz');
+  assert(d.categories.some((c) => c.id === 'pets' && c.count !== null), 'kedi kategorisi yok');
+  await fails('restore_backup_selective', { name: b.name, categories: [] }, 'kategori');
+  await fails('restore_backup_selective', { name: b.name, categories: ['şifreler'] }, 'Bilinmeyen');
+  await fails('inspect_backup', { name: '../wakai.db' }, 'Geçersiz');
+  await ok('delete_backup', { name: b.name });
+});
+
 for (const [cmd, args] of cleanup.reverse()) await invoke(cmd, args);
 ws.close();
+
+const widgetPage = targets.find((t) => t.type === 'page' && t.url.includes('widget'));
+if (widgetPage) {
+  await test('widget penceresi yıkıcı komutları çağıramaz', async () => {
+    const w = new WebSocket(widgetPage.webSocketDebuggerUrl);
+    await new Promise((r) => (w.onopen = r));
+    const res = await new Promise((resolve) => {
+      w.onmessage = (m) => resolve(JSON.parse(m.data).result?.result?.value);
+      w.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression: "window.__TAURI_INTERNALS__.invoke('delete_backup', { name: 'wakai-20000101-000000.db' }).then(() => 'ok', (e) => String(e))", awaitPromise: true, returnByValue: true } }));
+    });
+    w.close();
+    assert(String(res).includes('Kontrol Merkezi'), `beklenmeyen sonuç: ${res}`);
+  });
+}
 console.log(`\n${passed} başarılı, ${failures.length} başarısız`);
-process.exit(failures.length ? 1 : 0);
+process.exitCode = failures.length ? 1 : 0;

@@ -102,3 +102,9 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - Açılış süresi (aynı yöntem): 677 / 687 / 753 ms (6 widget + 2 kedi; temel 8 widget ile 884 / 983 / 784 ms).
 - Güvenlik: yıkıcı komutlar yalnızca Kontrol Merkezi penceresinden kabul edilir; güncelleme adresi geçersiz kılma yalnızca hata ayıklama derlemesinde. Ayrıntılar `docs/PERFORMANCE.md`.
 - Gözlem: ölçüm sırasında birincil veritabanında 6 widget kaldığı görüldü (önceki kopyada 9). Testler yalıtılmış kopyalarda yapıldığı için bu değişiklik büyük olasılıkla kullanıcının kendi işlemidir; kullanıcı bilgilendirilecek.
+
+## Aşama 13 — Testler
+
+- E2E betiği 7 yeni senaryoyla genişletildi (alışveriş, kediler, Kedi Evi, profiller, güncelleme/sürüm geçmişi, yedek inceleme/seçmeli geri yükleme, widget penceresi yetki sınırı). Yalıtılmış veri klasöründe (gerçek veritabanının kopyası) 19/19 geçti.
+- E2E düzeltmeleri: hata ayıklama derlemesinin `:1420/` adresi tanınıyor; en küçük boyut testi widget ölçeğini hesaba katıyor; çıkışta libuv iddia hatası giderildi.
+- Toplam: 94 Rust birim + 6 bütünleşme, 21 ön yüz, 19 uçtan uca test. Kapsam ve elle doğrulanamayanlar `docs/TESTLER.md` içinde.
