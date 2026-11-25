@@ -1,4 +1,4 @@
-// Özgün piksel kedi sprite'ları — Wakai Desktop'un görsel kimliği.
+// Özgün piksel kedi sprite'ları — Ivily Desktop'un görsel kimliği.
 //
 // Her sprite 16×16'lık katmanlardan oluşur. `base` her zaman çizilir; diğer katmanlar
 // CSS ile canlandırılır (göz kırpma, kuyruk sallama, Zz, parıltı). Karakterler:

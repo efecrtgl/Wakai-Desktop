@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Wakai Desktop'un kaynak kullanımını ölçer (ana süreç + tüm WebView2 alt süreçleri).
+  Ivily Desktop'un kaynak kullanımını ölçer (ana süreç + tüm WebView2 alt süreçleri).
 
 .DESCRIPTION
   Çalışan wakai-desktop.exe sürecini ve ondan türeyen tüm süreçleri bulur, belirtilen süre

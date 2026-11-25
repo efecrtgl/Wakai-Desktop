@@ -5,6 +5,7 @@ import { useSettings } from '../lib/settings.js';
 import { useMotionAttribute } from '../lib/motion.js';
 import { useTauriEvent } from '../lib/ipc.js';
 import { UpdateDialog } from './UpdateDialog.jsx';
+import { BrandNotice } from './BrandNotice.jsx';
 
 export default function App() {
   const [active, setActive] = useState(SECTIONS[0].id);
@@ -25,6 +26,7 @@ export default function App() {
     <div className="cc">
       <Sidebar sections={SECTIONS} active={section.id} onSelect={setActive} />
       <main className="cc__main">
+        <BrandNotice />
         <View settingsApi={settingsApi} onNavigate={setActive} focusWidget={focusWidget} />
       </main>
       <UpdateDialog />

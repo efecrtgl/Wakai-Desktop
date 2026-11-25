@@ -23,7 +23,7 @@ function Updates({ settings, update }) {
     setNote(null);
     try {
       const found = await call('check_for_updates');
-      setNote(found ? `Wakai Desktop ${found.version} yüklenebilir.` : 'Wakai Desktop güncel.');
+      setNote(found ? `Ivily Desktop ${found.version} yüklenebilir.` : 'Ivily Desktop güncel.');
       await reload();
     } catch (e) {
       setError(e.message);
@@ -125,7 +125,7 @@ function VersionHistory() {
           </>
         }
       >
-        <p>Wakai Desktop yeniden başlatılacak ve {confirm} sürümüyle açılacak. Veritabanınız önce yedeklenir; widget'larınız, kedileriniz ve ayarlarınız korunur.</p>
+        <p>Ivily Desktop yeniden başlatılacak ve {confirm} sürümüyle açılacak. Veritabanınız önce yedeklenir; widget'larınız, kedileriniz ve ayarlarınız korunur.</p>
         <p className="cc-muted">Otomatik güncelleme denetimi açıksa yeni sürüm yeniden önerilir; istemiyorsanız "Daha Sonra" deyin ya da denetimi kapatın.</p>
       </Dialog>
     </Card>
@@ -184,14 +184,14 @@ function RestoreDialog({ name, onClose, onError }) {
       }
     >
       {!info ? <Loading label="Yedek denetleniyor…" /> : null}
-      {info && !info.valid ? <p className="wk-error">Bu yedek bozuk ya da geçerli bir Wakai Desktop yedeği değil; geri yüklenemez.</p> : null}
+      {info && !info.valid ? <p className="wk-error">Bu yedek bozuk ya da geçerli bir Ivily Desktop yedeği değil; geri yüklenemez.</p> : null}
       {info?.valid ? (
         <>
           <p>
             <strong>{info.created}</strong> · {bytes(info.size)} · <Badge tone="mint">Bütünlük denetimi geçti</Badge>
           </p>
           {info.newer ? (
-            <p className="cc-note">Bu yedek daha yeni bir Wakai Desktop sürümüyle alınmış. Bu sürümün tanımadığı veriler korunur ama kullanılmaz.</p>
+            <p className="cc-note">Bu yedek daha yeni bir Ivily Desktop sürümüyle alınmış. Bu sürümün tanımadığı veriler korunur ama kullanılmaz.</p>
           ) : info.schema_version < info.supported_version ? (
             <p className="cc-muted">Daha eski bir sürümden alınmış; geri yüklendikten sonra otomatik olarak güncellenir.</p>
           ) : null}
@@ -306,7 +306,7 @@ export function SettingsSection({ settingsApi }) {
           <dt>Hava durumu verisi</dt>
           <dd>Open-Meteo (open-meteo.com, CC BY 4.0)</dd>
         </dl>
-        <p className="cc-muted">Wakai Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. İnternete yalnızca Hava Durumu Kedisi ve güncelleme denetimi bağlanır.</p>
+        <p className="cc-muted">Ivily Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. İnternete yalnızca Hava Durumu Kedisi ve güncelleme denetimi bağlanır.</p>
       </Card>
     </div>
   );

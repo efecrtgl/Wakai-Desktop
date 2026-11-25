@@ -818,7 +818,7 @@ impl Engine {
                 }
             }
             Anim::Play(toy) => {
-                if let Some(sprite) = Sprite::new("Wakai oyuncak") {
+                if let Some(sprite) = Sprite::new("Ivily oyuncak") {
                     let (w, h, px) = art::toy_pixels(&toy, p.scale);
                     let side = if p.face_right { 1.0 } else { -1.0 };
                     let tx = p.x + p.sprite.w as f64 / 2.0 + side * p.sprite.w as f64;
@@ -958,7 +958,7 @@ impl Engine {
                     .app
                     .notification()
                     .builder()
-                    .title("Wakai Desktop")
+                    .title("Ivily Desktop")
                     .body(e.to_string())
                     .show();
             }

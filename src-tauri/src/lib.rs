@@ -1,4 +1,4 @@
-//! Wakai Desktop — Rust çekirdeği.
+//! Ivily Desktop (eski adıyla Wakai Desktop) — Rust çekirdeği.
 
 pub mod backup;
 mod commands;
@@ -9,6 +9,7 @@ mod events;
 pub mod focus;
 mod http;
 mod layer;
+mod legacy;
 mod logging;
 mod main_window;
 mod media;
@@ -115,6 +116,22 @@ pub fn run() {
                 std::thread::spawn(move || {
                     std::thread::sleep(std::time::Duration::from_secs(15));
                     recovery::launch_healthy(&dir, &version);
+                });
+            }
+
+            // Wakai → Ivily geçişinden kalanlar (eski otomatik başlatma değeri, kilitli kalmış eski
+            // program dosyası). Otomatik başlatma açıksa yeni adla yeniden kaydedilir.
+            {
+                let handle = app.handle().clone();
+                let autostart = initial.launch_on_startup;
+                std::thread::spawn(move || {
+                    legacy::cleanup();
+                    if autostart
+                        && !cfg!(debug_assertions)
+                        && let Err(e) = commands::settings::apply_autostart(&handle, true)
+                    {
+                        log::warn!("otomatik başlatma yenilenemedi: {e}");
+                    }
                 });
             }
 
@@ -234,6 +251,8 @@ pub fn run() {
             commands::updates::verify_update,
             commands::updates::version_history,
             commands::updates::rollback_to_version,
+            commands::updates::brand_notice,
+            commands::updates::dismiss_brand_notice,
             commands::services::subscribe,
             commands::services::unsubscribe,
             commands::services::system_stats,
@@ -243,7 +262,7 @@ pub fn run() {
             commands::services::weather_search,
         ])
         .build(tauri::generate_context!())
-        .expect("Wakai Desktop başlatılamadı")
+        .expect("Ivily Desktop başlatılamadı")
         .run(|app, event| match event {
             // Son pencere kapandığında (ör. Kontrol Merkezi kapatıldı ve widget'lar gizli)
             // uygulama tepside çalışmaya devam eder. Açık çıkış (`app.exit`) bir kod taşır.
@@ -272,7 +291,7 @@ fn shutdown(app: &tauri::AppHandle) {
             .db
             .with(|c| Ok(c.execute_batch("PRAGMA wal_checkpoint(TRUNCATE);")?));
     }
-    log::info!("Wakai Desktop kapandı");
+    log::info!("Ivily Desktop kapandı");
 }
 
 /// Açılış güvenliği: kalan `.old` dosyasını temizler; hiç sağlıklı açılmamış bu sürüm art arda
@@ -314,7 +333,7 @@ fn notify_rolled_back(app: &tauri::AppHandle, from: &str, to: &str) {
     let _ = app
         .notification()
         .builder()
-        .title("Wakai Desktop önceki sürüme döndü")
+        .title("Ivily Desktop önceki sürüme döndü")
         .body(format!(
             "{from} sürümü düzgün açılamadığı için {to} sürümüne dönüldü. Verileriniz korunuyor."
         ))
@@ -331,7 +350,7 @@ fn notify_recovered(app: &tauri::AppHandle, quarantine: &std::path::Path) {
     let _ = app
         .notification()
         .builder()
-        .title("Wakai Desktop verileri okunamadı")
+        .title("Ivily Desktop verileri okunamadı")
         .body(format!(
             "Bozuk veritabanı {name} olarak saklandı ve yeni bir başlangıç yapıldı. Ayarlar → Yedekler bölümünden bir yedeği geri yükleyebilirsiniz."
         ))

@@ -89,7 +89,7 @@ pub fn send_test_notification(app: tauri::AppHandle) -> AppResult<()> {
     use tauri_plugin_notification::NotificationExt;
     app.notification()
         .builder()
-        .title("🐾 Wakai Desktop")
+        .title("🐾 Ivily Desktop")
         .body("Bildirimler çalışıyor! Kedin seni hatırlatacak.")
         .show()
         .map_err(|e| crate::error::AppError::Other(format!("Bildirim gösterilemedi: {e}")))

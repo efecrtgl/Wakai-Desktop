@@ -1,6 +1,6 @@
 # Katkıda Bulunma
 
-Wakai Desktop'a katkıda bulunmak istediğiniz için teşekkürler! 🐾
+Ivily Desktop'a (eski adıyla Wakai Desktop) katkıda bulunmak istediğiniz için teşekkürler! 🐾
 
 ## Başlamadan önce
 

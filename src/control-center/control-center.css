@@ -158,3 +158,29 @@
   font-weight: var(--weight-semibold);
   color: var(--color-text-strong);
 }
+
+/* Ad değişikliği notu (bir kez) */
+.cc-brand-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-4) var(--space-8) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-highlight);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+.cc-brand-note p {
+  flex: 1;
+  margin: 0;
+}
+.cc-brand-note__close {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary-strong);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}

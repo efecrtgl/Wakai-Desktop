@@ -18,8 +18,8 @@ Interaction, Inventory and Pet Home share one renderer and one save path).
 
 | # | Phase | Scope | Status | Tests | Commit | Pushed |
 |---|---|---|---|---|---|---|
-| 0 | Audit & baseline | Repository, architecture, installer identity, updater, data paths, baseline tests | COMMITTED | baseline suite executed: all green (see TESTING) | see git log (docs: establish Ivily 1.1.5 roadmap) | yes |
-| 1 | Brand migration | Product name, UI strings, tray, notifications, installer hooks for the Wakai→Ivily install move, legacy autostart cleanup, one-time notice | NOT STARTED | – | – | – |
+| 0 | Audit & baseline | Repository, architecture, installer identity, updater, data paths, baseline tests | COMMITTED | baseline suite executed: all green (see TESTING) | 90d5cd4 | yes |
+| 1 | Brand migration | Product name, UI strings, tray, notifications, installer hooks for the Wakai→Ivily install move, legacy autostart cleanup, one-time notice | COMMITTED | cargo test (97 + 6), clippy, lint; NSIS build with hooks compiles. Installer upgrade run: see phase 22 | see git log | see git log |
 | 3 | Theme Engine | Declarative manifest, validation, isolation, fallback, atomic switching, versioning, lazy assets | NOT STARTED | – | – | – |
 | 4 | Five themes | Pixel-Art (default), Modern, Cozy, Monochrome, Y2K | NOT STARTED | – | – | – |
 | 2 | UI redesign | Navigation, overview, widget management, settings categories, search | NOT STARTED | – | – | – |

@@ -1,6 +1,6 @@
 // Türkçe arayüz metinleri. Tüm kullanıcıya görünen metinler buradan gelir.
 export const tr = {
-  app: { name: 'Wakai Desktop', tagline: 'Masaüstündeki minik kedi dostların' },
+  app: { name: 'Ivily Desktop', tagline: 'Masaüstündeki minik kedi dostların' },
   nav: {
     overview: 'Genel Bakış',
     widgets: "Widget'larım",

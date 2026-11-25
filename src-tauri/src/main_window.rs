@@ -8,7 +8,7 @@ pub const LABEL: &str = "main";
 
 fn build(app: &AppHandle) -> AppResult<WebviewWindow> {
     let window = WebviewWindowBuilder::new(app, LABEL, WebviewUrl::App("index.html".into()))
-        .title("Wakai Desktop")
+        .title("Ivily Desktop")
         .inner_size(1100.0, 720.0)
         .min_inner_size(860.0, 560.0)
         .center()

@@ -102,3 +102,16 @@ pub fn rollback_to_version(
     );
     app.restart();
 }
+
+/// Wakai'den gelen kullanıcıya bir kez gösterilen ad değişikliği bildirimi.
+#[tauri::command]
+pub fn brand_notice(state: State<'_, AppState>) -> AppResult<bool> {
+    state.db.with(crate::legacy::brand_notice_pending)
+}
+
+#[tauri::command]
+pub fn dismiss_brand_notice(state: State<'_, AppState>) -> AppResult<()> {
+    state.db.with(|c| {
+        crate::db::settings::set(c, crate::legacy::BRAND_NOTICE_KEY, &serde_json::json!(true))
+    })
+}

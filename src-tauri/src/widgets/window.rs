@@ -24,7 +24,7 @@ pub fn id_from_label(label: &str) -> Option<&str> {
 pub fn create(app: &AppHandle, id: &str, rect: Rect) -> AppResult<WebviewWindow> {
     let url = WebviewUrl::App(format!("widget.html?id={id}").into());
     let window = WebviewWindowBuilder::new(app, label_for(id), url)
-        .title("Wakai Widget")
+        .title("Ivily Widget")
         .decorations(false)
         .transparent(true)
         .shadow(false)

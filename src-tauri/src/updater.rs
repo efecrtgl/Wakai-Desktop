@@ -136,7 +136,7 @@ fn notify(app: &AppHandle, info: &UpdateInfo) {
         .builder()
         .title("Yeni bir sürüm hazır!")
         .body(format!(
-            "Wakai Desktop {} yüklenebilir. Ayrıntılar için Kontrol Merkezi'ni açın.",
+            "Ivily Desktop {} yüklenebilir. Ayrıntılar için Kontrol Merkezi'ni açın.",
             info.version
         ))
         .show();

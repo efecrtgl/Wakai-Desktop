@@ -59,7 +59,7 @@ pub struct AppSettings {
     pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
-    /// Windows açıldığında Wakai Desktop'u başlat.
+    /// Windows açıldığında Ivily Desktop'u başlat.
     pub launch_on_startup: bool,
     /// Masaüstü widget'larını göster.
     pub widgets_visible: bool,

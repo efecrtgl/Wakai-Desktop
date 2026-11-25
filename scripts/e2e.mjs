@@ -67,7 +67,7 @@ const pad = (n) => String(n).padStart(2, '0');
 const day = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 const cleanup = [];
 
-console.log('Wakai Desktop uçtan uca testleri\n');
+console.log('Ivily Desktop uçtan uca testleri\n');
 
 await test('uygulama bilgisi ve şema', async () => {
   const info = await ok('app_info');

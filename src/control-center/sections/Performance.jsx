@@ -7,7 +7,7 @@ import { bytes, percent } from '../../lib/format.js';
 import { ANIMATION_OPTIONS } from './Appearance.jsx';
 import { PageHeader } from './PageHeader.jsx';
 
-/** Wakai Desktop'un kendi bellek kullanımı (ana süreç + WebView2 süreçleri). Sayfa açıkken 5 sn'de bir. */
+/** Ivily Desktop'un kendi bellek kullanımı (ana süreç + WebView2 süreçleri). Sayfa açıkken 5 sn'de bir. */
 function AppUsage() {
   const [usage, setUsage] = useState(null);
   useEffect(() => {
@@ -39,7 +39,7 @@ export function PerformanceSection({ settingsApi }) {
   if (!s) return null;
   return (
     <div className="cc-page">
-      <PageHeader title="Performans" subtitle="Wakai Desktop arka planda hafif kalacak şekilde tasarlandı" />
+      <PageHeader title="Performans" subtitle="Ivily Desktop arka planda hafif kalacak şekilde tasarlandı" />
       <ErrorNote error={error} />
       <Card title="Kaynak kullanımı">
         <Toggle
@@ -77,7 +77,7 @@ export function PerformanceSection({ settingsApi }) {
         />
       </Card>
       <div className="cc-grid">
-        <Card title="Wakai Desktop">
+        <Card title="Ivily Desktop">
           <AppUsage />
         </Card>
         <Card title="Sistem">

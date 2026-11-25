@@ -2,6 +2,13 @@
 
 Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınarak hazırlanmıştır.
 
+## [Yayınlanmadı] — Ivily Desktop 1.1.5 (ön sürüm)
+
+### Değişti
+- Wakai Desktop artık **Ivily Desktop**. Pencere başlıkları, tepsi, bildirimler, kısayollar ve yükleyici yeni adı kullanır. Veri klasörü ve tüm kullanıcı verileri olduğu gibi kalır.
+- Yükleyici eski "Wakai Desktop" kurulumunu taşır: eski kısayollar Ivily kısayollarıyla değiştirilir, eski program klasörü ve kaldırma kaydı temizlenir, eski otomatik başlatma kaydı kaldırılır.
+- Wakai'den gelen kullanıcılara bir kez, sessiz bir "Wakai Desktop artık Ivily Desktop." notu gösterilir.
+
 ## [1.1.0] — 2026-11-25
 
 ### Eklendi

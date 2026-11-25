@@ -1,4 +1,4 @@
-# Wakai Desktop sürüm derlemesi: v* etiketi itildiğinde imzalı NSIS yükleyicisi,
+# Ivily Desktop sürüm derlemesi: v* etiketi itildiğinde imzalı NSIS yükleyicisi,
 # .sig imza dosyası ve güncelleyici bildirimi (latest.json) bir GitHub Release'e yüklenir.
 #
 # Gerekli depo gizlileri (Settings → Secrets and variables → Actions):
@@ -59,7 +59,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: 'Wakai Desktop ${{ github.ref_name }}'
+          releaseName: 'Ivily Desktop ${{ github.ref_name }}'
           releaseBody: 'Değişiklikler için CHANGELOG.md dosyasına bakın.'
           releaseDraft: false
           prerelease: false

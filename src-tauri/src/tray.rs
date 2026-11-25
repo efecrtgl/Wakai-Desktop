@@ -81,7 +81,7 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<Wry>> {
 
 pub fn create(app: &AppHandle) -> tauri::Result<()> {
     let mut builder = TrayIconBuilder::with_id(TRAY_ID)
-        .tooltip("Wakai Desktop")
+        .tooltip("Ivily Desktop")
         .menu(&build_menu(app)?)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| {

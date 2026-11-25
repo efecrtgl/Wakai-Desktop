@@ -206,7 +206,7 @@ pub fn apply_pending_restore(data_dir: &Path, db_path: &Path) -> AppResult<bool>
 /// Yedeğin bozulmamış bir Wakai Desktop veritabanı olduğunu doğrular; şema sürümünü döndürür.
 pub fn verify(path: &Path) -> AppResult<usize> {
     let invalid =
-        || AppError::invalid("Bu dosya geçerli bir Wakai Desktop yedeği değil ya da bozuk.");
+        || AppError::invalid("Bu dosya geçerli bir Ivily Desktop yedeği değil ya da bozuk.");
     let conn =
         rusqlite::Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
             .map_err(|_| invalid())?;

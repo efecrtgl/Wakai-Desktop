@@ -61,13 +61,13 @@ export function UpdateDialog() {
       }
     >
       <p>
-        Wakai Desktop <strong>{update?.version}</strong> yüklenebilir (şu anki sürüm: {update?.current}).
+        Ivily Desktop <strong>{update?.version}</strong> yüklenebilir (şu anki sürüm: {update?.current}).
       </p>
       {update?.notes ? <div className="upd-notes">{update.notes}</div> : null}
       {busy ? (
         <div className="upd-progress" role="status">
           {progress.installing ? (
-            <span>Kuruluyor… Wakai Desktop kısa süre kapanıp yeniden açılacak.</span>
+            <span>Kuruluyor… Ivily Desktop kısa süre kapanıp yeniden açılacak.</span>
           ) : (
             <>
               <div className="upd-bar">

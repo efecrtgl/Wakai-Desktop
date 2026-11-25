@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Wakai Desktop",
+  "productName": "Ivily Desktop",
   "version": "1.1.0",
   "identifier": "com.wakai.desktop",
   "build": {
@@ -28,11 +28,11 @@
     "targets": [
       "nsis"
     ],
-    "publisher": "Wakai Desktop",
-    "copyright": "© 2026 Wakai Desktop geliştiricileri",
+    "publisher": "Ivily Desktop",
+    "copyright": "© 2026 Ivily Desktop geliştiricileri",
     "category": "Productivity",
-    "shortDescription": "Windows 11 için pastel piksel kedili masaüstü widget platformu",
-    "longDescription": "Wakai Desktop; takvim, görev, not, saat, odak, hava durumu, müzik ve sistem widget'larını doğrudan Windows 11 masaüstü duvar kağıdının üzerine yerleştirir.",
+    "shortDescription": "Windows 11 için piksel kedili masaüstü widget platformu",
+    "longDescription": "Ivily Desktop; takvim, görev, not, saat, odak, hava durumu, müzik ve sistem widget'larını doğrudan Windows 11 masaüstüne yerleştirir ve kedileriniz için oynanabilir bir Kedi Evi sunar.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -50,7 +50,8 @@
           "Turkish"
         ],
         "displayLanguageSelector": false,
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "installerHooks": "windows/installer-hooks.nsh"
       }
     },
     "createUpdaterArtifacts": true

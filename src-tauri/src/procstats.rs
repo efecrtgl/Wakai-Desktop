@@ -1,4 +1,4 @@
-//! Wakai Desktop'un kendi kaynak kullanımı: ana süreç ve ondan türeyen tüm süreçler
+//! Ivily Desktop'un kendi kaynak kullanımı: ana süreç ve ondan türeyen tüm süreçler
 //! (WebView2 tarayıcı, GPU ve renderer süreçleri). Performans sayfası ve ölçüm betiği kullanır.
 
 use serde::Serialize;
