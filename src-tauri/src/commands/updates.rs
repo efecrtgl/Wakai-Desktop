@@ -37,7 +37,8 @@ pub fn update_status(app: AppHandle) -> UpdateStatus {
 }
 
 #[tauri::command]
-pub async fn install_update(app: AppHandle) -> AppResult<()> {
+pub async fn install_update(app: AppHandle, window: tauri::WebviewWindow) -> AppResult<()> {
+    super::require_main(&window)?;
     updater::download_and_install(&app).await
 }
 
@@ -72,7 +73,12 @@ pub fn version_history(app: AppHandle, state: State<'_, AppState>) -> AppResult<
 /// Saklanan önceki sürüme döner ve uygulamayı yeniden başlatır. Önce veritabanı yedeklenir;
 /// veriler geri alınmaz (göçler eski sürümlerle uyumludur).
 #[tauri::command]
-pub fn rollback_to_version(app: AppHandle, version: String) -> AppResult<()> {
+pub fn rollback_to_version(
+    app: AppHandle,
+    window: tauri::WebviewWindow,
+    version: String,
+) -> AppResult<()> {
+    super::require_main(&window)?;
     let state = app.state::<AppState>();
     // Önce doğrula: geçersiz istek yedek ya da başka bir iz bırakmasın.
     if !recovery::list_previous(&state.data_dir)?

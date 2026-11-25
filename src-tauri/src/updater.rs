@@ -45,7 +45,9 @@ fn updater(app: &AppHandle) -> AppResult<tauri_plugin_updater::Updater> {
     let mut b = app.updater_builder().timeout(Duration::from_secs(30));
     // Test için uç nokta geçersiz kılma. Güvenlidir: imza yine gömülü anahtarla doğrulanır ve
     // sürüm derlemelerinde HTTPS dışı adresler eklenti tarafından reddedilir.
-    if let Ok(url) = std::env::var("WAKAI_UPDATE_ENDPOINT")
+    // Yalnızca hata ayıklama derlemelerinde geçerlidir.
+    if cfg!(debug_assertions)
+        && let Ok(url) = std::env::var("WAKAI_UPDATE_ENDPOINT")
         && let Ok(u) = url.parse()
     {
         b = b

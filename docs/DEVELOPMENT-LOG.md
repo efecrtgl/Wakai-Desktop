@@ -99,3 +99,6 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 
 - Sürüm derlemesiyle yalıtılmış ortamda ölçüldü (bkz. `docs/PERFORMANCE.md`): 8 widget'ta özel bellek 375,3 → 362,2 MB; 2 masaüstü kedisi eklenince fark ölçülemeyecek kadar küçük; yalnızca kediler açıkken 1 süreç, 3,0 MB, ~%0 CPU.
 - Kalan: açılış süresi ölçümü, güvenlik incelemesi.
+- Açılış süresi (aynı yöntem): 677 / 687 / 753 ms (6 widget + 2 kedi; temel 8 widget ile 884 / 983 / 784 ms).
+- Güvenlik: yıkıcı komutlar yalnızca Kontrol Merkezi penceresinden kabul edilir; güncelleme adresi geçersiz kılma yalnızca hata ayıklama derlemesinde. Ayrıntılar `docs/PERFORMANCE.md`.
+- Gözlem: ölçüm sırasında birincil veritabanında 6 widget kaldığı görüldü (önceki kopyada 9). Testler yalıtılmış kopyalarda yapıldığı için bu değişiklik büyük olasılıkla kullanıcının kendi işlemidir; kullanıcı bilgilendirilecek.

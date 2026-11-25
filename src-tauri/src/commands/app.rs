@@ -31,7 +31,12 @@ pub fn list_backups(state: State<'_, AppState>) -> AppResult<Vec<crate::backup::
 }
 
 #[tauri::command]
-pub fn delete_backup(state: State<'_, AppState>, name: String) -> AppResult<()> {
+pub fn delete_backup(
+    window: tauri::WebviewWindow,
+    state: State<'_, AppState>,
+    name: String,
+) -> AppResult<()> {
+    super::require_main(&window)?;
     crate::backup::delete(&state.data_dir, &name)
 }
 
@@ -39,9 +44,11 @@ pub fn delete_backup(state: State<'_, AppState>, name: String) -> AppResult<()> 
 #[tauri::command]
 pub fn restore_backup(
     app: tauri::AppHandle,
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     name: String,
 ) -> AppResult<()> {
+    super::require_main(&window)?;
     crate::backup::schedule_restore(&state.data_dir, &name)?;
     crate::widgets::manager::flush_rects(&app);
     if let Some(store) = app.try_state::<crate::pets::store::PetStore>() {
@@ -63,10 +70,12 @@ pub fn inspect_backup(
 #[tauri::command]
 pub fn restore_backup_selective(
     app: tauri::AppHandle,
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     name: String,
     categories: Vec<String>,
 ) -> AppResult<()> {
+    super::require_main(&window)?;
     crate::backup::schedule_selective_restore(&state.data_dir, &name, &categories)?;
     crate::widgets::manager::flush_rects(&app);
     if let Some(store) = app.try_state::<crate::pets::store::PetStore>() {
