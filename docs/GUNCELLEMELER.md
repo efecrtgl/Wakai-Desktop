@@ -69,6 +69,18 @@ gh secret set TAURI_SIGNING_PRIVATE_KEY < "$env:USERPROFILE\.tauri\wakai-desktop
 
 Gizli tanımlı değilse iş akışı "TAURI_SIGNING_PRIVATE_KEY secret is missing" hatasıyla durur; imzasız sürüm yayınlanmaz.
 
+### Yayımlanmış sürümler (25 Kasım 2026)
+
+| Etiket | Ad | Tür | Varlıklar |
+|---|---|---|---|
+| `v1.0.0` | Wakai Desktop 1.0.0 | Kararlı | Yükleyici (etiketteki koddan yeniden derlendi), SHA256SUMS |
+| `v1.1.0` | Wakai Desktop 1.1.0 | Kararlı ("latest") | Yükleyici, `.sig`, `latest.json`, SHA256SUMS |
+| `v1.1.5` | Ivily Desktop 1.1.5 | **Ön sürüm** | Yükleyici, `.sig`, `latest.json`, SHA256SUMS |
+| `updater-prerelease` | Ön sürüm kanalı (otomatik) | Ön sürüm | `latest.json` (iş akışı yönetir) |
+
+Bu sürümler imzalama gizlisi henüz GitHub'a eklenmediği için yerelde derlenip API ile yüklendi.
+Gizli eklendikten sonra yeni sürümler `release.yml` ile taslak olarak oluşturulur.
+
 ### Elle (yerel) imzalı derleme
 
 ```powershell

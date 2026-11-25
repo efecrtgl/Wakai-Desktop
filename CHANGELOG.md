@@ -2,7 +2,7 @@
 
 Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınarak hazırlanmıştır.
 
-## [1.1.5] — 2026-11-25 (ön sürüm)
+## [1.1.5] — 2026-11-25 (ön sürüm, GitHub Pre-release)
 
 ### Eklendi
 - Tema motoru: temalar bildirimsel paketlerdir (renkler, yazı tipleri, biçim, yüzey, kenarlık, simge seti, doku, hareket karakteri, kedi paleti, Kedi Evi zemini/duvarı, ortam efekti, sesler). Yeniden başlatma gerekmeden tek adımda değişir; bozuk tema uygulamayı etkilemez, güvenli Modern temaya dönülür.

@@ -32,7 +32,7 @@ Interaction, Inventory and Pet Home share one renderer and one save path).
 | 22 | Installer | Ivily identity, upgrade from Wakai installs | PUSHED | isolated hook variant vs fake legacy install, update + install modes, 13/13 checks each; signed 1.1.5 installer built | 352219c | yes |
 | 23 | Security | Theme packs, IPC, permissions review | PUSHED | docs/IVILY_SECURITY.md; window guard added to world commands | 352219c | yes |
 | 24 | Testing | Unit, integration, E2E, manual | PUSHED | 52 Vitest, 122 Rust unit, 6 integration, 22 E2E (docs/IVILY_1.1.5_TESTING.md) | 352219c | yes |
-| 25/27 | Docs & release prep | Docs, version 1.1.5, Turkish release notes, artifacts | PUSHED | README, THEME_API, KEDI_EVI, release notes, architecture; signed installer + .sig + latest-1.1.5.json built locally. GitHub Release NOT published (not authorized) | 352219c | yes |
+| 25/27 | Docs & release prep | Docs, version 1.1.5, Turkish release notes, artifacts | PUSHED + RELEASED | GitHub Pre-release v1.1.5 published 25 Nov 2026 with signed installer, .sig, latest.json, SHA256SUMS; v1.0.0 and v1.1.0 published with installers; all assets downloaded anonymously and SHA-256 verified; stable endpoint → 1.1.0, prerelease endpoint → 1.1.5 | 352219c, ee9f961 (tag v1.1.5) | yes |
 
 ## Known issues found during the audit
 
