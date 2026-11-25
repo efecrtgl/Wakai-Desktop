@@ -38,3 +38,5 @@ pub const PROFILES_CHANGED: &str = "profiles:changed";
 pub const UPDATE_AVAILABLE: &str = "update:available";
 /// Güncelleme indirme ilerlemesi. Yük: `{ downloaded, total }` ya da `{ installing: true }`.
 pub const UPDATE_PROGRESS: &str = "update:progress";
+/// Özel tema yüklendi ya da silindi (tüm pencereler listeyi yeniler).
+pub const THEMES_CHANGED: &str = "themes:changed";

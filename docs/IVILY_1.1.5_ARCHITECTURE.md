@@ -44,3 +44,57 @@ existing enum fields (`appearance`). A rollback to 1.1.0 then still parses the s
 ### 2.4 Schema compatibility
 New migrations only add tables and columns with defaults. Older builds keep working against a
 newer schema (they never write the new columns), which keeps version rollback safe.
+
+## 3. Theme Engine (phase 3)
+
+```
+src/theme/contract.json   ← single source of truth: token names, style enums, limits
+   │                         (read by the frontend AND include_str!'d by src-tauri/src/themes.rs)
+   ├─ src/theme/builtin/*.json   five declarative manifests (also embedded in the Rust binary)
+   ├─ src/theme/schema.js        validateTheme / migrateTheme (runtime normalization)
+   ├─ src/theme/engine.js        compileTheme → cssFor + attrsFor → applyTheme (atomic)
+   ├─ src/theme/useTheme.js      React hook: settings → resolved theme, custom theme loading
+   ├─ src/theme/ThemeBoundary.jsx error boundary → fallback theme
+   └─ src/ui/theme-styles.css    structural rules keyed on data-* attributes
+src-tauri/src/themes.rs   import gate (strict validation), custom_themes table, window chrome
+                          (is_dark), desktop-cat palette (pet_palette)
+```
+
+**Manifest → runtime.** A manifest only *selects* from the contract: semantic tokens (colors,
+shadows, radii, border width), font stacks, structural options (`shape`, `surface`, `border`,
+`icons`, `density`, `texture`, `headings`, `motion`, `rendering`), pet palette, Pet Home floor
+and wall patterns/colors, ambient effect, synthesized UI sounds and embedded images. Themes
+contain no CSS, no JavaScript and no file paths, so a theme cannot change behaviour, read files
+or load remote content.
+
+**Atomic switching.** `applyTheme` computes the full CSS text (`:root{--token:value;…}`) and the
+attribute set first, then writes the single `<style id="ivily-theme">` element and the root
+`data-*` attributes in the same task, so the browser performs one style recalculation and a
+half-applied theme is never visible. If writing throws, the previous CSS and attributes are
+restored. Switching touches only presentation; widget positions, widget data, pets, the Pet
+World and profiles live in SQLite and are never read or written by the theme engine.
+
+**Isolation and fallback.**
+1. Invalid parts (unknown token, unsafe value, unknown enum value) are dropped with a warning;
+   the rest of the theme still applies.
+2. Fatal problems (bad id/name, unsupported schema, `min_app` newer than the app, missing theme)
+   resolve to the fallback theme (Modern) and `fallbackReason` is reported to the UI.
+3. `tokens.css` itself contains the Modern values, so the UI is usable even if no theme CSS is
+   ever applied.
+4. `ThemeBoundary` catches render errors, re-applies the fallback theme and offers "Yeniden dene".
+
+**Compatibility and versioning.** `schema` (contract version, currently 1), `version` (theme's
+own semver) and `min_app` (minimum Ivily version). Schema 0 manifests (`colors` instead of
+`tokens`) are migrated by `migrateTheme`. Manifests with a newer schema are rejected with a
+Turkish explanation. Widgets and the Pet World consume only semantic tokens and the compiled
+`pets`/`home` sections, so new themes need no code changes.
+
+**Rollback safety.** The new settings (`theme`, `theme_variant`, `theme_accent`, …) are new
+fields; `appearance` is kept in sync for the Modern variants, so a rollback to 1.1.0 shows the
+closest appearance instead of resetting settings. Settings stored by 1.1.0 (no `theme` key) are
+mapped to Modern + the matching variant, so existing users keep their look; new installs start
+with Pixel.
+
+**Lazy assets.** Embedded images are decoded only when first requested (`themeAsset`) and the
+cache is dropped when the theme changes. The Pixelify Sans font (OFL, bundled locally because
+the CSP forbids remote fonts) is declared with `unicode-range`, so only the needed subsets load.

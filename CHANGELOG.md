@@ -4,9 +4,15 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 
 ## [Yayınlanmadı] — Ivily Desktop 1.1.5 (ön sürüm)
 
+### Eklendi
+- Tema motoru: temalar bildirimsel paketlerdir (renkler, yazı tipleri, biçim, yüzey, kenarlık, simge seti, doku, hareket karakteri, kedi paleti, Kedi Evi zemini/duvarı, ortam efekti, sesler). Yeniden başlatma gerekmeden tek adımda değişir; bozuk tema uygulamayı etkilemez, güvenli Modern temaya dönülür.
+- Beş tema: **Piksel** (varsayılan; bitmap yazı tipi, sert gölgeler, piksel simgeler), **Modern**, **Sıcak Yuva**, **Tek Renk**, **Y2K**; her biri açık/koyu çeşitleriyle.
+- Vektör çizgi simge seti (piksel olmayan temalarda).
+
 ### Değişti
 - Wakai Desktop artık **Ivily Desktop**. Pencere başlıkları, tepsi, bildirimler, kısayollar ve yükleyici yeni adı kullanır. Veri klasörü ve tüm kullanıcı verileri olduğu gibi kalır.
 - Yükleyici eski "Wakai Desktop" kurulumunu taşır: eski kısayollar Ivily kısayollarıyla değiştirilir, eski program klasörü ve kaldırma kaydı temizlenir, eski otomatik başlatma kaydı kaldırılır.
+- 1.1.0'daki görünüm seçimi (Wakai/Siyah/Beyaz) korunur: Modern temanın karşılık gelen çeşidine taşınır.
 - Wakai'den gelen kullanıcılara bir kez, sessiz bir "Wakai Desktop artık Ivily Desktop." notu gösterilir.
 
 ## [1.1.0] — 2026-11-25

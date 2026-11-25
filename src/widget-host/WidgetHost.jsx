@@ -6,6 +6,8 @@ import { useMotionAttribute } from '../lib/motion.js';
 import { WIDGET_COMPONENTS } from '../widgets/registry.js';
 import { WidgetShell } from './WidgetShell.jsx';
 import { tr } from '../lib/i18n.js';
+import { useThemeEngine } from '../theme/useTheme.js';
+import { ThemeContext } from '../theme/context.js';
 
 function useAppearance(settings) {
   useMotionAttribute(settings);
@@ -23,6 +25,7 @@ export function WidgetHost({ id }) {
   const [error, setError] = useState(null);
   const { settings } = useSettings();
   useAppearance(settings);
+  const themeApi = useThemeEngine(settings);
 
   useEffect(() => {
     if (!id) return;
@@ -44,6 +47,7 @@ export function WidgetHost({ id }) {
 
   const Component = WIDGET_COMPONENTS[detail.instance.kind];
   return (
+    <ThemeContext.Provider value={themeApi}>
     <WidgetShell instance={detail.instance} definition={detail.definition}>
       {Component ? (
         <Suspense fallback={null}>
@@ -53,5 +57,6 @@ export function WidgetHost({ id }) {
         <p className="widget-unsupported">{tr.widget.unsupported}</p>
       )}
     </WidgetShell>
+    </ThemeContext.Provider>
   );
 }

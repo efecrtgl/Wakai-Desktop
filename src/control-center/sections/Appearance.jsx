@@ -1,3 +1,4 @@
+import { BUILTIN_THEMES } from '../../theme/engine.js';
 import { Card, ErrorNote, Select, Slider, Toggle } from '../../ui/components.jsx';
 import { PixelCat } from '../../ui/cats/PixelCat.jsx';
 import { POSES } from '../../ui/cats/sprites.js';
@@ -9,11 +10,6 @@ export const ANIMATION_OPTIONS = [
   { value: 'off', label: 'Kapalı' },
 ];
 
-const THEMES = [
-  { id: 'wakai', name: 'Wakai', desc: 'Özgün pastel pembe' },
-  { id: 'dark', name: 'Siyah', desc: 'Göz yormayan koyu görünüm' },
-  { id: 'light', name: 'Beyaz', desc: 'Sade ve ferah' },
-];
 
 const FONTS = [
   { value: 'system', label: 'Varsayılan (Segoe UI)' },
@@ -29,24 +25,23 @@ export function AppearanceSection({ settingsApi }) {
       <PageHeader title="Görünüm" subtitle="Pastel pembe piksel kedi teması" />
       <ErrorNote error={error} />
       <Card title="Görünüm modu">
-        <div className="cc-themes" role="radiogroup" aria-label="Görünüm modu">
-          {THEMES.map((t) => (
+        <div className="cc-themes" role="radiogroup" aria-label="Tema">
+          {BUILTIN_THEMES.map((t) => (
             <button
               key={t.id}
               type="button"
               role="radio"
-              aria-checked={s.appearance === t.id}
+              aria-checked={s.theme === t.id}
               className="cc-theme"
-              data-preview={t.id}
-              onClick={() => update({ appearance: t.id })}
+              onClick={() => update({ theme: t.id, theme_variant: '' })}
             >
               <span className="cc-theme__swatch" aria-hidden="true">
-                <span />
-                <span />
-                <span />
+                <span style={{ background: t.tokens['color-bg'] }} />
+                <span style={{ background: t.tokens['color-primary'] }} />
+                <span style={{ background: t.tokens['color-text'] }} />
               </span>
               <span className="cc-theme__name">{t.name}</span>
-              <span className="cc-muted">{t.desc}</span>
+              <span className="cc-muted">{t.description}</span>
             </button>
           ))}
         </div>

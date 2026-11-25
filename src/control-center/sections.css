@@ -405,42 +405,6 @@
   flex: 1;
   border-radius: 4px;
 }
-.cc-theme[data-preview='wakai'] .cc-theme__swatch {
-  background: #fffaf6;
-}
-.cc-theme[data-preview='wakai'] .cc-theme__swatch span:nth-child(1) {
-  background: #f49ab2;
-}
-.cc-theme[data-preview='wakai'] .cc-theme__swatch span:nth-child(2) {
-  background: #ddd2f5;
-}
-.cc-theme[data-preview='wakai'] .cc-theme__swatch span:nth-child(3) {
-  background: #ffffff;
-}
-.cc-theme[data-preview='dark'] .cc-theme__swatch {
-  background: #151315;
-}
-.cc-theme[data-preview='dark'] .cc-theme__swatch span:nth-child(1) {
-  background: #f49ab2;
-}
-.cc-theme[data-preview='dark'] .cc-theme__swatch span:nth-child(2) {
-  background: #2b272b;
-}
-.cc-theme[data-preview='dark'] .cc-theme__swatch span:nth-child(3) {
-  background: #211e21;
-}
-.cc-theme[data-preview='light'] .cc-theme__swatch {
-  background: #f5f5f6;
-}
-.cc-theme[data-preview='light'] .cc-theme__swatch span:nth-child(1) {
-  background: #e0789a;
-}
-.cc-theme[data-preview='light'] .cc-theme__swatch span:nth-child(2) {
-  background: #e6e6ea;
-}
-.cc-theme[data-preview='light'] .cc-theme__swatch span:nth-child(3) {
-  background: #ffffff;
-}
 
 /* Kediler */
 .pet-sprite {

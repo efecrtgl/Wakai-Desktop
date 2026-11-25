@@ -60,8 +60,15 @@ pub enum CloseAction {
 pub fn apply_theme(app: &AppHandle, window: &WebviewWindow) {
     let dark = app
         .try_state::<crate::state::AppState>()
-        .and_then(|s| crate::settings::load(&s.db).ok())
-        .is_some_and(|s| s.appearance == crate::settings::Appearance::Dark);
+        .is_some_and(|state| {
+            let Ok(s) = crate::settings::load(&state.db) else {
+                return false;
+            };
+            state
+                .db
+                .with(|c| Ok(crate::themes::is_dark(c, &s.theme, &s.theme_variant)))
+                .unwrap_or(false)
+        });
     let _ = window.set_theme(Some(if dark {
         tauri::Theme::Dark
     } else {

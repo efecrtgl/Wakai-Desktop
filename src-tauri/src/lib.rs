@@ -22,6 +22,7 @@ mod scheduler;
 pub mod settings;
 mod state;
 mod subscriptions;
+pub mod themes;
 mod tray;
 mod updater;
 mod validate;
@@ -252,6 +253,10 @@ pub fn run() {
             commands::updates::version_history,
             commands::updates::rollback_to_version,
             commands::updates::brand_notice,
+            commands::themes::list_custom_themes,
+            commands::themes::import_theme,
+            commands::themes::delete_custom_theme,
+            commands::themes::export_theme,
             commands::updates::dismiss_brand_notice,
             commands::services::subscribe,
             commands::services::unsubscribe,

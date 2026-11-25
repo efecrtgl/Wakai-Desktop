@@ -36,10 +36,37 @@ pub enum FontFamily {
     Mono,
 }
 
+/// Arayüz yoğunluğu: `Auto` temanın kendi yoğunluğunu kullanır.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Density {
+    Auto,
+    Compact,
+    Normal,
+    Roomy,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct AppSettings {
+    /// 1.1.0 görünüm modu. 1.1.5'te `theme`/`theme_variant` kullanılır; bu alan önceki sürüme
+    /// dönüşte görünümün korunması için Modern temanın çeşidiyle eşitlenir.
     pub appearance: Appearance,
+    /// Etkin tema kimliği (yerleşik ya da içe aktarılmış).
+    pub theme: String,
+    /// Temanın çeşidi (ör. "dark"); boşsa temanın varsayılanı.
+    pub theme_variant: String,
+    /// Kullanıcının vurgu rengi (#rrggbb); tema izin veriyorsa uygulanır.
+    pub theme_accent: Option<String>,
+    pub theme_favorites: Vec<String>,
+    pub ui_density: Density,
+    /// Yazı ölçeği (0.85 – 1.4), temadan bağımsız erişilebilirlik ayarı.
+    pub text_scale: f64,
+    pub high_contrast: bool,
+    /// Tema arayüz sesleri (varsayılan kapalı).
+    pub ui_sounds: bool,
+    /// Kedi Evi ortam efektleri (yağmur, yapraklar, yıldızlar).
+    pub ambient_effects: bool,
     /// Masaüstü kedileri açık mı?
     pub pets_enabled: bool,
     /// Kedilerin genel etkinlik düzeyi (profiller değiştirir).
@@ -85,6 +112,15 @@ impl Default for AppSettings {
     fn default() -> Self {
         Self {
             appearance: Appearance::Wakai,
+            theme: crate::themes::DEFAULT_THEME.to_string(),
+            theme_variant: String::new(),
+            theme_accent: None,
+            theme_favorites: Vec::new(),
+            ui_density: Density::Auto,
+            text_scale: 1.0,
+            high_contrast: false,
+            ui_sounds: false,
+            ambient_effects: true,
             pets_enabled: true,
             pet_activity: crate::pets::behavior::ActivityLevel::Normal,
             pet_size: 3,
@@ -123,6 +159,31 @@ impl AppSettings {
         self.pets_max_active = self.pets_max_active.clamp(1, 12);
         self.monitor_interval_secs = self.monitor_interval_secs.clamp(1, 60);
         self.weather_refresh_minutes = self.weather_refresh_minutes.clamp(15, 180);
+        self.text_scale = clamp_f(self.text_scale, 0.85, 1.4, 1.0);
+        if !crate::themes::valid_id(&self.theme) {
+            self.theme = crate::themes::DEFAULT_THEME.to_string();
+        }
+        if !self.theme_variant.is_empty() && !crate::themes::valid_id(&self.theme_variant) {
+            self.theme_variant.clear();
+        }
+        let hex6 = |v: &str| {
+            v.len() == 7 && v.starts_with('#') && v[1..].bytes().all(|c| c.is_ascii_hexdigit())
+        };
+        if self.theme_accent.as_deref().is_some_and(|a| !hex6(a)) {
+            self.theme_accent = None;
+        }
+        let mut seen = std::collections::HashSet::new();
+        self.theme_favorites
+            .retain(|id| crate::themes::valid_id(id) && seen.insert(id.clone()));
+        self.theme_favorites.truncate(50);
+        // Önceki sürüme dönüşte (1.1.0) en yakın görünüm: Modern temanın çeşidi.
+        if self.theme == "modern" {
+            self.appearance = match self.theme_variant.as_str() {
+                "dark" => Appearance::Dark,
+                "light" => Appearance::Light,
+                _ => Appearance::Wakai,
+            };
+        }
         self
     }
 }
@@ -136,9 +197,23 @@ pub fn load(db: &Db) -> AppResult<AppSettings> {
             Err(e) => return Err(e),
         };
         // Bozuk ya da eski biçimli kayıt varsayılanlara düşer; eksik alanlar `serde(default)` ile tamamlanır.
-        let parsed = value
+        // 1.1.0'dan gelen kayıtta `theme` yoktur: kullanıcının seçtiği görünüm Modern temanın
+        // karşılık gelen çeşidiyle korunur (yeni kurulumlar varsayılan Piksel temayla başlar).
+        let legacy = value
+            .as_ref()
+            .and_then(|v| v.as_object())
+            .is_some_and(|o| !o.contains_key("theme"));
+        let mut parsed = value
             .and_then(|v| serde_json::from_value::<AppSettings>(v).ok())
             .unwrap_or_default();
+        if legacy {
+            parsed.theme = "modern".into();
+            parsed.theme_variant = match parsed.appearance {
+                Appearance::Wakai => String::new(),
+                Appearance::Dark => "dark".into(),
+                Appearance::Light => "light".into(),
+            };
+        }
         Ok(parsed.sanitized())
     })
 }
@@ -203,6 +278,51 @@ mod tests {
         assert_eq!(s.appearance, Appearance::Dark);
         assert_eq!(load(&db).unwrap().font_family, FontFamily::Modern);
         assert!(update(&db, serde_json::json!({ "appearance": "neon" })).is_err());
+    }
+
+    #[test]
+    fn legacy_appearance_maps_to_modern_variant() {
+        let db = Db::open_in_memory().unwrap();
+        // 1.1.0 biçimindeki kayıt: theme alanı yok.
+        db.with(|c| {
+            db::settings::set(
+                c,
+                KEY,
+                &serde_json::json!({ "appearance": "dark", "shadows": false }),
+            )
+        })
+        .unwrap();
+        let s = load(&db).unwrap();
+        assert_eq!(
+            (s.theme.as_str(), s.theme_variant.as_str()),
+            ("modern", "dark")
+        );
+        assert!(!s.shadows);
+        // Kaydedildikten sonra tema seçimi kalıcıdır ve eski alan eşitlenir.
+        let s = update(&db, serde_json::json!({ "theme_variant": "light" })).unwrap();
+        assert_eq!(s.appearance, Appearance::Light);
+        let s = update(&db, serde_json::json!({ "theme": "cozy" })).unwrap();
+        assert_eq!(load(&db).unwrap().theme, "cozy");
+        assert_eq!(s.appearance, Appearance::Light);
+        // Yeni kurulum varsayılanı Piksel.
+        assert_eq!(AppSettings::default().theme, "pixel");
+    }
+
+    #[test]
+    fn theme_fields_are_sanitized() {
+        let db = Db::open_in_memory().unwrap();
+        let s = update(
+            &db,
+            serde_json::json!({ "theme": "../x", "theme_accent": "red", "text_scale": 9.0,
+                "theme_favorites": ["cozy", "cozy", "Kötü!", "y2k"] }),
+        )
+        .unwrap();
+        assert_eq!(s.theme, "pixel");
+        assert_eq!(s.theme_accent, None);
+        assert_eq!(s.text_scale, 1.4);
+        assert_eq!(s.theme_favorites, ["cozy", "y2k"]);
+        let s = update(&db, serde_json::json!({ "theme_accent": "#12ab9F" })).unwrap();
+        assert_eq!(s.theme_accent.as_deref(), Some("#12ab9F"));
     }
 
     #[test]
