@@ -24,7 +24,9 @@ function flashAnchor(anchor) {
       el.classList.remove('cc-flash');
       void el.offsetWidth;
       el.classList.add('cc-flash');
-      el.querySelector('input, button, select, [role="switch"]')?.focus({ preventScroll: true });
+      el.querySelector('input, button, select, [role="switch"]')?.focus({
+        preventScroll: true,
+      });
     }),
   );
 }
@@ -40,7 +42,7 @@ export default function App() {
   const navigate = useCallback((section, sub = null, anchor = null) => {
     setRoute(resolveRoute(section, sub));
     document.querySelector('.cc__main')?.scrollTo({ top: 0 });
-    flashAnchor(anchor);
+    if (anchor) flashAnchor(anchor);
   }, []);
 
   // Widget menüsü, tepsi ve kedi menüsü buraya yönlendirir (1.1.0 bölüm kimlikleri de geçerli).
@@ -72,8 +74,18 @@ export default function App() {
     <ThemeContext.Provider value={themeApi}>
       <ThemeBoundary onFallback={() => themeApi.setPreview(null)}>
         <div className="cc">
+          <a
+            className="cc-skip"
+            href="#cc-main"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('cc-main')?.focus();
+            }}
+          >
+            İçeriğe geç
+          </a>
           <Sidebar active={nav.id} onSelect={navigate} onSearch={() => setSearchOpen(true)} />
-          <main className="cc__main" id="cc-main">
+          <main className="cc__main" id="cc-main" tabIndex={-1} aria-label={nav.label}>
             <PreviewBar settingsApi={settingsApi} />
             <BrandNotice />
             <View key={nav.id} settingsApi={settingsApi} route={route} onNavigate={navigate} focusWidget={focusWidget} />
