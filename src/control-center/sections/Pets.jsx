@@ -37,13 +37,14 @@ function AdoptDialog({ open, catalog, onClose, onError }) {
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('pink');
   const [personality, setPersonality] = useState('playful');
+  const [quirk, setQuirk] = useState('none');
   const [busy, setBusy] = useState(false);
   const breedName = Object.fromEntries(catalog?.breeds ?? []);
 
   const adopt = async () => {
     setBusy(true);
     try {
-      await call('adopt_pet', { name: name.trim() || breedName[breed] || 'Kedi', breed, personality });
+      await call('adopt_pet', { name: name.trim() || breedName[breed] || 'Kedi', breed, personality, quirk });
       setName('');
       onClose();
     } catch (e) {
@@ -93,8 +94,45 @@ function AdoptDialog({ open, catalog, onClose, onError }) {
           </select>
           <span className="wk-field__hint">{PERSONALITIES[personality].desc}</span>
         </div>
+        <div className="wk-field">
+          <span className="wk-field__label">İkincil özellik</span>
+          <select className="wk-select" value={quirk} onChange={(e) => setQuirk(e.target.value)}>
+            {Object.entries(QUIRKS).map(([id, q]) => (
+              <option key={id} value={id}>{q.name}</option>
+            ))}
+          </select>
+          <span className="wk-field__hint">{QUIRKS[quirk].desc}</span>
+        </div>
       </div>
     </Dialog>
+  );
+}
+
+const QUIRKS = {
+  none: { name: 'Yok', desc: 'Yalnızca ana kişiliği belirler.' },
+  mischievous: { name: 'Yaramaz', desc: 'Oyuncakları dağıtır, tırmalamayı sever.' },
+  shy: { name: 'Utangaç', desc: 'Kucağa alınmaktan çekinir, ürkünce saklanır; güveni yavaş kazanılır.' },
+  lazy: { name: 'Tembel', desc: 'Uzun uzun dinlenir, az tırmanır.' },
+};
+
+/** Kedinin anıları (Kedi Evi'nde olanlar). */
+function Memories({ id }) {
+  const [list, setList] = useState(null);
+  return (
+    <details className="pet-card__memories" onToggle={(e) => e.currentTarget.open && !list && call('pet_memories', { id }).then(setList, () => setList([]))}>
+      <summary>Anılar</summary>
+      {list?.length ? (
+        <ul>
+          {list.map((m) => (
+            <li key={m.at + m.text}>
+              <span className="cc-muted">{m.at.slice(0, 10)}</span> {m.text}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="cc-muted">{list ? 'Henüz anı yok. Kedi Evi’nde vakit geçirdikçe oluşur.' : 'Yükleniyor…'}</p>
+      )}
+    </details>
   );
 }
 
@@ -139,7 +177,8 @@ function PetCard({ pet, catalog, onError }) {
           <h3 className="pet-card__name" onDoubleClick={() => setRenaming(true)} title="Yeniden adlandırmak için çift tıklayın">{pet.name}</h3>
         )}
         <p className="cc-muted">
-          {breedName} · {PERSONALITIES[pet.personality]?.name} · {mood(pet.needs)}
+          {breedName} · {PERSONALITIES[pet.personality]?.name}
+          {pet.quirk && pet.quirk !== 'none' ? ` · ${QUIRKS[pet.quirk]?.name}` : ''} · {mood(pet.needs)}
         </p>
         <div className="pet-card__badges">
           <Badge tone={onDesktop ? 'mint' : 'lavender'}>{onDesktop ? 'Masaüstünde' : "Kedi Evi'nde"}</Badge>
@@ -209,6 +248,7 @@ function PetCard({ pet, catalog, onError }) {
           <Button size="sm" variant="ghost" onClick={() => setConfirm(true)}>Koleksiyondan çıkar</Button>
         )}
       </div>
+      <Memories id={pet.id} />
     </article>
   );
 }

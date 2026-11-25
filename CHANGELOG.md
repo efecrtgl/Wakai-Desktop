@@ -19,6 +19,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Gün döngüsü (gerçek saat ya da hızlı gün), akşam/gece ışığı, gece yanan lambalar, pencereden yağmur, kar ve yıldızlar, temaya göre ortam parçacıkları.
 - Çevrim dışı ilerleme (en fazla 24 saat): kediler kaptan yer, oyuncakları dağıtır; dönüşte kısa bir özet.
 - Masaüstü kedileri de temanın kedi paletini kullanır.
+- Profiller artık bir tema (ve çeşidi) da seçebilir; profil değişince Kedi Evi ve widget yerleşimi korunur.
+- Kediler bölümü: sahiplenirken ikincil özellik seçimi, kedi kartında anılar.
 - Erişilebilirlik: yazı boyutu (%85–140), yüksek karşıtlık, animasyon yoğunluğu, arayüz sesleri (varsayılan kapalı), klavye kısayolları listesi.
 
 ### Değişti

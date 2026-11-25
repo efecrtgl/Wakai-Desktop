@@ -36,6 +36,9 @@ pub struct ProfileConfig {
     pub pets_hide_fullscreen: bool,
     pub animation_quality: AnimationQuality,
     pub notifications_enabled: bool,
+    /// Profil uygulanınca geçilecek tema (yoksa tema değişmez). 1.1.5
+    pub theme: Option<String>,
+    pub theme_variant: Option<String>,
 }
 
 impl Default for ProfileConfig {
@@ -50,6 +53,8 @@ impl Default for ProfileConfig {
             pets_hide_fullscreen: true,
             animation_quality: AnimationQuality::Full,
             notifications_enabled: true,
+            theme: None,
+            theme_variant: None,
         }
     }
 }
@@ -216,7 +221,7 @@ pub fn reset(db: &Db, id: i64) -> AppResult<Profile> {
 
 /// Profilin ayar yaması (yalnızca profilin yönettiği alanlar).
 pub fn settings_patch(cfg: &ProfileConfig, id: i64) -> serde_json::Value {
-    serde_json::json!({
+    let mut patch = serde_json::json!({
         "widgets_visible": cfg.widgets_visible,
         "pets_enabled": cfg.pets_enabled,
         "pet_activity": cfg.pet_activity,
@@ -224,7 +229,12 @@ pub fn settings_patch(cfg: &ProfileConfig, id: i64) -> serde_json::Value {
         "animation_quality": cfg.animation_quality,
         "notifications_enabled": cfg.notifications_enabled,
         "active_profile": id,
-    })
+    });
+    if let Some(theme) = cfg.theme.as_deref().filter(|t| crate::themes::valid_id(t)) {
+        patch["theme"] = theme.into();
+        patch["theme_variant"] = cfg.theme_variant.clone().unwrap_or_default().into();
+    }
+    patch
 }
 
 /// Bir widget bu profilde görünür mü? `None`: profil görünürlüğe dokunmaz.
@@ -240,6 +250,24 @@ pub fn widget_visible(cfg: &ProfileConfig, id: &str, kind: &str) -> Option<bool>
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn profile_theme_is_applied_only_when_set() {
+        let mut cfg = ProfileConfig::default();
+        assert!(
+            settings_patch(&cfg, 1).get("theme").is_none(),
+            "tema korunur"
+        );
+        cfg.theme = Some("cozy".into());
+        cfg.theme_variant = Some("evening".into());
+        let p = settings_patch(&cfg, 1);
+        assert_eq!(
+            (p["theme"].as_str(), p["theme_variant"].as_str()),
+            (Some("cozy"), Some("evening"))
+        );
+        cfg.theme = Some("../kotu".into());
+        assert!(settings_patch(&cfg, 1).get("theme").is_none());
+    }
 
     #[test]
     fn builtins_are_seeded_once_and_protected() {

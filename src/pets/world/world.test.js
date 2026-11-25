@@ -6,7 +6,7 @@ import { ANIMS, createWorldCat, gameHour, periodOf, setAnim, stepToys, toyEntity
 import { rng } from '../home/sim.js';
 
 const needs = (o = {}) => ({ satiety: 80, energy: 80, happiness: 80, rest: 80, social: 70, trust: 50, curiosity: 70, cleanliness: 85, ...o });
-const pet = (o = {}) => ({ id: 1, personality: 'calm', quirk: 'none', habits: {}, needs: needs(o.needs), ...o, needs: needs(o.needs) });
+const pet = (o = {}) => ({ id: 1, personality: 'calm', quirk: 'none', habits: {}, ...o, needs: needs(o.needs) });
 const item = (id, kind, tx, ty, extra = {}) => ({ id, kind, tx, ty, rot: 0, room: 'living', state: {}, ...extra });
 
 describe('katalog ve yerleşim (Rust world.rs ile aynı kurallar)', () => {

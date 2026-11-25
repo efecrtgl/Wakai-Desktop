@@ -1,3 +1,4 @@
+import { BUILTIN_THEMES } from '../../theme/engine.js';
 // Masaüstü profilleri: hızlı geçiş, profil başına widget görünürlüğü, kedi davranışı,
 // animasyon ve bildirim ayarları; özel profiller.
 import { useCallback, useEffect, useState } from 'react';
@@ -69,6 +70,16 @@ function ProfileEditor({ profile, widgets, defs, onSaved, onError }) {
       <Toggle label="Tam ekranda kedileri gizle" checked={cfg.pets_hide_fullscreen} onChange={(v) => set({ pets_hide_fullscreen: v })} />
       <Select label="Animasyonlar" value={cfg.animation_quality} options={ANIMATION_OPTIONS} onChange={(v) => set({ animation_quality: v })} />
       <Toggle label="Bildirimler" checked={cfg.notifications_enabled} onChange={(v) => set({ notifications_enabled: v })} />
+      <Select
+        label="Tema"
+        value={cfg.theme ? `${cfg.theme}|${cfg.theme_variant ?? ''}` : ''}
+        options={[{ value: '', label: 'Değiştirme' }, ...BUILTIN_THEMES.flatMap((t) => [{ value: `${t.id}|`, label: t.name }, ...Object.entries(t.variants).map(([v, d]) => ({ value: `${t.id}|${v}`, label: `${t.name} · ${d.name}` }))])]}
+        onChange={(v) => {
+          const [theme, variant] = v ? v.split('|') : [null, null];
+          set({ theme: theme || null, theme_variant: variant || null });
+        }}
+        description="Profil uygulanınca geçilecek tema. Kedi Evi ve widget yerleşimi değişmez."
+      />
       <div className="cc-actions">
         <Button variant="primary" size="sm" onClick={save}>Kaydet</Button>
       </div>
