@@ -30,7 +30,7 @@
 
 ```powershell
 # Birincil verilere dokunmamak için ayrı bir veri klasörü kullanın (isteğe bağlı olarak gerçek veritabanının kopyasıyla):
-$env:WAKAI_DATA_DIR="$env:TEMPwakai-e2e"
+$env:WAKAI_DATA_DIR="$env:TEMP\wakai-e2e"
 $env:WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS="--remote-debugging-port=9222"
 .\src-tauri\target\debug\wakai-desktop.exe
 node scripts/e2e.mjs
@@ -46,7 +46,7 @@ node scripts/e2e.mjs
 
 **Uçtan uca (yeni):** alışveriş listesi, kedi sahiplenme/besleme/çıkarma ve geçersiz girdiler, Kedi Evi eşyaları, profiller (yerleşik silinemez), güncelleme durumu ve sürüm geçmişi, yedek inceleme ve seçmeli geri yükleme doğrulaması, widget penceresinin yıkıcı komutları çağıramaması.
 
-**Elle / yalıtılmış ortamda yapılan testler:** imzalı güncelleme (geçerli/değiştirilmiş/eski/erişilemez; ), otomatik ve elle geri dönüş (), arayüzden seçmeli geri yükleme ve bozuk yedek (), performans ().
+**Elle / yalıtılmış ortamda yapılan testler:** imzalı güncelleme (geçerli/değiştirilmiş/eski/erişilemez; `docs/GUNCELLEMELER.md`), otomatik ve elle geri dönüş (`docs/GUNCELLEMELER.md`), arayüzden seçmeli geri yükleme ve bozuk yedek (`docs/YEDEKLER.md`), performans (`docs/PERFORMANCE.md`).
 
 **Gerçek fareyle denenmemiş olanlar:** kediyi okşama, sürükleyip fırlatma, sağ tık menüsü, pencere üstüne zıplama, tepsi profil menüsü, gerçek bir tam ekran oyunla otomatik Oyun profili, gerçek bir NSIS güncellemesinin uçtan uca kurulumu (imzalı ilk GitHub sürümünden sonra).
 
