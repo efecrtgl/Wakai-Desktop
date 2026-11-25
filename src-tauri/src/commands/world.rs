@@ -42,12 +42,14 @@ pub fn get_world(state: State<'_, AppState>, store: State<'_, PetStore>) -> AppR
 
 #[tauri::command]
 pub fn world_event(
+    window: tauri::WebviewWindow,
     app: AppHandle,
     state: State<'_, AppState>,
     store: State<'_, PetStore>,
     cooldowns: State<'_, Cooldowns>,
     input: EventInput,
 ) -> AppResult<EventOutcome> {
+    super::require_main(&window)?;
     let kind = input
         .kind
         .clone()
@@ -123,10 +125,12 @@ pub struct Position {
 /// Kedilerin oda ve konumlarını toplu kaydeder (her karede değil; aralıklarla ve kapanışta).
 #[tauri::command]
 pub fn save_world_positions(
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     store: State<'_, PetStore>,
     positions: Vec<Position>,
 ) -> AppResult<()> {
+    super::require_main(&window)?;
     for p in positions.iter().take(32) {
         if !["living", "bedroom", "playroom"].contains(&p.room.as_str())
             || !p.x.is_finite()
@@ -145,6 +149,7 @@ pub fn save_world_positions(
 
 #[tauri::command]
 pub fn place_world_item(
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     kind: String,
     room: String,
@@ -152,6 +157,7 @@ pub fn place_world_item(
     ty: i64,
     rot: i64,
 ) -> AppResult<WorldItem> {
+    super::require_main(&window)?;
     state
         .db
         .with_tx(|c| world::place(c, &kind, &room, tx, ty, rot))
@@ -159,6 +165,7 @@ pub fn place_world_item(
 
 #[tauri::command]
 pub fn move_world_item(
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     id: i64,
     room: String,
@@ -166,22 +173,30 @@ pub fn move_world_item(
     ty: i64,
     rot: i64,
 ) -> AppResult<WorldItem> {
+    super::require_main(&window)?;
     state
         .db
         .with_tx(|c| world::move_item(c, id, &room, tx, ty, rot))
 }
 
 #[tauri::command]
-pub fn remove_world_item(state: State<'_, AppState>, id: i64) -> AppResult<()> {
+pub fn remove_world_item(
+    window: tauri::WebviewWindow,
+    state: State<'_, AppState>,
+    id: i64,
+) -> AppResult<()> {
+    super::require_main(&window)?;
     state.db.with_tx(|c| world::remove(c, id))
 }
 
 #[tauri::command]
 pub fn fill_world_bowl(
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     id: i64,
     food: Option<String>,
 ) -> AppResult<WorldItem> {
+    super::require_main(&window)?;
     let today = crate::pets::service::today();
     state
         .db
@@ -190,11 +205,13 @@ pub fn fill_world_bowl(
 
 #[tauri::command]
 pub fn set_world_room_style(
+    window: tauri::WebviewWindow,
     state: State<'_, AppState>,
     room: String,
     floor: Option<String>,
     wall: Option<String>,
 ) -> AppResult<()> {
+    super::require_main(&window)?;
     state
         .db
         .with(|c| world::set_room_style(c, &room, floor.as_deref(), wall.as_deref()))

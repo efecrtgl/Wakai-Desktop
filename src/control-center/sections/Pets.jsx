@@ -1,6 +1,6 @@
 // Kediler: koleksiyon, ihtiyaçlar, etkileşimler, aksesuarlar, başarımlar ve kedi ayarları.
 import { useCallback, useEffect, useState } from 'react';
-import { Badge, Button, Card, Dialog, EmptyState, ErrorNote, Select, Slider, Toggle } from '../../ui/components.jsx';
+import { Badge, Button, Card, Dialog, EmptyState, ErrorNote, Select, Slider, Toggle, Segmented } from '../../ui/components.jsx';
 import { ProgressBar } from '../../ui/widget.jsx';
 import { PixelCat } from '../../ui/cats/PixelCat.jsx';
 import { PetSprite } from '../../pets/PetSprite.jsx';
@@ -286,6 +286,18 @@ function PetSettings({ settingsApi }) {
       <Slider label="Boyut" value={s.pet_size} min={2} max={5} format={(v) => ['', '', 'Küçük', 'Orta', 'Büyük', 'Çok büyük'][v]} onChange={(v) => update({ pet_size: v })} />
       <Slider label="Aynı anda en fazla" value={s.pets_max_active} min={1} max={12} format={(v) => `${v} kedi`} onChange={(v) => update({ pets_max_active: v })} description="Her kedi ayrı bir yerel pencere ve hareket hesabıdır." />
       <Toggle label="Tam ekranda gizle" description="Oyun, video ya da sunum gibi tam ekran bir uygulama öndeyken kediler gizlenir." checked={s.pets_hide_fullscreen} onChange={(v) => update({ pets_hide_fullscreen: v })} />
+      <Segmented
+        label="Kedi Evi saati"
+        value={s.world_time}
+        options={[
+          { value: 'real', label: 'Gerçek saat' },
+          { value: 'fast', label: 'Hızlı gün' },
+        ]}
+        onChange={(v) => update({ world_time: v })}
+        description="Hızlı günde bir oyun saati bir dakika sürer; gece ve gündüz daha sık değişir."
+      />
+      <Toggle label="Kedi Evi'nde hava durumu" description="Pencereden yağmur ve kar görünür; kediler buna tepki verir." checked={s.world_weather} onChange={(v) => update({ world_weather: v })} />
+      <Toggle anchor="set-ambient" label="Ortam efektleri" description="Temaya göre uçuşan toz, yaprak, yıldız ya da parıltılar. Hareket azaltıldığında zaten kapalıdır." checked={s.ambient_effects} onChange={(v) => update({ ambient_effects: v })} />
     </Card>
   );
 }

@@ -35,6 +35,14 @@ function invoke(cmd, args = {}) {
   });
 }
 
+/** Sayfada bir ifade değerlendirir (DOM denetimleri için). */
+function evaluate(expression) {
+  return new Promise((resolve) => {
+    pending.set(++seq, (d) => resolve(d.result?.result?.value));
+    ws.send(JSON.stringify({ id: seq, method: "Runtime.evaluate", params: { expression, awaitPromise: true, returnByValue: true } }));
+  });
+}
+
 let passed = 0;
 const failures = [];
 async function test(name, fn) {
@@ -247,6 +255,62 @@ await test('yedek inceleme ve seçmeli geri yükleme doğrulaması', async () =>
   await ok('delete_backup', { name: b.name });
 });
 
+// --- 1.1.5 ---
+
+await test('tema: geçersiz paket reddedilir, geçerli paket yüklenir → uygulanır → silinir', async () => {
+  const before = await ok('get_settings');
+  await fails('import_theme', { text: '{bozuk', replace: false }, 'JSON');
+  await fails('import_theme', { text: JSON.stringify({ schema: 1, id: 'e2e-kotu', name: 'K', tokens: { 'color-bg': 'url(http://x)' } }), replace: false }, 'güvenli değil');
+  await fails('import_theme', { text: JSON.stringify({ schema: 1, id: 'pixel', name: 'Sahte' }), replace: false }, 'yerleşik');
+  const pack = { schema: 1, id: 'e2e-tema', name: 'E2E Tema', version: '1.0.0', base: 'dark', tokens: { 'color-bg': '#101010' }, pets: { palette: 'grayscale' } };
+  cleanup.push(['delete_custom_theme', { id: 'e2e-tema' }]);
+  const r = await ok('import_theme', { text: JSON.stringify(pack), replace: false });
+  assert(r.id === 'e2e-tema', 'kimlik');
+  assert((await ok('list_custom_themes')).some((t) => t.id === 'e2e-tema'), 'listede yok');
+  await ok('update_settings', { patch: { theme: 'e2e-tema' } });
+  await new Promise((r) => setTimeout(r, 600));
+  const applied = await evaluate('document.documentElement.dataset.themeId');
+  assert(applied === 'e2e-tema', `tema uygulanmadı: ${applied}`);
+  await ok('delete_custom_theme', { id: 'e2e-tema' });
+  cleanup.pop();
+  const after = await ok('get_settings');
+  assert(after.theme === 'pixel', 'silinen etkin tema varsayılana dönmeli');
+  await ok('update_settings', { patch: { theme: before.theme, theme_variant: before.theme_variant } });
+});
+
+await test('Kedi Evi: dünya hazır, yerleşim doğrulanır, olay işlenir, envanter korunur', async () => {
+  const w = await ok('get_world');
+  assert(w.rooms.length === 3 && w.items.length > 0, 'dünya boş');
+  await fails('place_world_item', { kind: 'roket', room: 'living', tx: 1, ty: 5, rot: 0 }, 'Bilinmeyen');
+  await fails('place_world_item', { kind: 'plant', room: 'mutfak', tx: 1, ty: 5, rot: 0 }, 'oda');
+  const kind = Object.keys(w.inventory).find((k) => !['window', 'painting', 'shelf', 'rug', 'tree', 'sofa', 'cathouse', 'bed'].includes(k));
+  if (kind) {
+    let placed = null;
+    for (let tx = 0; tx < 20 && !placed; tx++)
+      for (let ty = 4; ty < 12 && !placed; ty++) {
+        const res = await invoke('place_world_item', { kind, room: 'playroom', tx, ty, rot: 0 });
+        if (res.ok) placed = res.value;
+      }
+    assert(placed, 'eşya yerleştirilemedi');
+    await fails('move_world_item', { id: placed.id, room: 'playroom', tx: placed.tx, ty: 0, rot: 0 }, 'sığmıyor');
+    await ok('remove_world_item', { id: placed.id });
+    const again = await ok('get_world');
+    assert((again.inventory[kind] ?? 0) === (w.inventory[kind] ?? 0), 'envanter sayısı değişti');
+  }
+  const pet = w.pets[0];
+  if (pet) {
+    const r = await ok('world_event', { input: { pet_id: pet.id, kind: 'explore' } });
+    assert(typeof r.pet.needs.curiosity === 'number', 'merak alanı yok');
+    await fails('world_event', { input: { pet_id: pet.id } }, 'Olay');
+    await fails('world_event', { input: { pet_id: 999999, kind: 'pet' } });
+  }
+});
+
+await test('arama ve yeni gezinme', async () => {
+  const count = await evaluate("document.querySelectorAll('.cc-nav__item').length");
+  assert(count === 7, `bölüm sayısı ${count}`);
+});
+
 for (const [cmd, args] of cleanup.reverse()) await invoke(cmd, args);
 ws.close();
 
@@ -261,6 +325,7 @@ if (widgetPage) {
     });
     w.close();
     assert(String(res).includes('Kontrol Merkezi'), `beklenmeyen sonuç: ${res}`);
+    // (aynı koruma: remove_world_item, import_theme, delete_custom_theme)
   });
 }
 console.log(`\n${passed} başarılı, ${failures.length} başarısız`);

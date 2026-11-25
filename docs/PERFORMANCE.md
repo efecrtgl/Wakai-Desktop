@@ -52,3 +52,34 @@ Security review:
 - `WAKAI_UPDATE_ENDPOINT` is honored only in debug builds. In any build, signatures are always verified against the embedded public key.
 - Version and backup names are validated against path traversal (`../`) in Rust (unit-tested). Selective restore only touches a fixed table list, and column names come from `PRAGMA table_info`.
 - No private key in the repository (checked before each commit). The CI fails if the signing secret is missing instead of publishing an unsigned release.
+
+## Ivily Desktop 1.1.5 (25 Nov 2026)
+
+Method: 1.1.0 (installed) and 1.1.5 (release build) each ran on a **fresh copy of the same
+database** (6 widgets, all made visible, desktop cats on), started with `--autostart` (Control
+Center closed), no CDP during measurement, 15 s settle, then `scripts/measure.ps1 -Duration 40`.
+
+| Scenario | 1.1.0 | 1.1.5 | Δ |
+|---|---|---|---|
+| Startup until WebView2 process count is stable | 736 ms | 699 ms | −5 % |
+| WebView2 processes | 9 | 9 | 0 |
+| Private memory, average | 316.9 MB | 319.2 MB | +2.3 MB (+0.7 %) |
+| Private memory, peak | 318.7 MB | 323.4 MB | +4.7 MB |
+| CPU average (32 logical cores) | 0.05 % | 0.025 % | ≈ 0 |
+
+The +2–5 MB is within run-to-run noise of earlier measurements; plausible sources are the theme
+engine module and the bundled Pixelify Sans subsets.
+
+Control Center open (1.1.5, CDP enabled, so memory is not comparable with the table above; CPU is):
+
+| Scenario | Private memory | CPU (of 32 cores) |
+|---|---|---|
+| Overview open | 379.0 MB | 0.00 % |
+| Pet World open, 2 cats, 30 fps cap | 386.1 MB (+7.1 MB) | 0.23 % (≈ 7.5 % of one core) |
+
+The Pet World loop stops when the tab is left or the window is hidden, so it costs nothing in the
+background. Reduced motion lowers it to 12 fps, animations off to 6 fps.
+
+Theme switching (settings write + atomic CSS application + two animation frames, 10 switches
+across all five themes): **median 23 ms**, min 11 ms, max 150 ms (first switch to Pixel loads the
+font subset).
