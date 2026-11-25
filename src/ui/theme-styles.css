@@ -1,8 +1,7 @@
 /*
- * Tema yapı öznitelikleri. Tema motoru bu öznitelikleri <html> öğesine (ya da önizleme
- * kutusuna) yazar; kurallar ATA seçicisiyle yazıldığı için aynı CSS hem uygulamanın tamamında
- * hem de yalıtılmış tema önizlemesinde çalışır. Temalar CSS dosyası taşımaz; yalnızca
- * sözleşmedeki (src/theme/contract.json) seçenekleri seçer.
+ * Tema yapı öznitelikleri. Tema motoru bu öznitelikleri <html> öğesine ya da bir tema önizleme
+ * kutusuna ([data-sandbox]) yazar. Temalar CSS dosyası taşımaz; yalnızca sözleşmedeki
+ * (src/theme/contract.json) seçenekleri seçer.
  *
  *   data-shape     rounded | soft | sharp | pixel
  *   data-surface   flat | soft | paper | glossy
@@ -13,9 +12,14 @@
  *   data-motion-style smooth | stepped | bouncy
  *   data-rendering pixelated | smooth
  *   data-contrast  high          (erişilebilirlik, temadan bağımsız)
+ *
+ * Alt öğeleri biçimlendiren kurallar `@scope (…) to (…)` ile EN YAKIN tema kökünde
+ * sınırlanır: <html> Piksel temadayken içindeki Modern önizleme kutusuna piksel kuralları
+ * sızmaz (ve tersi). Yalnızca değişken tanımlayan kurallar kalıtımla zaten en yakın kökten
+ * gelir; onlar kapsam gerektirmez.
  */
 
-/* ── Yoğunluk ─────────────────────────────────────────────────────────── */
+/* ── Yoğunluk (değişkenler) ───────────────────────────────────────────── */
 [data-density='compact'] {
   --space-2: 6px;
   --space-3: 9px;
@@ -24,7 +28,16 @@
   --space-6: 19px;
   --space-8: 26px;
 }
+[data-density='normal'] {
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+}
 [data-density='roomy'] {
+  --space-2: 9px;
   --space-3: 14px;
   --space-4: 19px;
   --space-5: 24px;
@@ -32,7 +45,10 @@
   --space-8: 38px;
 }
 
-/* ── Hareket karakteri ────────────────────────────────────────────────── */
+/* ── Hareket karakteri (değişkenler) ──────────────────────────────────── */
+[data-motion-style='smooth'] {
+  --ease-soft: cubic-bezier(0.25, 0.8, 0.35, 1);
+}
 [data-motion-style='stepped'] {
   --ease-soft: steps(3, end);
 }
@@ -41,145 +57,186 @@
 }
 
 /* ── Kenarlıklar ──────────────────────────────────────────────────────── */
-[data-border] .wk-card,
-[data-border] .widget-frame,
-[data-border] .wk-input,
-[data-border] .wk-select,
-[data-border] .wk-textarea,
-[data-border] .wk-dialog__panel {
-  border-width: var(--border-width, 1px);
+@scope ([data-border]) to ([data-border]) {
+  :scope .wk-card,
+  :scope .widget-frame,
+  :scope .wk-input,
+  :scope .wk-select,
+  :scope .wk-textarea {
+    border-width: var(--border-width, 1px);
+  }
 }
-[data-border='none'] .wk-card,
-[data-border='none'] .widget-frame {
-  border-color: transparent;
+@scope ([data-border='none']) to ([data-border]) {
+  :scope .wk-card,
+  :scope .widget-frame {
+    border-color: transparent;
+  }
 }
-[data-border='double'] .wk-card,
-[data-border='double'] .widget-frame {
-  border-style: double;
-  border-width: 3px;
+@scope ([data-border='double']) to ([data-border]) {
+  :scope .wk-card,
+  :scope .widget-frame {
+    border-style: double;
+    border-width: 3px;
+  }
 }
 
-/* ── Piksel biçim ─────────────────────────────────────────────────────── */
-[data-shape='pixel'] .widget-frame {
-  border-radius: 0;
-  border: 2px solid var(--color-border);
+/* ── Biçim ────────────────────────────────────────────────────────────── */
+@scope ([data-shape='pixel']) to ([data-shape]) {
+  :scope .widget-frame {
+    border-radius: 0;
+    border: 2px solid var(--color-border);
+  }
+  :scope .wk-btn,
+  :scope .wg-btn,
+  :scope .wk-icon-btn {
+    border: 2px solid var(--color-border-strong);
+    border-radius: 0;
+    box-shadow: 2px 2px 0 var(--color-border-strong);
+    transition: transform 60ms steps(1), box-shadow 60ms steps(1);
+  }
+  :scope .wk-btn:active:not(:disabled),
+  :scope .wg-btn:active:not(:disabled),
+  :scope .wk-icon-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--color-border-strong);
+  }
+  :scope .wk-btn--ghost {
+    border-color: transparent;
+    box-shadow: none;
+  }
+  :scope .wk-switch,
+  :scope .wk-switch__thumb,
+  :scope .wk-badge,
+  :scope .wg-progress,
+  :scope .wg-progress__fill,
+  :scope .wk-input,
+  :scope .wk-select,
+  :scope .wk-textarea,
+  :scope .wg-input,
+  :scope .wk-seg,
+  :scope .wk-seg__opt,
+  :scope .cc-tabs__tab,
+  :scope .cc-nav__item {
+    border-radius: 0;
+  }
+  :scope .wk-switch {
+    border: 2px solid var(--color-border-strong);
+  }
+  :scope .wk-card {
+    box-shadow: var(--shadow-md);
+  }
+  :scope :focus-visible {
+    outline-style: dashed;
+  }
 }
-[data-shape='pixel'] .wk-btn,
-[data-shape='pixel'] .wg-btn,
-[data-shape='pixel'] .wk-icon-btn {
-  border: 2px solid var(--color-border-strong);
-  border-radius: 0;
-  box-shadow: 2px 2px 0 var(--color-border-strong);
-  transition: transform 60ms steps(1), box-shadow 60ms steps(1);
-}
-[data-shape='pixel'] .wk-btn:active:not(:disabled),
-[data-shape='pixel'] .wg-btn:active:not(:disabled),
-[data-shape='pixel'] .wk-icon-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0 0 0 var(--color-border-strong);
-}
-[data-shape='pixel'] .wk-btn--ghost {
-  border-color: transparent;
-  box-shadow: none;
-}
-[data-shape='pixel'] .wk-switch,
-[data-shape='pixel'] .wk-switch__thumb,
-[data-shape='pixel'] .wk-badge,
-[data-shape='pixel'] .wg-progress,
-[data-shape='pixel'] .wg-progress__fill,
-[data-shape='pixel'] .wk-input,
-[data-shape='pixel'] .wk-select,
-[data-shape='pixel'] .wk-textarea,
-[data-shape='pixel'] .wg-input {
-  border-radius: 0;
-}
-[data-shape='pixel'] .wk-switch {
-  border: 2px solid var(--color-border-strong);
-}
-[data-shape='pixel'] .wk-card {
-  box-shadow: var(--shadow-md);
-}
-[data-shape='pixel'] h1,
-[data-shape='pixel'] h2,
-[data-shape='pixel'] h3 {
-  letter-spacing: 0.01em;
-}
-[data-shape='pixel'] :focus-visible {
-  outline-style: dashed;
-}
-[data-shape='sharp'] .wk-switch,
-[data-shape='sharp'] .wk-switch__thumb,
-[data-shape='sharp'] .wk-badge {
-  border-radius: 2px;
+@scope ([data-shape='sharp']) to ([data-shape]) {
+  :scope .wk-switch,
+  :scope .wk-switch__thumb,
+  :scope .wk-badge,
+  :scope .wk-seg,
+  :scope .wk-seg__opt {
+    border-radius: 2px;
+  }
+  :scope .widget-frame {
+    border-radius: var(--radius-lg);
+  }
 }
 
 /* ── Yüzeyler ─────────────────────────────────────────────────────────── */
-[data-surface='flat'] .wk-card {
-  box-shadow: none;
+@scope ([data-surface='flat']) to ([data-surface]) {
+  :scope .wk-card {
+    box-shadow: none;
+  }
 }
-[data-shape='pixel'][data-surface='flat'] .wk-card {
-  box-shadow: var(--shadow-md);
+@scope ([data-shape='pixel'][data-surface='flat']) to ([data-surface]) {
+  :scope .wk-card {
+    box-shadow: var(--shadow-md);
+  }
 }
-[data-surface='paper'] .wk-card,
-[data-surface='paper'] .widget-frame {
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(120, 90, 60, 0.035) 0 1px, transparent 1.5px),
-    radial-gradient(circle at 70% 80%, rgba(120, 90, 60, 0.03) 0 1px, transparent 1.5px);
-  background-size: 7px 7px, 11px 11px;
+@scope ([data-surface='paper']) to ([data-surface]) {
+  :scope .wk-card,
+  :scope .widget-frame {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(120, 90, 60, 0.035) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 70% 80%, rgba(120, 90, 60, 0.03) 0 1px, transparent 1.5px);
+    background-size:
+      7px 7px,
+      11px 11px;
+  }
 }
-[data-surface='glossy'] .wk-btn--primary,
-[data-surface='glossy'] .wg-btn--primary,
-[data-surface='glossy'] .cc-nav__item[aria-current='page'] {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0) 51%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 2px 6px color-mix(in srgb, var(--color-primary) 35%, transparent);
+@scope ([data-surface='glossy']) to ([data-surface]) {
+  :scope .wk-btn--primary,
+  :scope .wg-btn--primary,
+  :scope .cc-nav__item[aria-current='page'],
+  :scope .cc-tabs__tab[aria-selected='true'] {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0) 51%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 2px 6px color-mix(in srgb, var(--color-primary) 35%, transparent);
+  }
+  :scope .wk-btn--secondary {
+    background-image: var(--color-chrome);
+  }
+  :scope .wk-card {
+    background-image: linear-gradient(180deg, color-mix(in srgb, white 45%, transparent), transparent 40%);
+  }
 }
-[data-surface='glossy'] .wk-btn--secondary,
-[data-surface='glossy'] .wk-card__header {
-  background-image: var(--color-chrome);
-}
-[data-surface='glossy'] .wk-card {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 40%);
-}
-[data-surface='glossy'][data-base='dark'] .wk-card {
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 40%);
+@scope ([data-surface='glossy'][data-base='dark']) to ([data-surface]) {
+  :scope .wk-card {
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 40%);
+  }
 }
 
-/* ── Arka plan dokuları (yalnızca ana alanda; widget'larda yok) ─────────── */
-[data-texture='grid'] .cc__main {
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--color-border) 9%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--color-border) 9%, transparent) 1px, transparent 1px);
-  background-size: 16px 16px;
+/* ── Arka plan dokuları (ana alan ve önizleme alanı; widget'larda yok) ──── */
+@scope ([data-texture='grid']) to ([data-texture]) {
+  :scope .cc__main,
+  :scope .sb__main {
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--color-border) 9%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-border) 9%, transparent) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
 }
-[data-texture='paper'] .cc__main {
-  background-image:
-    radial-gradient(circle at 30% 40%, rgba(120, 90, 60, 0.05) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 80% 10%, rgba(120, 90, 60, 0.04) 0 1px, transparent 1.6px);
-  background-size: 9px 9px, 13px 13px;
+@scope ([data-texture='paper']) to ([data-texture]) {
+  :scope .cc__main,
+  :scope .sb__main {
+    background-image:
+      radial-gradient(circle at 30% 40%, rgba(120, 90, 60, 0.05) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 80% 10%, rgba(120, 90, 60, 0.04) 0 1px, transparent 1.6px);
+    background-size:
+      9px 9px,
+      13px 13px;
+  }
 }
-[data-texture='scanline'] .cc__main {
-  background-image: repeating-linear-gradient(0deg, color-mix(in srgb, var(--color-text) 3.5%, transparent) 0 1px, transparent 1px 4px);
+@scope ([data-texture='scanline']) to ([data-texture]) {
+  :scope .cc__main,
+  :scope .sb__main {
+    background-image: repeating-linear-gradient(0deg, color-mix(in srgb, var(--color-text) 3.5%, transparent) 0 1px, transparent 1px 4px);
+  }
 }
-[data-texture='dots'] .cc__main {
-  background-image: radial-gradient(color-mix(in srgb, var(--color-text) 10%, transparent) 1px, transparent 1.5px);
-  background-size: 14px 14px;
+@scope ([data-texture='dots']) to ([data-texture]) {
+  :scope .cc__main,
+  :scope .sb__main {
+    background-image: radial-gradient(color-mix(in srgb, var(--color-text) 10%, transparent) 1px, transparent 1.5px);
+    background-size: 14px 14px;
+  }
 }
 
 /* ── Başlıklar ────────────────────────────────────────────────────────── */
-[data-headings='upper'] h1,
-[data-headings='upper'] h2,
-[data-headings='upper'] .wk-card__title,
-[data-headings='upper'] .wg-header__title,
-[data-headings='upper'] .cc-nav__group {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+@scope ([data-headings='upper']) to ([data-headings]) {
+  :scope h1,
+  :scope h2,
+  :scope .wk-card__title,
+  :scope .wg-header__title,
+  :scope .sb__title {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
 }
 
 /* ── Görüntüleme: piksel sanat keskin kalsın ───────────────────────────── */
 canvas,
-[data-rendering='pixelated'] img.pixel {
+img.pixel {
   image-rendering: pixelated;
 }
 

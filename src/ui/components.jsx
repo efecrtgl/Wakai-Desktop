@@ -32,10 +32,10 @@ export function Card({ title, action, children, className = '', ...rest }) {
   );
 }
 
-export function Toggle({ checked, onChange, label, description, disabled }) {
+export function Toggle({ checked, onChange, label, description, disabled, anchor }) {
   const id = useId();
   return (
-    <div className="wk-row">
+    <div className="wk-row" id={anchor}>
       <div className="wk-row__text">
         <label htmlFor={id} className="wk-row__label">{label}</label>
         {description ? <p className="wk-row__desc">{description}</p> : null}
@@ -55,10 +55,10 @@ export function Toggle({ checked, onChange, label, description, disabled }) {
   );
 }
 
-export function Slider({ value, onChange, min, max, step = 1, label, format = (v) => v, description }) {
+export function Slider({ value, onChange, min, max, step = 1, label, format = (v) => v, description, anchor, disabled }) {
   const id = useId();
   return (
-    <div className="wk-row">
+    <div className="wk-row" id={anchor}>
       <div className="wk-row__text">
         <label htmlFor={id} className="wk-row__label">{label}</label>
         {description ? <p className="wk-row__desc">{description}</p> : null}
@@ -71,6 +71,7 @@ export function Slider({ value, onChange, min, max, step = 1, label, format = (v
           max={max}
           step={step}
           value={value}
+          disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
         />
         <output htmlFor={id}>{format(value)}</output>
@@ -79,10 +80,10 @@ export function Slider({ value, onChange, min, max, step = 1, label, format = (v
   );
 }
 
-export function Select({ value, onChange, options, label, description }) {
+export function Select({ value, onChange, options, label, description, anchor }) {
   const id = useId();
   return (
-    <div className="wk-row">
+    <div className="wk-row" id={anchor}>
       <div className="wk-row__text">
         <label htmlFor={id} className="wk-row__label">{label}</label>
         {description ? <p className="wk-row__desc">{description}</p> : null}
@@ -176,6 +177,43 @@ export function Dialog({ open, title, children, actions, onClose, dismissible = 
         <h2 className="wk-dialog__title">{title}</h2>
         <div className="wk-dialog__body">{children}</div>
         {actions ? <div className="wk-dialog__actions">{actions}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+/** Birkaç seçenekten biri (radyo grubu). Ok tuşlarıyla gezilir. */
+export function Segmented({ value, onChange, options, label, description, anchor }) {
+  const onKey = (e) => {
+    const i = options.findIndex((o) => o.value === value);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      onChange(options[(i + 1) % options.length].value);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      onChange(options[(i + options.length - 1) % options.length].value);
+    }
+  };
+  return (
+    <div className="wk-row" id={anchor}>
+      <div className="wk-row__text">
+        <span className="wk-row__label">{label}</span>
+        {description ? <p className="wk-row__desc">{description}</p> : null}
+      </div>
+      <div className="wk-seg" role="radiogroup" aria-label={label} onKeyDown={onKey}>
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={o.value === value}
+            tabIndex={o.value === value ? 0 : -1}
+            className="wk-seg__opt"
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
       </div>
     </div>
   );

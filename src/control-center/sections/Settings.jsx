@@ -3,7 +3,11 @@ import { Badge, Button, Card, Dialog, ErrorNote, Loading, Toggle } from '../../u
 import { call } from '../../lib/ipc.js';
 import { bytes } from '../../lib/format.js';
 import { tr } from '../../lib/i18n.js';
-import { PageHeader } from './PageHeader.jsx';
+import { SectionTabs } from './SectionTabs.jsx';
+import { NAV } from '../nav.js';
+import { AccessibilitySettings } from './Accessibility.jsx';
+import { PerformanceSection } from './Performance.jsx';
+import { NotificationsSection } from './Notifications.jsx';
 import { RELEASE_NOTES } from '../../lib/releaseNotes.js';
 
 function Updates({ settings, update }) {
@@ -81,7 +85,7 @@ function VersionHistory() {
   const notes = data ? RELEASE_NOTES[data.current] : null;
 
   return (
-    <Card title="Sürüm geçmişi">
+    <Card title="Sürüm geçmişi" id="set-versions">
       <ErrorNote error={error} />
       {notes ? (
         <div className="ver-notes">
@@ -276,38 +280,70 @@ function Backups() {
   );
 }
 
-export function SettingsSection({ settingsApi }) {
-  const { settings, update, error } = settingsApi;
+function About() {
   const [info, setInfo] = useState(null);
   useEffect(() => {
     call('app_info').then(setInfo, console.error);
   }, []);
-  if (!settings) return <div className="cc-page">{tr.common.loading}</div>;
-
   return (
-    <div className="cc-page">
-      <PageHeader title={tr.settings.title} />
+    <Card title="Ivily Desktop">
+      <dl className="cc-dl">
+        <dt>Sürüm</dt>
+        <dd>{info?.version ?? '—'}</dd>
+        <dt>Veritabanı şeması</dt>
+        <dd>{info ? `v${info.schema_version}` : '—'}</dd>
+        <dt>Veri konumu</dt>
+        <dd className="cc-dl__path">{info?.database_path ?? '—'}</dd>
+        <dt>Eski adı</dt>
+        <dd>Wakai Desktop (1.1.0 ve öncesi)</dd>
+        <dt>Hava durumu verisi</dt>
+        <dd>Open-Meteo (open-meteo.com, CC BY 4.0)</dd>
+        <dt>Piksel yazı tipi</dt>
+        <dd>Pixelify Sans (SIL Open Font License 1.1)</dd>
+      </dl>
+      <p className="cc-muted">Ivily Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. İnternete yalnızca Hava Durumu Kedisi ve güncelleme denetimi bağlanır.</p>
+    </Card>
+  );
+}
+
+function General({ settings, update }) {
+  return (
+    <>
+      <Card title="Pencere ve başlangıç">
+        <Toggle anchor="set-tray" label={tr.settings.closeToTray} description={tr.settings.closeToTrayDesc} checked={settings.close_to_tray} onChange={(v) => update({ close_to_tray: v })} />
+        <Toggle anchor="set-startup" label={tr.settings.launchOnStartup} description={tr.settings.launchOnStartupDesc} checked={settings.launch_on_startup} onChange={(v) => update({ launch_on_startup: v })} />
+      </Card>
+      <Card title="Masaüstü">
+        <Toggle label="Widget'ları masaüstünde göster" description="Kapatınca tüm widget pencereleri kapanır ve kaynak kullanmaz." checked={settings.widgets_visible} onChange={(v) => update({ widgets_visible: v })} />
+        <Toggle label="Masaüstü kedileri" description="Kediler görev çubuğunda ve pencerelerin üstünde dolaşır." checked={settings.pets_enabled} onChange={(v) => update({ pets_enabled: v })} />
+      </Card>
+    </>
+  );
+}
+
+export function SettingsSection({ settingsApi, route, onNavigate }) {
+  const { settings, update, error } = settingsApi;
+  const tabs = NAV.find((n) => n.id === 'settings').tabs;
+  const sub = route?.sub ?? 'general';
+  let body;
+  if (!settings) body = <Loading />;
+  else if (sub === 'general') body = <General settings={settings} update={update} />;
+  else if (sub === 'accessibility') body = <AccessibilitySettings settingsApi={settingsApi} />;
+  else if (sub === 'performance') body = <PerformanceSection settingsApi={settingsApi} />;
+  else if (sub === 'notifications') body = <NotificationsSection settingsApi={settingsApi} />;
+  else if (sub === 'updates')
+    body = (
+      <>
+        <Updates settings={settings} update={update} />
+        <VersionHistory />
+      </>
+    );
+  else if (sub === 'backup') body = <Backups />;
+  else body = <About />;
+  return (
+    <SectionTabs title={tr.settings.title} tabs={tabs} active={sub} onChange={(t) => onNavigate('settings', t)} vertical>
       <ErrorNote error={error} />
-      <Card title={tr.settings.general}>
-        <Toggle label={tr.settings.closeToTray} description={tr.settings.closeToTrayDesc} checked={settings.close_to_tray} onChange={(v) => update({ close_to_tray: v })} />
-        <Toggle label={tr.settings.launchOnStartup} description={tr.settings.launchOnStartupDesc} checked={settings.launch_on_startup} onChange={(v) => update({ launch_on_startup: v })} />
-      </Card>
-      <Updates settings={settings} update={update} />
-      <VersionHistory />
-      <Backups />
-      <Card title="Hakkında">
-        <dl className="cc-dl">
-          <dt>Sürüm</dt>
-          <dd>{info?.version ?? '—'}</dd>
-          <dt>Veritabanı şeması</dt>
-          <dd>{info ? `v${info.schema_version}` : '—'}</dd>
-          <dt>Veri konumu</dt>
-          <dd className="cc-dl__path">{info?.database_path ?? '—'}</dd>
-          <dt>Hava durumu verisi</dt>
-          <dd>Open-Meteo (open-meteo.com, CC BY 4.0)</dd>
-        </dl>
-        <p className="cc-muted">Ivily Desktop hesap gerektirmez; tüm verileriniz bu bilgisayarda kalır. İnternete yalnızca Hava Durumu Kedisi ve güncelleme denetimi bağlanır.</p>
-      </Card>
-    </div>
+      {body}
+    </SectionTabs>
   );
 }

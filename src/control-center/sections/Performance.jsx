@@ -4,7 +4,7 @@ import { ProgressBar } from '../../ui/widget.jsx';
 import { call } from '../../lib/ipc.js';
 import { useSystemStats } from '../../lib/data.js';
 import { bytes, percent } from '../../lib/format.js';
-import { ANIMATION_OPTIONS } from './Appearance.jsx';
+import { ANIMATION_OPTIONS } from './Accessibility.jsx';
 import { PageHeader } from './PageHeader.jsx';
 
 /** Ivily Desktop'un kendi bellek kullanımı (ana süreç + WebView2 süreçleri). Sayfa açıkken 5 sn'de bir. */
@@ -43,6 +43,7 @@ export function PerformanceSection({ settingsApi }) {
       <ErrorNote error={error} />
       <Card title="Kaynak kullanımı">
         <Toggle
+          anchor="set-low-resource"
           label="Düşük kaynak modu"
           description="Animasyonları kapatır ve sistem izleme aralığını iki katına çıkarır."
           checked={s.reduced_resource_mode}
@@ -66,14 +67,6 @@ export function PerformanceSection({ settingsApi }) {
           step={15}
           format={(v) => `${v} dk`}
           onChange={(v) => update({ weather_refresh_minutes: v })}
-        />
-      </Card>
-      <Card title="Başlangıç">
-        <Toggle
-          label="Windows ile başlat"
-          description="Oturum açınca widget'lar geri gelir; Kontrol Merkezi açılmaz."
-          checked={s.launch_on_startup}
-          onChange={(v) => update({ launch_on_startup: v })}
         />
       </Card>
       <div className="cc-grid">

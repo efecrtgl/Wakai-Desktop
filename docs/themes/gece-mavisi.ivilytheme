@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "gece-mavisi",
+  "name": "Gece Mavisi",
+  "version": "1.0.0",
+  "author": "Ivily örnek",
+  "description": "Tema geliştirme rehberindeki örnek: koyu lacivert, yumuşak köşeler.",
+  "min_app": "1.1.5",
+  "base": "dark",
+  "fonts": {
+    "display": "Bahnschrift, Segoe UI, sans-serif"
+  },
+  "style": {
+    "shape": "soft",
+    "surface": "soft",
+    "border": "thin",
+    "icons": "line",
+    "density": "normal",
+    "texture": "dots",
+    "headings": "normal",
+    "motion": "smooth"
+  },
+  "tokens": {
+    "color-bg": "#0f1730",
+    "color-surface": "#18223f",
+    "color-surface-soft": "#141d38",
+    "color-surface-sunken": "#0c1328",
+    "color-highlight": "#22305a",
+    "color-primary": "#7aa2ff",
+    "color-primary-strong": "#a9c2ff",
+    "color-primary-deep": "#5d86e8",
+    "color-primary-soft": "#24345f",
+    "color-accent-soft": "#1d2a4d",
+    "color-text": "#e3e9ff",
+    "color-text-strong": "#ffffff",
+    "color-text-muted": "#9aa7cf",
+    "color-text-faint": "#66739b",
+    "color-text-on-primary": "#0f1730",
+    "color-border": "#2a3762",
+    "color-border-strong": "#3d4d85",
+    "color-track": "#2a3762",
+    "color-nav-bg": "#0c1328",
+    "color-nav-text": "#e3e9ff",
+    "color-nav-active": "#24345f",
+    "color-nav-active-text": "#a9c2ff",
+    "cat-outline": "#05081a"
+  },
+  "pets": {
+    "palette": "cool"
+  },
+  "home": {
+    "floor": "carpet",
+    "wall": "plain",
+    "colors": {
+      "floor": "#2b3a6b",
+      "floor-alt": "#26345f",
+      "wall": "#1b2547",
+      "wall-alt": "#18213f",
+      "trim": "#3d4d85",
+      "line": "#05081a"
+    }
+  },
+  "ambient": "stars"
+}

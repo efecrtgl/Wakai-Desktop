@@ -5,7 +5,7 @@ import { Badge, Button, Card, ErrorNote, Select, Toggle } from '../../ui/compone
 import { call, useTauriEvent } from '../../lib/ipc.js';
 import { useWidgetDefinitions, useWidgets } from '../../lib/widgets.js';
 import { ACTIVITY_LEVELS } from '../../pets/labels.js';
-import { ANIMATION_OPTIONS } from './Appearance.jsx';
+import { ANIMATION_OPTIONS } from './Accessibility.jsx';
 import { PageHeader } from './PageHeader.jsx';
 
 const WIDGET_MODES = [

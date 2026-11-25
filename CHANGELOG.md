@@ -8,6 +8,11 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Tema motoru: temalar bildirimsel paketlerdir (renkler, yazı tipleri, biçim, yüzey, kenarlık, simge seti, doku, hareket karakteri, kedi paleti, Kedi Evi zemini/duvarı, ortam efekti, sesler). Yeniden başlatma gerekmeden tek adımda değişir; bozuk tema uygulamayı etkilemez, güvenli Modern temaya dönülür.
 - Beş tema: **Piksel** (varsayılan; bitmap yazı tipi, sert gölgeler, piksel simgeler), **Modern**, **Sıcak Yuva**, **Tek Renk**, **Y2K**; her biri açık/koyu çeşitleriyle.
 - Vektör çizgi simge seti (piksel olmayan temalarda).
+- Yeni Kontrol Merkezi: Genel Bakış, Widget'lar, Planlayıcı, Kedi Evi, Temalar, Kişiselleştirme ve Ayarlar. Ayarlar kategorilere ayrıldı (Genel, Erişilebilirlik, Performans, Bildirimler, Güncellemeler, Yedekleme, Hakkında).
+- Uygulama geneli arama (Ctrl+K): ayarları ve özellikleri Türkçe karakter duyarsız bulur, ilgili ayara gidip vurgular. Ctrl+1…7 ile bölümler arasında geçiş.
+- Tema kitaplığı: yalıtılmış önizlemeler, uygulamanın tamamında geçici önizleme (Uygula / Vazgeç), favoriler, sürüm ve uyumluluk bilgisi, `.ivilytheme` içe/dışa aktarma, özel tema kaldırma.
+- Kişiselleştirme: vurgu rengi (okunabilir metin rengi otomatik), arayüz yoğunluğu, yazı tipi, widget görünümü.
+- Erişilebilirlik: yazı boyutu (%85–140), yüksek karşıtlık, animasyon yoğunluğu, arayüz sesleri (varsayılan kapalı), klavye kısayolları listesi.
 
 ### Değişti
 - Wakai Desktop artık **Ivily Desktop**. Pencere başlıkları, tepsi, bildirimler, kısayollar ve yükleyici yeni adı kullanır. Veri klasörü ve tüm kullanıcı verileri olduğu gibi kalır.

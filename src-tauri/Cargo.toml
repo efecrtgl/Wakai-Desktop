@@ -1,6 +1,6 @@
 [package]
 name = "wakai-desktop"
-version = "1.1.0"
+version = "1.1.5"
 description = "Ivily Desktop — Windows 11 için piksel kedili masaüstü widget platformu"
 license = "MIT"
 repository = "https://github.com/efecrtgl/Wakai-Desktop"

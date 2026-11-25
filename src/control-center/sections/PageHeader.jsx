@@ -1,4 +1,9 @@
+import { useEmbedded } from './SectionTabs.jsx';
+
 export function PageHeader({ title, subtitle, actions }) {
+  const embedded = useEmbedded();
+  // Sekme içinde: başlık bölümün kendisinde; yalnızca eylemler (ör. "Ekle") gösterilir.
+  if (embedded) return actions ? <div className="cc-page__toolbar">{actions}</div> : null;
   return (
     <header className="cc-page__header">
       <div>

@@ -98,3 +98,37 @@ with Pixel.
 **Lazy assets.** Embedded images are decoded only when first requested (`themeAsset`) and the
 cache is dropped when the theme changes. The Pixelify Sans font (OFL, bundled locally because
 the CSP forbids remote fonts) is declared with `unicode-range`, so only the needed subsets load.
+
+## 4. Control Center information architecture (phases 2 and 5)
+
+`src/control-center/nav.js` is the single description of the navigation: seven sections, their
+tabs, a map from 1.1.0 section ids (still sent by the widget context menu, tray and desktop cat
+menu) to the new routes, and the search index. It contains no components and is unit-tested.
+
+| Section | Tabs | Contents |
+|---|---|---|
+| Genel Bakış | – | Status tiles (widgets, theme, profile, cats), Pet Home summary, today, quick actions, app status |
+| Widget'lar | Masaüstümde · Widget ekle | Existing widget management and store |
+| Planlayıcı | Takvim · Görevler · Notlar | Existing data pages |
+| Kedi Evi | Dünya · Kediler | Pet World and the cat collection |
+| Temalar | – | Theme Library |
+| Kişiselleştirme | Görünüm · Profiller | Accent, density, font, widget look; desktop profiles |
+| Ayarlar | Genel · Erişilebilirlik · Performans · Bildirimler · Güncellemeler · Yedekleme · Hakkında | Vertical category list |
+
+Existing section components are reused inside tabs; `SectionTabs` provides an `EmbedContext`
+so their own page headers collapse into a toolbar (no duplicated titles).
+
+**Search** (`CommandPalette`, Ctrl+K): Turkish-insensitive normalization (ı/i, ş/s, ğ/g, ü/u,
+ö/o, ç/c, diacritics), every query word must match the label or keywords, results ranked by
+label prefix. Choosing a result navigates and, when the entry has an `anchor`, scrolls to the
+control, focuses it and flashes it. The index is a static array, so search costs nothing until
+the palette is opened.
+
+**Theme Library.** Cards render a `ThemeSandbox`: the compiled theme's CSS is scoped to
+`[data-sandbox="<id>"]` and the structural attributes are written on the sandbox element. The
+structural rules in `theme-styles.css` use `@scope (…) to (…)`, so the nearest theme root wins
+and the app's active theme never leaks into a preview (and vice versa). "Uygulamada önizle" sets
+an in-memory preview in the theme hook (`PreviewBar` offers Uygula / Vazgeç); nothing is written
+to settings until "Uygula". Import reads the file in the WebView (no path crosses IPC), validates
+it client-side for the preview dialog and then server-side in Rust (`import_theme`). Export
+writes `<id>.ivilytheme` to the Downloads known folder without overwriting existing files.

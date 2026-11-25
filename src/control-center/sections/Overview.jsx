@@ -1,12 +1,17 @@
+// Genel Bakış: masaüstünün, kedilerin ve günün özeti; en sık kullanılan işlemler tek tıkla.
+import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Toggle } from '../../ui/components.jsx';
-import { PixelCat } from '../../ui/cats/PixelCat.jsx';
 import { ColorDot, ProgressBar } from '../../ui/widget.jsx';
-import { useFocusState, useSystemStats, useTasks, useUpcomingEvents } from '../../lib/data.js';
-import { useWidgetDefinitions, useWidgets } from '../../lib/widgets.js';
-import { call } from '../../lib/ipc.js';
+import { PixelIcon } from '../../ui/PixelIcon.jsx';
+import { PetSprite } from '../../pets/PetSprite.jsx';
+import { mood } from '../../pets/labels.js';
+import { useTasks, useUpcomingEvents } from '../../lib/data.js';
+import { useWidgets } from '../../lib/widgets.js';
+import { call, useTauriEvent } from '../../lib/ipc.js';
 import { useNow } from '../../lib/time.js';
-import { dateKey, eventTimeLabel, formatDayLong, parseLocal, relativeDay } from '../../lib/dates.js';
-import { bytes, percent } from '../../lib/format.js';
+import { eventTimeLabel, formatDayLong, parseLocal, relativeDay } from '../../lib/dates.js';
+import { bytes } from '../../lib/format.js';
+import { useThemeApi } from '../../theme/context.js';
 import { PageHeader } from './PageHeader.jsx';
 import '../../widgets/tasks/tasks.css';
 
@@ -17,49 +22,115 @@ function greeting(h) {
   return 'İyi akşamlar';
 }
 
-function Stat({ label, value, hint, cat }) {
+function usePets() {
+  const [pets, setPets] = useState(null);
+  const load = () => {
+    call('list_pets').then(setPets, () => setPets([]));
+  };
+  useEffect(load, []);
+  useTauriEvent('pets:changed', load);
+  return pets;
+}
+
+function useProfiles() {
+  const [list, setList] = useState([]);
+  useEffect(() => {
+    call('list_profiles').then(setList, () => setList([]));
+  }, []);
+  return list;
+}
+
+function useAppUsage() {
+  const [usage, setUsage] = useState(null);
+  useEffect(() => {
+    call('app_resource_usage').then(setUsage, () => {});
+  }, []);
+  return usage;
+}
+
+/** Tıklanabilir durum kutucuğu. */
+function Tile({ icon, label, value, hint, onClick }) {
   return (
-    <div className="cc-stat">
-      <PixelCat pose={cat} size={40} />
-      <div>
-        <p className="cc-stat__value">{value}</p>
-        <p className="cc-stat__label">{label}</p>
-        {hint ? <p className="cc-stat__hint">{hint}</p> : null}
-      </div>
-    </div>
+    <button type="button" className="ov-tile" onClick={onClick}>
+      <span className="ov-tile__icon">
+        <PixelIcon name={icon} size={18} />
+      </span>
+      <span className="ov-tile__text">
+        <span className="ov-tile__value">{value}</span>
+        <span className="ov-tile__label">{label}</span>
+        {hint ? <span className="ov-tile__hint">{hint}</span> : null}
+      </span>
+    </button>
   );
 }
 
 export function Overview({ settingsApi, onNavigate }) {
   const now = useNow('minute');
   const { widgets } = useWidgets();
-  const defs = useWidgetDefinitions();
   const { data: tasks } = useTasks();
-  const { data: upcoming } = useUpcomingEvents(5);
-  const [focus] = useFocusState();
-  const stats = useSystemStats();
+  const { data: upcoming } = useUpcomingEvents(4);
+  const pets = usePets();
+  const profiles = useProfiles();
+  const usage = useAppUsage();
+  const api = useThemeApi();
   const { settings: s, update } = settingsApi;
-  const byKind = Object.fromEntries(defs.map((d) => [d.kind, d]));
+  if (!s) return null;
 
   const visible = widgets?.filter((w) => w.visible).length ?? 0;
   const open = tasks?.filter((t) => !t.completed) ?? [];
   const overdue = open.filter((t) => t.due_at && parseLocal(t.due_at) < now).length;
-  const done = (tasks?.length ?? 0) - open.length;
-  const todayEvents = upcoming?.filter((e) => e.start_at.startsWith(dateKey(now))).length ?? 0;
+  const activeProfile = profiles.find((p) => p.id === s.active_profile);
+  const homePets = pets?.filter((p) => p.location === 'home') ?? [];
+  const needy = pets?.filter((p) => mood(p.needs) !== 'Keyifli' && mood(p.needs) !== 'Çok mutlu') ?? [];
+
+  const applyProfile = async (id) => {
+    try {
+      await call('apply_profile', { id });
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
-    <div className="cc-page">
-      <PageHeader title={`${greeting(now.getHours())}! 🐾`} subtitle={formatDayLong(now)} actions={<PixelCat pose="happy" size={56} wag />} />
+    <div className="cc-page ov">
+      <PageHeader title={`${greeting(now.getHours())}!`} subtitle={formatDayLong(now)} />
 
-      <div className="cc-stats">
-        <Stat cat="sitting" label="Etkin widget" value={`${visible}/${widgets?.length ?? 0}`} hint={s && !s.widgets_visible ? 'Masaüstünde gizli' : null} />
-        <Stat cat="working" label="Açık görev" value={open.length} hint={overdue ? `${overdue} gecikmiş` : null} />
-        <Stat cat="curious" label="Bugün kalan etkinlik" value={todayEvents} />
-        <Stat cat="relaxed" label="Bugünkü odak" value={focus?.completed_today ?? 0} hint={focus?.running ? 'Şu an çalışıyor' : null} />
+      <div className="ov-tiles">
+        <Tile icon="widgets" label="Widget masaüstünde" value={`${s.widgets_visible ? visible : 0}/${widgets?.length ?? 0}`} hint={!s.widgets_visible ? 'Tümü gizli' : null} onClick={() => onNavigate('widgets')} />
+        <Tile icon="layers" label="Tema" value={api?.compiled?.name ?? '—'} onClick={() => onNavigate('themes')} />
+        <Tile icon="sliders" label="Profil" value={activeProfile?.name ?? 'Yok'} onClick={() => onNavigate('personalize', 'profiles')} />
+        <Tile icon="paw" label="Kedi" value={pets?.length ?? 0} hint={needy.length ? `${needy.length} kedinin ihtiyacı var` : pets?.length ? 'Hepsi keyifli' : null} onClick={() => onNavigate('pethome', 'cats')} />
       </div>
 
-      <div className="cc-grid">
-        <Card title="Yaklaşan etkinlikler" action={<Button size="sm" variant="ghost" onClick={() => onNavigate('calendar')}>Takvim</Button>}>
+      <div className="ov-grid">
+        <Card className="ov-pets" title="Kedi Evi" action={<Button size="sm" variant="primary" onClick={() => onNavigate('pethome', 'world')}>Kedi Evi'ne git</Button>}>
+          {pets?.length ? (
+            <ul className="ov-pets__list">
+              {pets.slice(0, 4).map((p) => (
+                <li key={p.id} className="ov-pet">
+                  <PetSprite breed={p.breed} anim={p.needs.rest < 25 ? 'sleep' : 'sit'} scale={2} accessories={[p.acc_head, p.acc_neck].filter(Boolean)} />
+                  <div className="ov-pet__text">
+                    <span className="ov-pet__name">{p.name}</span>
+                    <span className="ov-pet__mood">
+                      {mood(p.needs)} · {p.location === 'home' ? 'Kedi Evi’nde' : 'masaüstünde'}
+                    </span>
+                    <ProgressBar value={p.needs.satiety / 100} label="Tokluk" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="ov-empty">
+              <p className="cc-muted">Henüz kediniz yok. İlk kedinizi sahiplenin; masaüstünde ve Kedi Evi'nde yaşasın.</p>
+              <Button size="sm" variant="primary" onClick={() => onNavigate('pethome', 'cats')}>
+                Kedi sahiplen
+              </Button>
+            </div>
+          )}
+          {homePets.length ? <p className="cc-muted">{homePets.length} kedi şu an Kedi Evi'nde.</p> : null}
+        </Card>
+
+        <Card title="Bugün" action={<Button size="sm" variant="ghost" onClick={() => onNavigate('planner')}>Planlayıcı</Button>}>
           {upcoming?.length ? (
             <ul className="cc-list">
               {upcoming.map((e) => (
@@ -74,15 +145,13 @@ export function Overview({ settingsApi, onNavigate }) {
           ) : (
             <p className="cc-muted">Yaklaşan etkinlik yok.</p>
           )}
-        </Card>
-
-        <Card title="Görevler" action={<Button size="sm" variant="ghost" onClick={() => onNavigate('tasks')}>Tümü</Button>}>
-          <ProgressBar value={tasks?.length ? done / tasks.length : 0} label="Tamamlanma" />
-          <p className="cc-muted cc-gap">{done}/{tasks?.length ?? 0} tamamlandı</p>
+          <p className="ov-sub">
+            {open.length} açık görev{overdue ? ` · ${overdue} gecikmiş` : ''}
+          </p>
           <ul className="cc-list">
-            {open.slice(0, 5).map((t) => (
+            {open.slice(0, 4).map((t) => (
               <li key={t.id} className="cc-list__row">
-                <button type="button" className="task__check" role="checkbox" aria-checked={false} aria-label="Tamamla" onClick={() => call('set_task_completed', { id: t.id, completed: true })} />
+                <button type="button" className="task__check" role="checkbox" aria-checked={false} aria-label={`${t.title} görevini tamamla`} onClick={() => call('set_task_completed', { id: t.id, completed: true })} />
                 <span className="cc-list__title">{t.title}</span>
                 {t.due_at ? <span className="cc-muted">{relativeDay(parseLocal(t.due_at), now)}</span> : null}
               </li>
@@ -90,37 +159,42 @@ export function Overview({ settingsApi, onNavigate }) {
           </ul>
         </Card>
 
-        <Card title="Performans" action={<Button size="sm" variant="ghost" onClick={() => onNavigate('performance')}>Ayrıntılar</Button>}>
-          {stats ? (
-            <div className="cc-meters">
-              <span>İşlemci {percent(stats.cpu)}</span>
-              <ProgressBar value={(stats.cpu ?? 0) / 100} label="İşlemci" />
-              <span>Bellek {bytes(stats.memory_used)} / {bytes(stats.memory_total)}</span>
-              <ProgressBar value={stats.memory_total ? stats.memory_used / stats.memory_total : 0} label="Bellek" />
+        <Card title="Hızlı işlemler">
+          {profiles.length ? (
+            <div className="ov-chips" role="group" aria-label="Profil seç">
+              {profiles.map((p) => (
+                <button key={p.id} type="button" className="ov-chip" aria-pressed={p.id === s.active_profile} onClick={() => applyProfile(p.id)}>
+                  {p.name}
+                </button>
+              ))}
             </div>
-          ) : (
-            <p className="cc-muted">Ölçülüyor…</p>
-          )}
+          ) : null}
+          <Toggle label="Widget'ları göster" checked={s.widgets_visible} onChange={(v) => update({ widgets_visible: v })} />
+          <Toggle label="Masaüstü kedileri" checked={s.pets_enabled} onChange={(v) => update({ pets_enabled: v })} />
+          <Toggle label="Düşük kaynak modu" checked={s.reduced_resource_mode} onChange={(v) => update({ reduced_resource_mode: v })} />
+          <div className="cc-actions">
+            <Button size="sm" onClick={() => onNavigate('widgets', 'store')} icon={<PixelIcon name="plus" size={12} />}>
+              Widget ekle
+            </Button>
+          </div>
         </Card>
 
-        <Card title="Hızlı widget kontrolleri" action={<Button size="sm" variant="ghost" onClick={() => onNavigate('widgets')}>Yönet</Button>}>
-          {widgets?.length ? (
-            widgets.map((w) => (
-              <Toggle key={w.id} label={byKind[w.kind]?.name ?? w.kind} checked={w.visible} onChange={(v) => call('set_widget_visible', { id: w.id, visible: v })} />
-            ))
-          ) : (
-            <Button size="sm" variant="primary" onClick={() => onNavigate('store')}>İlk widget'ı ekle</Button>
-          )}
+        <Card title="Uygulama" action={<Badge tone="mint">Çalışıyor</Badge>}>
+          <dl className="cc-dl">
+            <dt>Bellek</dt>
+            <dd>{usage ? bytes(usage.private_bytes) : 'Ölçülüyor…'}</dd>
+            <dt>Açık widget penceresi</dt>
+            <dd>{usage?.widget_windows ?? '—'}</dd>
+          </dl>
+          <div className="cc-actions">
+            <Button size="sm" variant="ghost" onClick={() => onNavigate('settings', 'performance')}>
+              Performans
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => onNavigate('settings', 'updates')}>
+              Güncellemeler
+            </Button>
+          </div>
         </Card>
-
-        {s ? (
-          <Card title="Hızlı ayarlar" action={<Badge tone="mint">Çalışıyor</Badge>}>
-            <Toggle label="Widget'ları göster" checked={s.widgets_visible} onChange={(v) => update({ widgets_visible: v })} />
-            <Toggle label="Hareketi azalt" checked={s.reduced_motion} onChange={(v) => update({ reduced_motion: v })} />
-            <Toggle label="Bildirimler" checked={s.notifications_enabled} onChange={(v) => update({ notifications_enabled: v })} />
-            <Toggle label="Düşük kaynak modu" checked={s.reduced_resource_mode} onChange={(v) => update({ reduced_resource_mode: v })} />
-          </Card>
-        ) : null}
       </div>
     </div>
   );

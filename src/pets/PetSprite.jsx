@@ -3,9 +3,13 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { CANVAS_H, CANVAS_W, SPRITES, drawGrid, petGrid } from './sprite.js';
 import { useMotionAllowed } from '../ui/cats/useCatMotion.js';
+import { useActiveTheme } from '../theme/context.js';
 
-export const PetSprite = memo(function PetSprite({ breed = 'pink', anim = 'sit', accessories = [], scale = 3, flip = false, animate = false, interval = 450, className = '', title }) {
+export const PetSprite = memo(function PetSprite({ breed = 'pink', anim = 'sit', accessories = [], scale = 3, flip = false, animate = false, interval = 450, className = '', title, palette }) {
   const ref = useRef(null);
+  const theme = useActiveTheme();
+  // Açıkça verilmezse etkin temanın kedi paleti (önizleme kutuları kendi paletini verir).
+  const pal = palette ?? theme?.pets?.palette ?? 'none';
   const motion = useMotionAllowed();
   const [frame, setFrame] = useState(0);
   const count = SPRITES.animations[anim]?.length ?? 1;
@@ -21,8 +25,8 @@ export const PetSprite = memo(function PetSprite({ breed = 'pink', anim = 'sit',
     const ctx = ref.current?.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    drawGrid(ctx, petGrid({ anim, frame, breed, accessories: accKey ? accKey.split(',') : [] }), { scale, flip });
-  }, [anim, frame, breed, accKey, scale, flip]);
+    drawGrid(ctx, petGrid({ anim, frame, breed, accessories: accKey ? accKey.split(',') : [] }), { scale, flip, palette: pal });
+  }, [anim, frame, breed, accKey, scale, flip, pal]);
 
   return (
     <canvas

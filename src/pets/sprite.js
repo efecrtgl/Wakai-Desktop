@@ -1,6 +1,7 @@
 // Masaüstü motoruyla (src-tauri/src/pets/art.rs) aynı sprite verisinden kedi pikselleri üretir.
 // Tek kaynak: src-tauri/assets/pets/sprites.json (scripts/gen-pet-sprites.mjs üretir).
 import SPRITES from '../../src-tauri/assets/pets/sprites.json';
+import { transformColor } from '../theme/palette.js';
 
 export const PAD_TOP = 5;
 export const PAD_SIDE = 2;
@@ -32,12 +33,12 @@ export function petGrid({ anim = 'sit', frame = 0, breed = 'pink', accessories =
   return g;
 }
 
-/** Izgarayı 2B tuvale çizer (en yakın komşu, isteğe bağlı aynalama). */
-export function drawGrid(ctx, grid, { x = 0, y = 0, scale = 3, flip = false } = {}) {
+/** Izgarayı 2B tuvale çizer (en yakın komşu, isteğe bağlı aynalama ve tema paleti). */
+export function drawGrid(ctx, grid, { x = 0, y = 0, scale = 3, flip = false, palette = 'none' } = {}) {
   grid.forEach((row, gy) =>
     row.forEach((c, gx) => {
       if (!c) return;
-      ctx.fillStyle = c;
+      ctx.fillStyle = transformColor(c, palette);
       const px = flip ? CANVAS_W - 1 - gx : gx;
       ctx.fillRect(x + px * scale, y + gy * scale, scale, scale);
     }),

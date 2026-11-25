@@ -8,6 +8,7 @@ import '../ui/components.css';
 import '../ui/theme-styles.css';
 import './control-center.css';
 import './sections.css';
+import './redesign.css';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
