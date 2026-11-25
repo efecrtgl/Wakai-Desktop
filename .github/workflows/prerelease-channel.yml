@@ -3,6 +3,8 @@
 # uygulamalar bu dosyayı okur (src-tauri/src/updater.rs, PRERELEASE_ENDPOINT); kararlı kanal
 # GitHub'ın "latest" bağlantısını kullanır ve ön sürümleri hiç görmez.
 # Bildirim imzalı paketlere işaret eder; imza uygulamada gömülü açık anahtarla doğrulanır.
+# - latest.json içermeyen sürümler (ör. güncelleyicisi olmayan 1.0.0) atlanır.
+# - Kanal hiçbir zaman daha eski bir sürüme indirilmez (sürümler aynı anda yayımlansa bile).
 name: Prerelease channel
 
 on:
@@ -11,6 +13,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: prerelease-channel
+  cancel-in-progress: false
 
 jobs:
   channel:
@@ -22,8 +28,22 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.release.tag_name }}
         run: |
-          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern latest.json --dir .
-          if ! gh release view updater-prerelease --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create updater-prerelease --repo "$GITHUB_REPOSITORY" --prerelease               --title "Ön sürüm kanalı (otomatik)" --notes "Uygulamanın ön sürüm kanalı için bildirim. Elle düzenlemeyin."
+          set -euo pipefail
+          mkdir new current
+          if ! gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern latest.json --dir new; then
+            echo "$TAG has no latest.json; nothing to do."
+            exit 0
           fi
-          gh release upload updater-prerelease latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          NEW=$(jq -r .version new/latest.json)
+          if ! gh release view updater-prerelease --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create updater-prerelease --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+              --title "Ön sürüm kanalı (otomatik)" --notes "Uygulamanın ön sürüm kanalı için güncelleme bildirimi. Elle düzenlemeyin."
+          elif gh release download updater-prerelease --repo "$GITHUB_REPOSITORY" --pattern latest.json --dir current; then
+            CUR=$(jq -r .version current/latest.json)
+            if [ "$(printf '%s\n%s\n' "$CUR" "$NEW" | sort -V | tail -n1)" != "$NEW" ]; then
+              echo "Channel already at $CUR (newer than $NEW); keeping it."
+              exit 0
+            fi
+          fi
+          gh release upload updater-prerelease new/latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          echo "Prerelease channel now points at $NEW."
