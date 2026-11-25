@@ -30,7 +30,6 @@
 
 ## Bilinen sorunlar ve sınırlamalar
 
-- Otomatik güncelleme için GitHub deposunun (ya da ayrı bir sürüm deposunun) herkese açık olması gerekir; şu an depo herkese açık değil.
 - 1.1.0'da güncelleme kanalı seçimi olmadığı için 1.1.0 kurulumları ön sürümü otomatik görmez; denemek için 1.1.5 yükleyicisini bir kez elle kurun.
 - Kedi Evi'nde kediler odalar arasında kendiliğinden geçmez; kapıya sürükleyerek taşınırlar.
 - Ortam sesleri (yağmur sesi vb.) yoktur; yalnızca isteğe bağlı kısa arayüz sesleri vardır.

@@ -66,5 +66,5 @@ channels, installer hooks). Reviewed against the existing 1.1.0 baseline (docs/P
 
 ## Residual risks
 
-- The repository is private; installed apps cannot reach update metadata until it is public.
+- Update metadata and installers are served from public GitHub Releases over HTTPS; integrity relies on the embedded minisign key, not on transport.
 - Theme author text (name, description) is rendered as React text (escaped), never as HTML.

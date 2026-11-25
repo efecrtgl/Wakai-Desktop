@@ -65,7 +65,7 @@ gh secret set TAURI_SIGNING_PRIVATE_KEY < "$env:USERPROFILE\.tauri\wakai-desktop
 4. Taslak hiçbir kullanıcıya ulaşmaz. GitHub'da sürüm notlarını kontrol edip **Publish release** dediğinizde yayımlanır. Yayımlanınca `.github/workflows/prerelease-channel.yml` `latest.json`'u ön sürüm kanalına kopyalar.
 5. Kararlı kanal `releases/latest/download/latest.json` adresini denetler; bu adres yalnızca yayımlanmış, ön sürüm olmayan en son sürümü gösterir.
 
-> **Önemli:** Depo şu an herkese açık değil (oturum açmadan `github.com/efecrtgl/Wakai-Desktop` 404 döner). Kurulu uygulamalar oturum açmadığı için güncelleme bildirimine ve dosyalara erişemez. Otomatik güncellemenin çalışması için ya depo herkese açık yapılmalı ya da yalnızca sürümlerin yayımlandığı herkese açık bir depo kullanılmalı (bu durumda `src-tauri/src/updater.rs` içindeki iki adres değiştirilir).
+> Depo herkese açıktır; kurulu uygulamalar sürüm bildirimine ve yükleyicilere oturum açmadan erişir (25 Kasım 2026'da doğrulandı).
 
 Gizli tanımlı değilse iş akışı "TAURI_SIGNING_PRIVATE_KEY secret is missing" hatasıyla durur; imzasız sürüm yayınlanmaz.
 

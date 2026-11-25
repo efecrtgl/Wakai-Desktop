@@ -36,10 +36,7 @@ Interaction, Inventory and Pet Home share one renderer and one save path).
 
 ## Known issues found during the audit
 
-- The GitHub repository is not publicly reachable (`https://github.com/efecrtgl/Wakai-Desktop`
-  returns 404 without authentication). The updater endpoint (`releases/latest/download/latest.json`)
-  therefore cannot be reached by installed apps until the repository (or a separate release
-  repository) is public. Owner decision; documented in `docs/GUNCELLEMELER.md`.
+- During the audit the repository returned 404 without authentication; by release time it was public (verified via the API, `private: false`).
 - The v1.1.0 release workflow needs the `TAURI_SIGNING_PRIVATE_KEY` secret (owner action from 1.1.0).
 - Renaming `productName` changes the NSIS install directory, uninstall key and shortcut names
   (see `IVILY_BRAND_MIGRATION.md`); handled by installer hooks in phase 1.
