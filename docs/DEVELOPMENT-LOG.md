@@ -108,3 +108,10 @@ Kurallar (Rust, Aşama 3–4 commit'inde test edildi) bu aşamada kullanıcı ar
 - E2E betiği 7 yeni senaryoyla genişletildi (alışveriş, kediler, Kedi Evi, profiller, güncelleme/sürüm geçmişi, yedek inceleme/seçmeli geri yükleme, widget penceresi yetki sınırı). Yalıtılmış veri klasöründe (gerçek veritabanının kopyası) 19/19 geçti.
 - E2E düzeltmeleri: hata ayıklama derlemesinin `:1420/` adresi tanınıyor; en küçük boyut testi widget ölçeğini hesaba katıyor; çıkışta libuv iddia hatası giderildi.
 - Toplam: 94 Rust birim + 6 bütünleşme, 21 ön yüz, 19 uçtan uca test. Kapsam ve elle doğrulanamayanlar `docs/TESTLER.md` içinde.
+
+## Aşama 14 — Belgeler ve 1.1.0 sürümü
+
+- Sürüm 1.1.0 (`package.json`, `Cargo.toml`, `tauri.conf.json`). README (kediler, profiller, güncellemeler bölümleri, yeni ekran görüntüleri), CHANGELOG 1.1.0.
+- Yerelde imzalı NSIS yükleyicisi derlendi: `Wakai Desktop_1.1.0_x64-setup.exe` (3,49 MiB, SHA-256 `67fac1f6…629992`), `.sig` ve `latest.json` (depoya eklenmedi; `src-tauri/target/release/bundle/nsis/`).
+- 1.0.0 → 1.1.0 elle geçiş gerçek kurulumda denendi: yükleyici `/S` ile kuruldu (öncesinde veriler `kurulum-oncesi-*` klasörüne kopyalandı), 1.1.0 açıldı, şema 6, kediler, widget'lar, profiller ve görevler korundu; sürüm geçmişi 1.0.0 → 1.1.0; açılış sağlığı "1.1.0 ok".
+- `v1.1.0` etiketi itildi. GitHub Release'in iş akışıyla oluşması için **sahip eylemi gerekir**: `TAURI_SIGNING_PRIVATE_KEY` gizlisini ekleyip başarısız "Release" işini yeniden çalıştırmak (ya da yerel yükleyici + `.sig` + `latest.json` dosyalarını elle yayına yüklemek; yükleyici adı GitHub'da `Wakai.Desktop_1.1.0_x64-setup.exe` olur ve `latest.json`'daki adres buna göre hazırlandı).

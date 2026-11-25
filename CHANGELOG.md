@@ -2,7 +2,7 @@
 
 Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınarak hazırlanmıştır.
 
-## [Yayınlanmadı] — 1.1.0
+## [1.1.0] — 2026-11-25
 
 ### Eklendi
 - Görünüm modları: Wakai (özgün), Siyah ve Beyaz.
@@ -11,10 +11,20 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Masaüstü kedileri: yerel, hafif kedi motoru; 8 cins, 6 kişilik, ihtiyaçlar, besleme, sevme, oyuncaklar, aksesuarlar, başarımlar.
 - Kedi Evi: düzenlenebilir piksel sanatı oda.
 - Masaüstü profilleri (Çalışma, Oyun, Dinlenme, Odaklanma, özel profiller), tepsiden hızlı geçiş ve isteğe bağlı tam ekranda otomatik Oyun profili.
+- İmzalı otomatik güncellemeler (Tauri Updater + GitHub Releases): açılışta arka planda denetim, "Yeni bir sürüm hazır!" penceresi, indirme ilerlemesi, elle denetim, kapatılabilir. Onaysız kurulum yok.
+- Sürüm geçmişi, kurulumdan önce önceki sürümün saklanması, Ayarlar'dan önceki sürüme dönüş ve art arda başarısız açılışta otomatik geri dönüş.
+- Yedek inceleme (bütünlük, şema uyumluluğu, içerik) ve seçmeli geri yükleme (yalnızca seçilen kategoriler).
+- Tepsi menüsüne "Masaüstü kedileri" ve profil alt menüsü.
 
 ### Değişti
 - Takvim Kedisi yeniden tasarlandı (okunaklı başlık, Bugün kısayolu, klavye gezinmesi, renk çubuklu etkinlikler, kompakt düzen).
 - Widget'lar kendi boyutlarına göre sadeleşir.
+- Yedekler atomik yazılır ve doğrulanır; geri yükleme geçici dosya üzerinden doğrulanarak yapılır.
+- Geri yükleme, geri dönüş, güncelleme kurulumu ve yedek silme yalnızca Kontrol Merkezi'nden yapılabilir.
+- Widget'lar açıkken özel bellek 375 MB'tan 362 MB'a indi; kedi motoru ölçülebilir ek yük getirmez (docs/PERFORMANCE.md).
+
+### Geçiş notu
+- 1.0.0 güncelleyici içermediği için 1.1.0 bir kez elle kurulmalıdır; veriler korunur ve göçler otomatik uygulanır. Sonraki sürümler otomatik güncellenir.
 
 ## [1.0.0] — 2026-11-24
 
