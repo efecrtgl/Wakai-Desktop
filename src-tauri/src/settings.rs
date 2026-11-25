@@ -87,6 +87,8 @@ pub struct AppSettings {
     pub auto_gaming_profile: bool,
     /// Açılışta (en fazla günde bir) güncellemeleri arka planda denetle.
     pub auto_update_check: bool,
+    /// Güncelleme kanalı: "stable" (yalnızca kararlı sürümler) ya da "prerelease" (ön sürümler dahil).
+    pub update_channel: String,
     pub font_family: FontFamily,
     /// Ana pencere kapatıldığında uygulama tepside çalışmaya devam eder.
     pub close_to_tray: bool,
@@ -135,6 +137,7 @@ impl Default for AppSettings {
             active_profile: None,
             auto_gaming_profile: false,
             auto_update_check: true,
+            update_channel: "stable".into(),
             font_family: FontFamily::System,
             close_to_tray: true,
             launch_on_startup: false,
@@ -166,6 +169,9 @@ impl AppSettings {
         self.monitor_interval_secs = self.monitor_interval_secs.clamp(1, 60);
         self.weather_refresh_minutes = self.weather_refresh_minutes.clamp(15, 180);
         self.text_scale = clamp_f(self.text_scale, 0.85, 1.4, 1.0);
+        if self.update_channel != "prerelease" {
+            self.update_channel = "stable".into();
+        }
         if self.world_time != "fast" {
             self.world_time = "real".into();
         }

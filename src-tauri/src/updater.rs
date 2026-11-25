@@ -30,19 +30,51 @@ pub struct UpdateInfo {
     pub version: String,
     pub notes: String,
     pub date: Option<String>,
+    /// Güncellemenin bulunduğu kanal ("stable" | "prerelease").
+    pub channel: String,
 }
 
-fn info(u: &Update) -> UpdateInfo {
+fn info(u: &Update, channel: &str) -> UpdateInfo {
     UpdateInfo {
         current: u.current_version.clone(),
         version: u.version.clone(),
         notes: u.body.clone().unwrap_or_default(),
         date: u.date.map(|d| d.date().to_string()),
+        channel: channel.to_string(),
     }
 }
 
+/// Kararlı kanal: GitHub'ın "en son sürüm" bağlantısı ön sürümleri ve taslakları HİÇ
+/// göstermez; kararlı kanaldaki kullanıcı ön sürüme zorlanamaz.
+pub const STABLE_ENDPOINT: &str =
+    "https://github.com/efecrtgl/Wakai-Desktop/releases/latest/download/latest.json";
+/// Ön sürüm kanalı: yayımlanan her sürümde (ön sürüm ya da kararlı) iş akışının güncellediği
+/// sabit bir bildirim (bkz. .github/workflows/prerelease-channel.yml).
+pub const PRERELEASE_ENDPOINT: &str =
+    "https://github.com/efecrtgl/Wakai-Desktop/releases/download/updater-prerelease/latest.json";
+
+pub fn endpoint_for(channel: &str) -> &'static str {
+    if channel == "prerelease" {
+        PRERELEASE_ENDPOINT
+    } else {
+        STABLE_ENDPOINT
+    }
+}
+
+fn channel(app: &AppHandle) -> String {
+    app.try_state::<AppState>()
+        .and_then(|s| crate::settings::load(&s.db).ok())
+        .map_or_else(|| "stable".into(), |s| s.update_channel)
+}
+
 fn updater(app: &AppHandle) -> AppResult<tauri_plugin_updater::Updater> {
-    let mut b = app.updater_builder().timeout(Duration::from_secs(30));
+    let mut b = app
+        .updater_builder()
+        .timeout(Duration::from_secs(30))
+        .endpoints(vec![
+            endpoint_for(&channel(app)).parse().expect("sabit adres"),
+        ])
+        .map_err(|e| AppError::Other(format!("Güncelleme adresi geçersiz: {e}")))?;
     // Test için uç nokta geçersiz kılma. Güvenlidir: imza yine gömülü anahtarla doğrulanır ve
     // sürüm derlemelerinde HTTPS dışı adresler eklenti tarafından reddedilir.
     // Yalnızca hata ayıklama derlemelerinde geçerlidir.
@@ -73,7 +105,8 @@ pub async fn check(app: &AppHandle) -> AppResult<Option<UpdateInfo>> {
     let _ = state
         .db
         .with(|c| crate::db::settings::set(c, LAST_CHECK_KEY, &serde_json::json!(now_ms())));
-    let out = result.as_ref().map(info);
+    let ch = channel(app);
+    let out = result.as_ref().map(|u| info(u, &ch));
     *app.state::<UpdateState>()
         .pending
         .lock()
@@ -82,12 +115,13 @@ pub async fn check(app: &AppHandle) -> AppResult<Option<UpdateInfo>> {
 }
 
 pub fn pending(app: &AppHandle) -> Option<UpdateInfo> {
+    let ch = channel(app);
     app.state::<UpdateState>()
         .pending
         .lock()
         .unwrap_or_else(|e| e.into_inner())
         .as_ref()
-        .map(info)
+        .map(|u| info(u, &ch))
 }
 
 pub fn last_check(app: &AppHandle) -> Option<i64> {
@@ -229,4 +263,20 @@ pub async fn verify_only(app: &AppHandle) -> AppResult<u64> {
         .await
         .map_err(|e| AppError::Other(format!("İmza doğrulanamadı: {e}")))?;
     Ok(bytes.len() as u64)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn stable_channel_never_points_at_prereleases() {
+        assert!(endpoint_for("stable").contains("/releases/latest/download/"));
+        assert_eq!(endpoint_for("bilinmeyen"), STABLE_ENDPOINT);
+        assert!(endpoint_for("prerelease").contains("updater-prerelease"));
+        for e in [STABLE_ENDPOINT, PRERELEASE_ENDPOINT] {
+            assert!(e.starts_with("https://"));
+            assert!(e.parse::<tauri::Url>().is_ok());
+        }
+    }
 }

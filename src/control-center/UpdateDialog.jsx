@@ -62,6 +62,7 @@ export function UpdateDialog() {
     >
       <p>
         Ivily Desktop <strong>{update?.version}</strong> yüklenebilir (şu anki sürüm: {update?.current}).
+        {update?.channel === 'prerelease' ? <span className="upd-pre"> Ön sürüm kanalından: yeni özellikler içerir, hata barındırabilir.</span> : null}
       </p>
       {update?.notes ? <div className="upd-notes">{update.notes}</div> : null}
       {busy ? (

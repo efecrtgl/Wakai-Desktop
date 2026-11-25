@@ -1,0 +1,29 @@
+# Ön sürüm güncelleme kanalı: bir sürüm YAYIMLANDIĞINDA (ön sürüm ya da kararlı) o sürümün
+# latest.json bildirimi sabit "updater-prerelease" sürümüne kopyalanır. Ön sürüm kanalındaki
+# uygulamalar bu dosyayı okur (src-tauri/src/updater.rs, PRERELEASE_ENDPOINT); kararlı kanal
+# GitHub'ın "latest" bağlantısını kullanır ve ön sürümleri hiç görmez.
+# Bildirim imzalı paketlere işaret eder; imza uygulamada gömülü açık anahtarla doğrulanır.
+name: Prerelease channel
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  channel:
+    if: github.event.release.tag_name != 'updater-prerelease'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy latest.json to the prerelease channel
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern latest.json --dir .
+          if ! gh release view updater-prerelease --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create updater-prerelease --repo "$GITHUB_REPOSITORY" --prerelease               --title "Ön sürüm kanalı (otomatik)" --notes "Uygulamanın ön sürüm kanalı için bildirim. Elle düzenlemeyin."
+          fi
+          gh release upload updater-prerelease latest.json --repo "$GITHUB_REPOSITORY" --clobber

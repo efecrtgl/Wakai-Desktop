@@ -21,6 +21,8 @@ Bu projedeki önemli değişiklikler bu dosyada belgelenir. Biçim [Keep a Chang
 - Masaüstü kedileri de temanın kedi paletini kullanır.
 - Profiller artık bir tema (ve çeşidi) da seçebilir; profil değişince Kedi Evi ve widget yerleşimi korunur.
 - Kediler bölümü: sahiplenirken ikincil özellik seçimi, kedi kartında anılar.
+- Güncelleme kanalı: Kararlı (varsayılan) ya da Ön sürüm. Kararlı kanaldaki kullanıcılara ön sürüm asla önerilmez.
+- Sürüm iş akışı artık taslak oluşturur; sürüm, depo sahibi yayımlayana kadar kullanıcılara ulaşmaz.
 - Erişilebilirlik: yazı boyutu (%85–140), yüksek karşıtlık, animasyon yoğunluğu, arayüz sesleri (varsayılan kapalı), klavye kısayolları listesi.
 
 ### Değişti

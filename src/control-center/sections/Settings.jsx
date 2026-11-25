@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Badge, Button, Card, Dialog, ErrorNote, Loading, Toggle } from '../../ui/components.jsx';
+import { Badge, Button, Card, Dialog, ErrorNote, Loading, Segmented, Toggle } from '../../ui/components.jsx';
 import { call } from '../../lib/ipc.js';
 import { bytes } from '../../lib/format.js';
 import { tr } from '../../lib/i18n.js';
@@ -45,6 +45,16 @@ function Updates({ settings, update }) {
         description="Açılıştan kısa süre sonra, en fazla günde bir kez arka planda denetlenir. Güncelleme sizin onayınız olmadan asla kurulmaz."
         checked={settings.auto_update_check}
         onChange={(v) => update({ auto_update_check: v })}
+      />
+      <Segmented
+        label="Güncelleme kanalı"
+        value={settings.update_channel}
+        options={[
+          { value: 'stable', label: 'Kararlı' },
+          { value: 'prerelease', label: 'Ön sürüm' },
+        ]}
+        onChange={(v) => update({ update_channel: v })}
+        description={settings.update_channel === 'prerelease' ? 'Ön sürümler yeni özellikleri erken getirir ama hata içerebilir. Kararlı kanala dönebilirsiniz; kurulu sürüm geri alınmaz (Sürüm geçmişi’nden dönülebilir).' : 'Yalnızca kararlı sürümler önerilir. Ön sürümler size asla kendiliğinden önerilmez.'}
       />
       <dl className="cc-dl">
         <dt>Şu anki sürüm</dt>

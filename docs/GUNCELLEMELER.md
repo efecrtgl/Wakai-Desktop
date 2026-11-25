@@ -1,6 +1,6 @@
 # Otomatik güncellemeler
 
-Wakai Desktop 1.1.0'dan itibaren yeni sürümleri kendisi bulur. Güncellemeler resmi **Tauri Updater** eklentisiyle, **GitHub Releases** üzerinden dağıtılır ve **dijital olarak imzalanır**.
+Ivily Desktop (1.1.0'a kadar adı Wakai Desktop) yeni sürümleri kendisi bulur. Güncellemeler resmi **Tauri Updater** eklentisiyle, **GitHub Releases** üzerinden dağıtılır ve **dijital olarak imzalanır**.
 
 ## Kullanıcı için
 
@@ -13,7 +13,20 @@ Wakai Desktop 1.1.0'dan itibaren yeni sürümleri kendisi bulur. Güncellemeler 
   2. veritabanı yedeklenir (`yedekler/wakai-…-guncelleme-oncesi.db`),
   3. çalışan program geri dönüş için saklanır (`previous/<sürüm>/`, en fazla 2 sürüm).
 - Kurulum yükleyicinin "pasif" kipinde yapılır: küçük bir ilerleme penceresi görünür, soru sorulmaz, uygulama kapanır ve kurulum bitince yeniden açılır.
-- **Ayarlar → Güncellemeler:** otomatik denetimi kapatma, elle "Güncellemeleri denetle", şu anki sürüm ve son denetim zamanı.
+- **Ayarlar → Güncellemeler:** otomatik denetimi kapatma, elle "Güncellemeleri denetle", şu anki sürüm, son denetim zamanı ve **güncelleme kanalı**.
+
+### Kararlı ve ön sürüm kanalı (1.1.5)
+
+| Kanal | Denetlenen adres | Ne gelir? |
+|---|---|---|
+| **Kararlı** (varsayılan) | `releases/latest/download/latest.json` | Yalnızca kararlı sürümler. GitHub'ın "latest" bağlantısı ön sürümleri ve taslakları hiç göstermez; kararlı kanaldaki kullanıcı ön sürüme zorlanamaz. |
+| **Ön sürüm** | `releases/download/updater-prerelease/latest.json` | Yayımlanan en yeni sürüm (ön sürüm ya da kararlı). Güncelleme penceresinde "Ön sürüm kanalından" notu görünür. |
+
+1.1.0 kullanıcılarının uygulamasında kanal seçimi yoktur; kararlı kanalı kullanırlar. Bu nedenle
+**1.1.5 ön sürüm olarak yayımlanırsa 1.1.0 kurulumlarına önerilmez** (doğru davranış); denemek
+isteyen 1.1.0 kullanıcısı 1.1.5 yükleyicisini bir kez elle kurar. Not: GitHub'da yalnızca ön
+sürümler varken kararlı kanaldaki elle denetim "Güncelleme denetlenemedi" der (yayımlanmış
+kararlı sürüm yok).
 
 ## 1.0.0'dan geçiş (tek seferlik, elle)
 
@@ -45,11 +58,14 @@ gh secret set TAURI_SIGNING_PRIVATE_KEY < "$env:USERPROFILE\.tauri\wakai-desktop
 ### Sürüm yayınlama
 
 1. `package.json`, `src-tauri/Cargo.toml` ve `src-tauri/tauri.conf.json` içindeki sürümü yükseltin, `CHANGELOG.md`'yi güncelleyin.
-2. Commit atın ve etiketleyin: `git tag v1.2.0 && git push origin v1.2.0`.
-3. `.github/workflows/release.yml` testleri çalıştırır, NSIS yükleyicisini derler, imzalar ve GitHub Release'e şunları yükler:
-   - `Wakai-Desktop_<sürüm>_x64-setup.exe` ve `.sig` imza dosyası,
+2. Commit atın ve etiketleyin: `git tag v1.2.0 && git push origin v1.2.0` (ön sürüm için etikete `-pre` ekleyin ya da iş akışını elle "prerelease" seçerek çalıştırın).
+3. `.github/workflows/release.yml` testleri çalıştırır, NSIS yükleyicisini derler, imzalar ve **taslak** bir GitHub Release'e şunları yükler:
+   - `Ivily.Desktop_<sürüm>_x64-setup.exe` ve `.sig` imza dosyası,
    - `latest.json` (güncelleyici bildirimi).
-4. Uygulamalar `https://github.com/efecrtgl/Wakai-Desktop/releases/latest/download/latest.json` adresini denetler. Bu yüzden yayın **taslak ya da ön sürüm olmamalıdır** ("latest" yalnızca tam sürümleri gösterir).
+4. Taslak hiçbir kullanıcıya ulaşmaz. GitHub'da sürüm notlarını kontrol edip **Publish release** dediğinizde yayımlanır. Yayımlanınca `.github/workflows/prerelease-channel.yml` `latest.json`'u ön sürüm kanalına kopyalar.
+5. Kararlı kanal `releases/latest/download/latest.json` adresini denetler; bu adres yalnızca yayımlanmış, ön sürüm olmayan en son sürümü gösterir.
+
+> **Önemli:** Depo şu an herkese açık değil (oturum açmadan `github.com/efecrtgl/Wakai-Desktop` 404 döner). Kurulu uygulamalar oturum açmadığı için güncelleme bildirimine ve dosyalara erişemez. Otomatik güncellemenin çalışması için ya depo herkese açık yapılmalı ya da yalnızca sürümlerin yayımlandığı herkese açık bir depo kullanılmalı (bu durumda `src-tauri/src/updater.rs` içindeki iki adres değiştirilir).
 
 Gizli tanımlı değilse iş akışı "TAURI_SIGNING_PRIVATE_KEY secret is missing" hatasıyla durur; imzasız sürüm yayınlanmaz.
 

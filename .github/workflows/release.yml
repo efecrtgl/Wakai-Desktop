@@ -1,5 +1,8 @@
 # Ivily Desktop sürüm derlemesi: v* etiketi itildiğinde imzalı NSIS yükleyicisi,
-# .sig imza dosyası ve güncelleyici bildirimi (latest.json) bir GitHub Release'e yüklenir.
+# .sig imza dosyası ve güncelleyici bildirimi (latest.json) TASLAK bir GitHub Release'e yüklenir.
+# Sürüm, depo sahibi GitHub'da "Publish release" diyene kadar yayımlanmaz ve kullanıcılara
+# ulaşmaz. Etiket "-pre" içeriyorsa (ör. v1.1.6-pre) ya da elle çalıştırmada "prerelease"
+# seçildiyse sürüm ön sürüm olarak işaretlenir; kararlı kanaldaki uygulamalar ön sürümleri görmez.
 #
 # Gerekli depo gizlileri (Settings → Secrets and variables → Actions):
 #   TAURI_SIGNING_PRIVATE_KEY           — güncelleme imzalama özel anahtarının içeriği
@@ -11,6 +14,11 @@ on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Ön sürüm olarak işaretle'
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -61,7 +69,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'Ivily Desktop ${{ github.ref_name }}'
           releaseBody: 'Değişiklikler için CHANGELOG.md dosyasına bakın.'
-          releaseDraft: false
-          prerelease: false
+          releaseDraft: true
+          prerelease: ${{ contains(github.ref_name, '-pre') || inputs.prerelease == true }}
           includeUpdaterJson: true
           args: --bundles nsis
